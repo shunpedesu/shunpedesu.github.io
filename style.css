@@ -226,6 +226,26 @@ main {
 }
 .btn--ghost:hover { background: rgba(0,0,0,0.04); opacity: 1; }
 
+/* ===== Game list ===== */
+.game-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.game-list li {
+  font-size: 0.95rem;
+  color: var(--ink);
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.game-list li::before {
+  content: "🎮 ";
+}
+
 /* ===== Project footer link ===== */
 .project__more {
   margin-top: 40px;
