@@ -204,6 +204,7 @@
   </footer>
 
   <script>
+    window.addEventListener('beforeinstallprompt', (e) => e.preventDefault());
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
