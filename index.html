@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>window.addEventListener('beforeinstallprompt', (e) => e.preventDefault());</script>
   <title>しゅんぺ | 人生1ミリ研究所 × チームグンマサイタマゲーム × クリエイター</title>
   <meta name="description" content="人生の寄り道を、仕事にしている人。著書・アプリ・ゲーム・AI作品。" />
 
@@ -204,7 +205,6 @@
   </footer>
 
   <script>
-    window.addEventListener('beforeinstallprompt', (e) => e.preventDefault());
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (e.isIntersecting) {
