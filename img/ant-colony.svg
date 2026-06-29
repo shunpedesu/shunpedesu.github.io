@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#d4a96a"/>
+      <stop offset="100%" stop-color="#7a4c20"/>
+    </radialGradient>
+    <radialGradient id="nestGrad" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#8b4513"/>
+      <stop offset="100%" stop-color="#3d1f00"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 砂粒テクスチャ風の微細ドット -->
+  <rect width="1200" height="630" fill="none" opacity="0.04"
+    style="background-image: radial-gradient(circle, #000 1px, transparent 1px)"/>
+
+  <!-- フェロモン軌跡（薄い曲線） -->
+  <g opacity="0.18" stroke="#5a2e00" stroke-width="2.5" fill="none">
+    <path d="M 900,420 Q 750,360 600,315 Q 450,270 300,220"/>
+    <path d="M 900,430 Q 740,375 600,325 Q 460,278 310,230"/>
+    <path d="M 880,380 Q 730,330 600,300 Q 470,265 320,210"/>
+    <path d="M 920,460 Q 760,390 600,340 Q 440,285 290,240"/>
+    <path d="M 870,350 Q 720,310 600,285 Q 478,258 330,195"/>
+  </g>
+
+  <!-- 巣（中心左） -->
+  <circle cx="360" cy="315" r="52" fill="url(#nestGrad)" opacity="0.95"/>
+  <circle cx="352" cy="307" r="24" fill="#8b4513" opacity="0.7"/>
+  <text x="360" y="390" text-anchor="middle"
+    font-family="'Hiragino Mincho ProN','Yu Mincho',Georgia,serif"
+    font-size="18" fill="#f5deb3" opacity="0.8" letter-spacing="2">巣</text>
+
+  <!-- アリ群（点で表現） -->
+  <!-- 探索中のアリ（黒） -->
+  <g fill="#111111" opacity="0.85">
+    <ellipse cx="520" cy="180" rx="9" ry="5.5" transform="rotate(30,520,180)"/>
+    <ellipse cx="620" cy="140" rx="9" ry="5.5" transform="rotate(-15,620,140)"/>
+    <ellipse cx="740" cy="200" rx="9" ry="5.5" transform="rotate(45,740,200)"/>
+    <ellipse cx="850" cy="160" rx="9" ry="5.5" transform="rotate(20,850,160)"/>
+    <ellipse cx="950" cy="230" rx="9" ry="5.5" transform="rotate(-30,950,230)"/>
+    <ellipse cx="480" cy="420" rx="9" ry="5.5" transform="rotate(60,480,420)"/>
+    <ellipse cx="600" cy="460" rx="9" ry="5.5" transform="rotate(-45,600,460)"/>
+    <ellipse cx="730" cy="430" rx="9" ry="5.5" transform="rotate(15,730,430)"/>
+    <ellipse cx="860" cy="400" rx="9" ry="5.5" transform="rotate(-20,860,400)"/>
+    <ellipse cx="980" cy="350" rx="9" ry="5.5" transform="rotate(35,980,350)"/>
+    <ellipse cx="1050" cy="180" rx="9" ry="5.5" transform="rotate(-10,1050,180)"/>
+    <ellipse cx="1100" cy="300" rx="9" ry="5.5" transform="rotate(50,1100,300)"/>
+    <ellipse cx="200" cy="200" rx="9" ry="5.5" transform="rotate(25,200,200)"/>
+    <ellipse cx="140" cy="380" rx="9" ry="5.5" transform="rotate(-35,140,380)"/>
+    <ellipse cx="220" cy="460" rx="9" ry="5.5" transform="rotate(70,220,460)"/>
+    <ellipse cx="560" cy="260" rx="9" ry="5.5" transform="rotate(-25,560,260)"/>
+    <ellipse cx="680" cy="300" rx="9" ry="5.5" transform="rotate(40,680,300)"/>
+    <ellipse cx="800" cy="270" rx="9" ry="5.5" transform="rotate(-50,800,270)"/>
+  </g>
+
+  <!-- 帰巣中のアリ（赤） -->
+  <g fill="#cc2200" opacity="0.85">
+    <ellipse cx="450" cy="290" rx="9" ry="5.5" transform="rotate(170,450,290)"/>
+    <ellipse cx="510" cy="310" rx="9" ry="5.5" transform="rotate(165,510,310)"/>
+    <ellipse cx="420" cy="340" rx="9" ry="5.5" transform="rotate(175,420,340)"/>
+    <ellipse cx="560" cy="295" rx="9" ry="5.5" transform="rotate(160,560,295)"/>
+    <ellipse cx="490" cy="260" rx="9" ry="5.5" transform="rotate(180,490,260)"/>
+  </g>
+
+  <!-- テキストエリア（右側） -->
+  <!-- メインタイトル -->
+  <text x="800" y="260"
+    font-family="'Hiragino Mincho ProN','Yu Mincho',Georgia,serif"
+    font-size="58" font-weight="300"
+    fill="#fff8ef" letter-spacing="6"
+    text-anchor="middle" opacity="0.96">
+    アリコロニー研究室
+  </text>
+
+  <!-- サブタイトル -->
+  <text x="800" y="315"
+    font-family="'Hiragino Mincho ProN','Yu Mincho',Georgia,serif"
+    font-size="22" font-weight="300"
+    fill="#e8c88a" letter-spacing="8"
+    text-anchor="middle" opacity="0.82">
+    ― ただ、群れを見つめる ―
+  </text>
+
+  <!-- 区切り線 -->
+  <line x1="620" y1="345" x2="980" y2="345" stroke="#c8a060" stroke-width="0.8" opacity="0.5"/>
+
+  <!-- 説明文 -->
+  <text x="800" y="385"
+    font-family="'Hiragino Mincho ProN','Yu Mincho',Georgia,serif"
+    font-size="18" font-weight="300"
+    fill="#d4b896" letter-spacing="3"
+    text-anchor="middle" opacity="0.75">
+    操作はありません。
+  </text>
+  <text x="800" y="415"
+    font-family="'Hiragino Mincho ProN','Yu Mincho',Georgia,serif"
+    font-size="18" font-weight="300"
+    fill="#d4b896" letter-spacing="3"
+    text-anchor="middle" opacity="0.75">
+    ただ、アリの群れの流れを見つめる観察室です。
+  </text>
+
+  <!-- クレジット -->
+  <text x="800" y="490"
+    font-family="'Hiragino Mincho ProN','Yu Mincho',Georgia,serif"
+    font-size="15" font-weight="300"
+    fill="#c8a060" letter-spacing="2"
+    text-anchor="middle" opacity="0.65">
+    明日なんとかなるかも研究所 / しゅんぺ
+  </text>
+
+  <!-- URL -->
+  <text x="800" y="530"
+    font-family="Georgia, serif"
+    font-size="14" font-weight="300"
+    fill="#b8905a" letter-spacing="1"
+    text-anchor="middle" opacity="0.55">
+    ant-colony-app.vercel.app
+  </text>
+
+  <!-- 外枠 -->
+  <rect x="2" y="2" width="1196" height="626" fill="none"
+    stroke="#8b5e2a" stroke-width="3" opacity="0.4" rx="4"/>
+</svg>

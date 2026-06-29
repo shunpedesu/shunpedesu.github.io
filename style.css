@@ -151,13 +151,26 @@ main {
 .card {
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 28px 26px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
   transition: border-color .3s ease, transform .3s ease;
 }
 .card:hover { border-color: var(--ink); transform: translateY(-3px); }
+.card__thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+.card__body {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
 .card__title {
   font-size: 1.05rem;
   font-weight: 700;
