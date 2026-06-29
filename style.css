@@ -131,6 +131,7 @@ main {
   font-size: clamp(0.95rem, 2.6vw, 1.05rem);
   color: var(--muted);
   line-height: 2;
+  text-wrap: balance;
 }
 
 /* ===== Group (著書 / アプリ / ゲーム / 作品) ===== */
