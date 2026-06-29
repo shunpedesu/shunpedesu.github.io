@@ -164,6 +164,12 @@ main {
   object-fit: cover;
   display: block;
 }
+.card__thumb--book {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: top;
+  background: #f8f8f6;
+}
 .card__body {
   padding: 22px 24px;
   display: flex;
