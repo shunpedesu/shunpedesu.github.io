@@ -93,6 +93,10 @@ main {
   align-items: center;
   gap: 16px;
 }
+.hero__illust {
+  width: 180px;
+  height: auto;
+}
 .hero__name {
   font-size: clamp(1.7rem, 5vw, 2.3rem);
   font-weight: 700;
