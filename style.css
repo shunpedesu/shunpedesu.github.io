@@ -108,6 +108,30 @@ main {
   color: var(--muted);
 }
 
+/* ===== Hero nav ===== */
+.hero__nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.hero__nav-btn {
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  transition: border-color .25s ease, color .25s ease;
+  white-space: nowrap;
+}
+.hero__nav-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
 /* ===== Project section ===== */
 .project { padding: 80px 0; }
 .project__head {
