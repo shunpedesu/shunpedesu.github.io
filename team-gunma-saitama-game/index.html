@@ -495,6 +495,98 @@
       box-shadow: 3px 3px 0 var(--ink);
     }
 
+    .diagnosis {
+      background: #fff5dc;
+      border-block: 1px solid var(--line);
+    }
+
+    .diagnosis-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .quiz-box,
+    .result-box {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 6px 6px 0 rgba(28, 34, 39, .9);
+      padding: clamp(18px, 2.4vw, 24px);
+    }
+
+    .quiz-step + .quiz-step {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px dashed rgba(28, 34, 39, .24);
+    }
+
+    .quiz-step p {
+      margin: 0 0 10px;
+      color: var(--green-dark);
+      font-weight: 900;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .quiz-option {
+      min-height: 40px;
+      padding: 9px 11px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(28, 34, 39, .85);
+    }
+
+    .quiz-option.is-selected {
+      background: var(--gold);
+      color: var(--ink);
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0 rgba(28, 34, 39, .85);
+    }
+
+    .result-box {
+      position: sticky;
+      top: 84px;
+    }
+
+    .result-box__label {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(216, 76, 61, .12);
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .result-box h3 {
+      font-size: 26px;
+    }
+
+    .result-box p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.9;
+      font-weight: 700;
+    }
+
+    .result-box .button {
+      width: 100%;
+      margin-top: 18px;
+    }
+
     .members {
       background: #eef7f0;
       border-block: 1px solid var(--line);
@@ -710,6 +802,7 @@
       .hero__inner,
       .section-head,
       .about-grid,
+      .diagnosis-panel,
       .contact-box {
         grid-template-columns: 1fr;
       }
@@ -776,8 +869,18 @@
 
       .game-card__body,
       .member-card,
+      .quiz-box,
+      .result-box,
       .info-panel {
         padding: 16px;
+      }
+
+      .result-box {
+        position: static;
+      }
+
+      .quiz-options {
+        display: grid;
       }
 
       .member-card {
@@ -966,6 +1069,54 @@
       </div>
     </section>
 
+    <section id="diagnosis" class="diagnosis" aria-label="おすすめゲーム診断">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-kicker">Quick Quest</p>
+            <h2>あなたに合う事件簿は？</h2>
+          </div>
+          <p class="section-copy">3つ選ぶだけで、今日のあなたにおすすめのゲームを出します。直感でどうぞ。</p>
+        </header>
+
+        <div class="diagnosis-panel">
+          <div class="quiz-box">
+            <div class="quiz-step">
+              <p>Q1. 今夜の気分は？</p>
+              <div class="quiz-options">
+                <button class="quiz-option is-selected" type="button" data-question="mood" data-game="hazard">ぞわっとしたい</button>
+                <button class="quiz-option" type="button" data-question="mood" data-game="karakkaze">じっくり読みたい</button>
+                <button class="quiz-option" type="button" data-question="mood" data-game="monsters">外に出たくなる</button>
+              </div>
+            </div>
+            <div class="quiz-step">
+              <p>Q2. 好きな舞台は？</p>
+              <div class="quiz-options">
+                <button class="quiz-option is-selected" type="button" data-question="place" data-game="hazard">廃旅館</button>
+                <button class="quiz-option" type="button" data-question="place" data-game="karakkaze">雪の温泉街</button>
+                <button class="quiz-option" type="button" data-question="place" data-game="monsters">地図の上</button>
+              </div>
+            </div>
+            <div class="quiz-step">
+              <p>Q3. 遊び方の好みは？</p>
+              <div class="quiz-options">
+                <button class="quiz-option is-selected" type="button" data-question="play" data-game="hazard">逃げて解く</button>
+                <button class="quiz-option" type="button" data-question="play" data-game="karakkaze">読んで推理</button>
+                <button class="quiz-option" type="button" data-question="play" data-game="monsters">歩いて集める</button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="result-box" aria-live="polite">
+            <span class="result-box__label">診断結果</span>
+            <h3 id="diagnosisTitle">GUNMA HAZARD</h3>
+            <p id="diagnosisText">今日は、廃旅館でひやっとする日です。上毛かるたを握りしめて、怪物から逃げましょう。</p>
+            <a id="diagnosisLink" class="button" href="https://shunpedesu.github.io/gunma-hazard/lp/" target="_blank" rel="noopener noreferrer">この事件簿を開く</a>
+          </aside>
+        </div>
+      </div>
+    </section>
+
     <section id="members" class="members" aria-label="メンバー">
       <div class="section-inner">
         <header class="section-head">
@@ -1088,5 +1239,50 @@
     </span>
     <a href="https://shunpedesu.github.io/" target="_blank" rel="noopener noreferrer">しゅんぺのページへ</a>
   </footer>
+  <script>
+    const diagnosisData = {
+      hazard: {
+        title: "GUNMA HAZARD",
+        text: "今日は、廃旅館でひやっとする日です。上毛かるたを握りしめて、怪物から逃げましょう。",
+        href: "https://shunpedesu.github.io/gunma-hazard/lp/"
+      },
+      karakkaze: {
+        title: "からっかぜの夜",
+        text: "今日は、雪の温泉街でじっくり推理する日です。密室の空気を吸いながら、事件の奥へ進みましょう。",
+        href: "https://shunpedesu.github.io/karakkaze-lp/"
+      },
+      monsters: {
+        title: "群馬モンスターズ",
+        text: "今日は、地図を開いて探しに行く日です。GPSと8bitの気配を連れて、ローカル探索へ出発しましょう。",
+        href: "https://gunma-monsters.vercel.app/lp.html"
+      }
+    };
+
+    const answers = { mood: "hazard", place: "hazard", play: "hazard" };
+    const titleEl = document.getElementById("diagnosisTitle");
+    const textEl = document.getElementById("diagnosisText");
+    const linkEl = document.getElementById("diagnosisLink");
+
+    function updateDiagnosis() {
+      const counts = { hazard: 0, karakkaze: 0, monsters: 0 };
+      Object.values(answers).forEach((game) => counts[game] += 1);
+      const winner = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+      const result = diagnosisData[winner];
+      titleEl.textContent = result.title;
+      textEl.textContent = result.text;
+      linkEl.href = result.href;
+    }
+
+    document.querySelectorAll(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const question = button.dataset.question;
+        answers[question] = button.dataset.game;
+        document.querySelectorAll(`[data-question="${question}"]`).forEach((item) => {
+          item.classList.toggle("is-selected", item === button);
+        });
+        updateDiagnosis();
+      });
+    });
+  </script>
 </body>
 </html>
