@@ -3,12 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>チームグンマサイタマゲーム | 群馬・埼玉発のインディーゲームチーム</title>
-  <meta name="description" content="チームグンマサイタマゲームは、群馬・埼玉の風土やローカルな物語をゲームに変えるインディーゲームチームです。" />
+  <title>チームグンマサイタマゲーム | 群馬と埼玉を、遊び場に。</title>
+  <meta name="description" content="群馬と埼玉の風土を、なんか遊んでみたいゲームに変えるインディーゲームチーム。" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="チームグンマサイタマゲーム" />
-  <meta property="og:description" content="群馬・埼玉の風土やローカルな物語をゲームに変えるインディーゲームチーム。" />
-  <meta property="og:image" content="https://shunpedesu.github.io/img/gunma-hazard.png" />
+  <meta property="og:site_name" content="チームグンマサイタマゲーム" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta property="og:title" content="チームグンマサイタマゲーム | 群馬と埼玉を、遊び場に。" />
+  <meta property="og:description" content="群馬と埼玉の風土を、なんか遊んでみたいゲームに変えるインディーゲームチーム。" />
+  <meta property="og:url" content="https://shunpedesu.github.io/team-gunma-saitama-game/" />
+  <meta property="og:image" content="https://shunpedesu.github.io/team-gunma-saitama-game/ogp.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="チームグンマサイタマゲーム | 群馬と埼玉を、遊び場に。" />
+  <meta name="twitter:description" content="群馬と埼玉の風土を、なんか遊んでみたいゲームに変えるインディーゲームチーム。" />
+  <meta name="twitter:image" content="https://shunpedesu.github.io/team-gunma-saitama-game/ogp.png" />
+  <link rel="canonical" href="https://shunpedesu.github.io/team-gunma-saitama-game/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
@@ -728,13 +738,53 @@
         padding-top: 34px;
       }
 
+      main section {
+        padding-top: 46px;
+        padding-bottom: 54px;
+      }
+
       h1 {
         font-size: clamp(42px, 13vw, 58px);
       }
 
       .hero__lead {
         font-size: 16px;
-        line-height: 1.75;
+        line-height: 1.7;
+      }
+
+      .keyword-cloud,
+      .case-file,
+      .member-loadout,
+      .quest-grid {
+        display: none;
+      }
+
+      .section-head {
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .games,
+      .member-grid {
+        gap: 16px;
+      }
+
+      .game-card__body,
+      .member-card,
+      .info-panel {
+        padding: 16px;
+      }
+
+      .member-card {
+        display: grid;
+        grid-template-columns: 92px minmax(0, 1fr);
+        column-gap: 14px;
+        align-items: start;
+      }
+
+      .member-portrait {
+        grid-row: span 4;
+        margin-bottom: 0;
       }
 
       .hero__actions {
@@ -800,7 +850,7 @@
       <div class="hero__inner">
         <div class="hero__copy">
           <p class="eyebrow">群馬・埼玉発 / ちょっと変なゲーム制作チーム</p>
-          <h1>群馬と埼玉を、<br><span class="hero__accent">遊び場にしている。</span></h1>
+          <h1>群馬と埼玉を、<br><span class="hero__accent">遊び場に。</span></h1>
           <p class="hero__lead">チームグンマサイタマゲームは、群馬と埼玉の風土を「なんか遊んでみたい」に変えるインディーゲームチームです。</p>
           <div class="keyword-cloud" aria-label="制作テーマ">
             <span style="--tilt:-2deg">廃旅館</span>
