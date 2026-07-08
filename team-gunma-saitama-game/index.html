@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>チームグンマサイタマゲーム | 群馬・埼玉発のインディーゲームチーム</title>
+  <meta name="description" content="チームグンマサイタマゲームは、群馬・埼玉の風土やローカルな物語をゲームに変えるインディーゲームチームです。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="チームグンマサイタマゲーム" />
+  <meta property="og:description" content="群馬・埼玉の風土やローカルな物語をゲームに変えるインディーゲームチーム。" />
+  <meta property="og:image" content="https://shunpedesu.github.io/img/gunma-hazard.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1c2227;
+      --muted: #617078;
+      --paper: #fffdf7;
+      --cream: #f5efe2;
+      --green: #13785b;
+      --green-dark: #0d4d3d;
+      --red: #d84c3d;
+      --gold: #d8a640;
+      --line: rgba(28, 34, 39, .14);
+      --shadow: 0 18px 48px rgba(33, 48, 54, .14);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans JP", system-ui, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(19, 120, 91, .08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(19, 120, 91, .08) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px clamp(18px, 4vw, 48px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 247, .92);
+      backdrop-filter: blur(14px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      line-height: 1.1;
+    }
+
+    .brand__mark {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      color: #fff;
+      background: var(--green);
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      box-shadow: 3px 3px 0 var(--gold);
+      font-size: 14px;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .site-nav a {
+      padding: 8px 10px;
+      border-radius: 999px;
+    }
+
+    .site-nav a:hover {
+      color: var(--ink);
+      background: rgba(19, 120, 91, .1);
+    }
+
+    .hero {
+      min-height: calc(100vh - 66px);
+      display: grid;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: clamp(44px, 6vw, 78px) clamp(18px, 5vw, 72px) clamp(36px, 5vw, 58px);
+      background:
+        radial-gradient(circle at 88% 22%, rgba(216, 76, 61, .38), transparent 28%),
+        linear-gradient(135deg, rgba(13, 77, 61, .98) 0%, rgba(19, 120, 91, .9) 45%, rgba(255, 253, 247, .82) 45.2%, rgba(255, 253, 247, .92) 100%),
+        var(--green-dark);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      mix-blend-mode: overlay;
+    }
+
+    .hero__inner {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 590px) minmax(360px, 1fr);
+      gap: clamp(24px, 5vw, 62px);
+      align-items: center;
+    }
+
+    .hero__copy {
+      color: #fff;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      padding: 9px 13px;
+      border: 2px solid rgba(255, 255, 255, .75);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 18px 0 18px;
+      max-width: 820px;
+      font-size: clamp(44px, 6.6vw, 78px);
+      line-height: 1.02;
+      font-weight: 900;
+      text-wrap: balance;
+    }
+
+    .hero__accent {
+      color: var(--gold);
+      text-shadow: 3px 3px 0 rgba(28, 34, 39, .8);
+    }
+
+    .hero__lead {
+      max-width: 640px;
+      margin: 0;
+      color: rgba(255, 255, 255, .88);
+      font-size: clamp(17px, 2vw, 22px);
+      line-height: 1.85;
+      font-weight: 700;
+    }
+
+    .hero__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .keyword-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+      max-width: 620px;
+    }
+
+    .keyword-cloud span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border: 2px solid rgba(255, 255, 255, .78);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .14);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+      transform: rotate(var(--tilt, 0deg));
+    }
+
+    .hero__copy .button {
+      background: var(--gold);
+      color: var(--ink);
+      border-color: #fff;
+      box-shadow: 4px 4px 0 #fff;
+    }
+
+    .hero__copy .button--ghost {
+      background: rgba(255, 255, 255, .12);
+      color: #fff;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 18px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--green);
+      color: #fff;
+      box-shadow: 4px 4px 0 var(--ink);
+      font-weight: 900;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .button:hover {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .button--ghost {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .hero__stage {
+      display: grid;
+      gap: 14px;
+    }
+
+    .hero-card {
+      position: relative;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 8px 8px 0 rgba(28, 34, 39, .95);
+      overflow: hidden;
+      transform: rotate(1.5deg);
+    }
+
+    .hero-card__image {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .hero-card__body {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      font-weight: 900;
+    }
+
+    .hero-card__body span {
+      color: var(--red);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .hero-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      transform: rotate(-1deg);
+    }
+
+    .hero-mini {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 5px 5px 0 rgba(28, 34, 39, .9);
+      overflow: hidden;
+    }
+
+    .hero-mini img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .hero-mini span {
+      display: block;
+      padding: 9px 10px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .stat {
+      padding: 13px 12px;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 247, .94);
+      box-shadow: 4px 4px 0 rgba(28, 34, 39, .86);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--red);
+      font-size: 19px;
+      line-height: 1.1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    main section {
+      padding: clamp(68px, 9vw, 118px) clamp(18px, 5vw, 72px);
+    }
+
+    .section-inner {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 420px);
+      gap: 34px;
+      align-items: end;
+      margin-bottom: 34px;
+    }
+
+    .section-kicker {
+      margin: 0 0 10px;
+      color: var(--green-dark);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 56px);
+      line-height: 1.1;
+      font-weight: 900;
+      text-wrap: balance;
+    }
+
+    .section-copy {
+      margin: 0;
+      color: var(--muted);
+      line-height: 2;
+      font-weight: 700;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .game-card,
+    .member-card,
+    .info-panel {
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 6px 6px 0 rgba(28, 34, 39, .9);
+      overflow: hidden;
+    }
+
+    .game-card__image {
+      aspect-ratio: 16 / 10;
+      width: 100%;
+      object-fit: cover;
+      border-bottom: 2px solid var(--ink);
+      background: var(--cream);
+    }
+
+    .game-card__body,
+    .member-card,
+    .info-panel {
+      padding: clamp(18px, 2.4vw, 24px);
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      margin-bottom: 12px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(216, 166, 64, .22);
+      color: #6e4c00;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .case-file {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding: 12px;
+      border: 1px dashed rgba(28, 34, 39, .32);
+      border-radius: var(--radius);
+      background: rgba(245, 239, 226, .72);
+    }
+
+    .case-file__row {
+      display: grid;
+      grid-template-columns: 76px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .case-file__row strong {
+      color: var(--green-dark);
+    }
+
+    .meter {
+      color: var(--red);
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      line-height: 1.35;
+    }
+
+    .game-card p,
+    .member-card p,
+    .info-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.9;
+      font-weight: 600;
+    }
+
+    .game-card .button {
+      margin-top: 18px;
+      width: 100%;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    .members {
+      background: #eef7f0;
+      border-block: 1px solid var(--line);
+    }
+
+    .member-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .member-card__role {
+      margin-bottom: 12px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .member-portrait {
+      width: 100%;
+      aspect-ratio: 1;
+      margin-bottom: 16px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background: var(--cream);
+      box-shadow: 4px 4px 0 rgba(28, 34, 39, .86);
+      object-fit: cover;
+    }
+
+    .member-card h3 {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .member-card small {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .member-loadout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .member-loadout span {
+      padding: 6px 9px;
+      border: 1px solid rgba(28, 34, 39, .18);
+      border-radius: 999px;
+      background: rgba(19, 120, 91, .1);
+      color: var(--green-dark);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 108px minmax(0, 1fr);
+      gap: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .info-row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .info-row dt {
+      color: var(--green-dark);
+      font-weight: 900;
+    }
+
+    .info-row dd {
+      margin: 0;
+      color: var(--ink);
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .contact {
+      background: var(--green-dark);
+      color: #fff;
+    }
+
+    .contact .section-kicker,
+    .contact .section-copy {
+      color: rgba(255, 255, 255, .78);
+    }
+
+    .contact h2 {
+      color: #fff;
+    }
+
+    .contact-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: center;
+      margin-top: 30px;
+      padding: clamp(20px, 3vw, 30px);
+      border: 2px solid #fff;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .08);
+    }
+
+    .contact-box p {
+      margin: 0;
+      color: rgba(255, 255, 255, .82);
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .quest-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .quest-card {
+      padding: 16px;
+      border: 2px solid rgba(255, 255, 255, .82);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .09);
+    }
+
+    .quest-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .quest-card span {
+      display: block;
+      color: rgba(255, 255, 255, .76);
+      line-height: 1.7;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .contact .button {
+      background: var(--gold);
+      color: var(--ink);
+      border-color: #fff;
+      box-shadow: 4px 4px 0 #fff;
+      white-space: nowrap;
+    }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 26px clamp(18px, 5vw, 72px);
+      background: #15191d;
+      color: rgba(255, 255, 255, .78);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .footer__copy {
+      display: grid;
+      gap: 5px;
+    }
+
+    .footer__tagline {
+      color: rgba(255, 255, 255, .52);
+      font-size: 13px;
+    }
+
+    .footer a {
+      color: #fff;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .site-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .site-nav {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .hero {
+        min-height: auto;
+        background:
+          linear-gradient(180deg, rgba(13, 77, 61, .98) 0%, rgba(19, 120, 91, .92) 62%, rgba(255, 253, 247, .9) 62.2%, rgba(255, 253, 247, .96) 100%);
+      }
+
+      .hero__inner,
+      .section-head,
+      .about-grid,
+      .contact-box {
+        grid-template-columns: 1fr;
+      }
+
+      .hero__stage {
+        margin-top: 10px;
+      }
+
+      .games,
+      .member-grid,
+      .quest-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contact-box .button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand {
+        font-size: 15px;
+      }
+
+      .site-nav a {
+        flex: 0 0 auto;
+      }
+
+      .hero {
+        padding-top: 34px;
+      }
+
+      h1 {
+        font-size: clamp(42px, 13vw, 58px);
+      }
+
+      .hero__lead {
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .hero__actions {
+        display: grid;
+      }
+
+      .button {
+        width: 100%;
+      }
+
+      .stat-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .hero-mini-grid {
+        display: none;
+      }
+
+      .stat {
+        padding: 10px 8px;
+      }
+
+      .stat strong {
+        font-size: 16px;
+      }
+
+      .stat span {
+        font-size: 11px;
+      }
+
+      .hero-card {
+        transform: none;
+      }
+
+      .info-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="トップへ戻る">
+      <span class="brand__mark">GS</span>
+      <span>チームグンマサイタマゲーム</span>
+    </a>
+    <nav class="site-nav" aria-label="ページ内リンク">
+      <a href="#games">Games</a>
+      <a href="#members">Members</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-label="チーム紹介">
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow">群馬・埼玉発 / ちょっと変なゲーム制作チーム</p>
+          <h1>群馬と埼玉を、<br><span class="hero__accent">遊び場にしている。</span></h1>
+          <p class="hero__lead">チームグンマサイタマゲームは、群馬と埼玉の風土を「なんか遊んでみたい」に変えるインディーゲームチームです。</p>
+          <div class="keyword-cloud" aria-label="制作テーマ">
+            <span style="--tilt:-2deg">廃旅館</span>
+            <span style="--tilt:1.5deg">温泉街</span>
+            <span style="--tilt:-1deg">上毛かるた</span>
+            <span style="--tilt:2deg">埼玉の気配</span>
+            <span style="--tilt:-1.5deg">GPS</span>
+            <span style="--tilt:1deg">8bit</span>
+            <span style="--tilt:-2deg">謎解き</span>
+          </div>
+          <div class="hero__actions">
+            <a class="button" href="#games">ゲームを見る</a>
+            <a class="button button--ghost" href="#contact">問い合わせる</a>
+          </div>
+        </div>
+        <div class="hero__stage" aria-label="代表作">
+          <article class="hero-card">
+            <img class="hero-card__image" src="https://shunpedesu.github.io/img/gunma-hazard.png" alt="GUNMA HAZARD キービジュアル" />
+            <div class="hero-card__body">
+              <strong>GUNMA HAZARD</strong>
+              <span>廃旅館ホラー</span>
+            </div>
+          </article>
+          <div class="hero-mini-grid">
+            <article class="hero-mini">
+              <img src="https://shunpedesu.github.io/img/karakkaze.png" alt="からっかぜの夜 スクリーンショット" />
+              <span>温泉街ミステリー</span>
+            </article>
+            <article class="hero-mini">
+              <img src="https://shunpedesu.github.io/img/gunma-monsters.webp" alt="群馬モンスターズ キービジュアル" />
+              <span>GPS × 8bit</span>
+            </article>
+          </div>
+          <div class="stat-row" aria-label="活動概要">
+            <div class="stat">
+              <strong>3</strong>
+              <span>Games</span>
+            </div>
+            <div class="stat">
+              <strong>3</strong>
+              <span>Members</span>
+            </div>
+            <div class="stat">
+              <strong>群馬 埼玉</strong>
+              <span>Base</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="games" aria-label="開発したゲーム">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-kicker">Case Files</p>
+            <h2>制作物という名の事件簿</h2>
+          </div>
+          <p class="section-copy">ブラウザで遊べる作品を中心に、群馬と埼玉の気配をまとったゲームを制作しています。各作品は、だいたい事件です。</p>
+        </header>
+
+        <div class="games">
+          <article class="game-card">
+            <img class="game-card__image" src="https://shunpedesu.github.io/img/gunma-hazard.png" alt="GUNMA HAZARD キービジュアル" />
+            <div class="game-card__body">
+              <span class="tag">公開中</span>
+              <h3>GUNMA HAZARD</h3>
+              <p>群馬の廃旅館を舞台に、怪物から逃げながら上毛かるたクイズを解いて脱出するホラー謎解きゲーム。</p>
+              <div class="case-file" aria-label="GUNMA HAZARD 指標">
+                <div class="case-file__row"><strong>危険度</strong><span class="meter">★★★★★</span></div>
+                <div class="case-file__row"><strong>地域濃度</strong><span class="meter">★★★★☆</span></div>
+                <div class="case-file__row"><strong>遊び方</strong><span>ブラウザで無料</span></div>
+              </div>
+              <a class="button" href="https://shunpedesu.github.io/gunma-hazard/lp/" target="_blank" rel="noopener noreferrer">プレイする</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <img class="game-card__image" src="https://shunpedesu.github.io/img/karakkaze.png" alt="からっかぜの夜 スクリーンショット" />
+            <div class="game-card__body">
+              <span class="tag">公開中</span>
+              <h3>からっかぜの夜</h3>
+              <p>大雪で孤立した四万温泉の旅館。5人の客と3人のスタッフが巻き込まれる密室ミステリーサウンドノベル。</p>
+              <div class="case-file" aria-label="からっかぜの夜 指標">
+                <div class="case-file__row"><strong>密室度</strong><span class="meter">★★★★★</span></div>
+                <div class="case-file__row"><strong>温泉度</strong><span class="meter">★★★★☆</span></div>
+                <div class="case-file__row"><strong>遊び方</strong><span>ブラウザで無料</span></div>
+              </div>
+              <a class="button" href="https://shunpedesu.github.io/karakkaze-lp/" target="_blank" rel="noopener noreferrer">プレイする</a>
+            </div>
+          </article>
+
+          <article class="game-card">
+            <img class="game-card__image" src="https://shunpedesu.github.io/img/gunma-monsters.webp" alt="群馬モンスターズ キービジュアル" />
+            <div class="game-card__body">
+              <span class="tag">開発中</span>
+              <h3>群馬モンスターズ</h3>
+              <p>全国でも遊べて、群馬で深くなる。GPS、8bit、ローカル探索の本気を組み合わせたアプリ不要のブラウザゲーム。</p>
+              <div class="case-file" aria-label="群馬モンスターズ 指標">
+                <div class="case-file__row"><strong>探索度</strong><span class="meter">★★★★★</span></div>
+                <div class="case-file__row"><strong>8bit度</strong><span class="meter">★★★★★</span></div>
+                <div class="case-file__row"><strong>遊び方</strong><span>アプリ不要</span></div>
+              </div>
+              <a class="button" href="https://gunma-monsters.vercel.app/lp.html" target="_blank" rel="noopener noreferrer">詳しく見る</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="members" class="members" aria-label="メンバー">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-kicker">Party</p>
+            <h2>この3人でつくっています</h2>
+          </div>
+          <p class="section-copy">小さなパーティだからこそ、企画から公開まで近い距離で動きます。役割はゆるく、熱量は濃いめです。</p>
+        </header>
+
+        <div class="member-grid">
+          <article class="member-card">
+            <img class="member-portrait" src="assets/member-shunpe.jpg" alt="上原惇（しゅんぺ）のイラスト" loading="lazy" />
+            <div class="member-card__role">Lv. しゅんぺ / 企画・実装・発信</div>
+            <h3>上原惇 <small>しゅんぺ</small></h3>
+            <p>ゲーム、アプリ、文章、AI作品を横断して制作するクリエイター。チームでは企画、構成、実装、発信まわりを担当。</p>
+            <div class="member-loadout">
+              <span>企画</span>
+              <span>実装</span>
+              <span>発信</span>
+            </div>
+            <a class="button" href="https://shunpedesu.github.io/" target="_blank" rel="noopener noreferrer">しゅんぺを見る</a>
+          </article>
+
+          <article class="member-card">
+            <img class="member-portrait" src="assets/member-kawamura.jpg" alt="川村慎吾のイラスト" loading="lazy" />
+            <div class="member-card__role">Lv. 制作メンバー / 世界観・相談</div>
+            <h3>川村慎吾</h3>
+            <p>チームのゲーム制作に参加。作品のアイデア出し、世界観づくり、制作過程の相談役としてプロジェクトを支える。</p>
+            <div class="member-loadout">
+              <span>世界観</span>
+              <span>相談役</span>
+              <span>制作補助</span>
+            </div>
+          </article>
+
+          <article class="member-card">
+            <img class="member-portrait" src="assets/member-eno.jpg" alt="江野貴也のイラスト" loading="lazy" />
+            <div class="member-card__role">Lv. 制作メンバー / ローカル感・遊び</div>
+            <h3>江野貴也</h3>
+            <p>チームのゲーム制作に参加。ローカルな題材や遊びの方向性を一緒に考え、作品づくりを進める。</p>
+            <div class="member-loadout">
+              <span>地域感</span>
+              <span>遊びの方向性</span>
+              <span>制作相談</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" aria-label="組織概要">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-kicker">Base</p>
+            <h2>だいたい群馬か埼玉から</h2>
+          </div>
+          <p class="section-copy">群馬と埼玉を拠点に、群馬と埼玉の空気をゲームの形にして公開しています。</p>
+        </header>
+
+        <div class="about-grid">
+          <div class="info-panel">
+            <h3>活動内容</h3>
+            <p>ブラウザゲームの企画・開発・公開。群馬と埼玉を中心に、地域を題材にしたホラー、ミステリー、GPSゲームなど、ローカルなモチーフを遊びに変える活動を行っています。</p>
+          </div>
+
+          <dl class="info-panel info-list">
+            <div class="info-row">
+              <dt>団体名</dt>
+              <dd>チームグンマサイタマゲーム</dd>
+            </div>
+            <div class="info-row">
+              <dt>所在地</dt>
+              <dd>群馬県東吾妻町を主な拠点に、群馬・埼玉を対象に活動</dd>
+            </div>
+            <div class="info-row">
+              <dt>活動領域</dt>
+              <dd>ゲーム企画、ゲーム開発、Web公開、群馬・埼玉モチーフのコンテンツ制作</dd>
+            </div>
+            <div class="info-row">
+              <dt>連絡先</dt>
+              <dd>問い合わせフォーム、または上原惇（しゅんぺ）宛</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact" aria-label="問い合わせ">
+      <div class="section-inner">
+        <p class="section-kicker">Quest Board</p>
+        <h2>怪しい依頼、歓迎します</h2>
+        <div class="contact-box">
+          <p>問い合わせ窓口は、運用しやすく迷惑メール対策もしやすいGoogleフォームがおすすめです。フォーム公開までは、しゅんぺのXまたはnoteを仮窓口にできます。</p>
+          <a class="button" href="https://x.com/shunpedesu" target="_blank" rel="noopener noreferrer">しゅんぺに連絡する</a>
+        </div>
+        <div class="quest-grid" aria-label="問い合わせ内容">
+          <div class="quest-card">
+            <strong>取材クエスト</strong>
+            <span>チームや作品について話を聞きたい方向け。</span>
+          </div>
+          <div class="quest-card">
+            <strong>制作相談クエスト</strong>
+            <span>地域、ゲーム、Web公開まわりの相談はこちら。</span>
+          </div>
+          <div class="quest-card">
+            <strong>感想を送る</strong>
+            <span>プレイ後のひとことが、次の作品の燃料になります。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="footer__copy">
+      <span>© 2026 チームグンマサイタマゲーム</span>
+      <span class="footer__tagline">今日もどこかで、群馬と埼玉がゲームになっている。</span>
+    </span>
+    <a href="https://shunpedesu.github.io/" target="_blank" rel="noopener noreferrer">しゅんぺのページへ</a>
+  </footer>
+</body>
+</html>
