@@ -189,6 +189,10 @@
       text-shadow: 3px 3px 0 rgba(28, 34, 39, .8);
     }
 
+    .hero__line {
+      white-space: nowrap;
+    }
+
     .hero__lead {
       max-width: 640px;
       margin: 0;
@@ -744,7 +748,8 @@
       }
 
       h1 {
-        font-size: clamp(42px, 13vw, 58px);
+        font-size: clamp(35px, 10.4vw, 42px);
+        line-height: 1.08;
       }
 
       .hero__lead {
@@ -850,7 +855,7 @@
       <div class="hero__inner">
         <div class="hero__copy">
           <p class="eyebrow">群馬・埼玉発 / ちょっと変なゲーム制作チーム</p>
-          <h1>群馬と埼玉を、<br><span class="hero__accent">遊び場に。</span></h1>
+          <h1><span class="hero__line">群馬と埼玉を、</span><br><span class="hero__accent">遊び場に。</span></h1>
           <p class="hero__lead">チームグンマサイタマゲームは、群馬と埼玉の風土を「なんか遊んでみたい」に変えるインディーゲームチームです。</p>
           <div class="keyword-cloud" aria-label="制作テーマ">
             <span style="--tilt:-2deg">廃旅館</span>
