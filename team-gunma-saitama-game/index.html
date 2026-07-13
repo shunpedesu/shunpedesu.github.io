@@ -587,6 +587,36 @@
       margin-top: 18px;
     }
 
+    .radio {
+      background: #fdf1ef;
+      border-block: 1px solid var(--line);
+    }
+
+    .radio-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 420px);
+      gap: 22px;
+      align-items: center;
+      padding: clamp(20px, 3vw, 30px);
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      background: var(--paper);
+      box-shadow: 6px 6px 0 rgba(28, 34, 39, .9);
+    }
+
+    .radio-panel__copy p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.9;
+      font-weight: 700;
+    }
+
+    .radio-panel__player {
+      width: 100%;
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+    }
+
     .members {
       background: #eef7f0;
       border-block: 1px solid var(--line);
@@ -803,6 +833,7 @@
       .section-head,
       .about-grid,
       .diagnosis-panel,
+      .radio-panel,
       .contact-box {
         grid-template-columns: 1fr;
       }
@@ -947,6 +978,7 @@
     </a>
     <nav class="site-nav" aria-label="ページ内リンク">
       <a href="#games">Games</a>
+      <a href="#radio">Radio</a>
       <a href="#members">Members</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
@@ -1113,6 +1145,26 @@
             <p id="diagnosisText">今日は、廃旅館でひやっとする日です。上毛かるたを握りしめて、怪物から逃げましょう。</p>
             <a id="diagnosisLink" class="button" href="https://shunpedesu.github.io/gunma-hazard/lp/" target="_blank" rel="noopener noreferrer">この事件簿を開く</a>
           </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="radio" class="radio" aria-label="ポッドキャスト">
+      <div class="section-inner">
+        <header class="section-head">
+          <div>
+            <p class="section-kicker">On Air</p>
+            <h2>ラジオ・グンマサイタマ</h2>
+          </div>
+          <p class="section-copy">群馬と埼玉のローカルな話題を、AIが毎日お届けするポッドキャスト。制作の裏話も、そのうちここで。</p>
+        </header>
+
+        <div class="radio-panel">
+          <div class="radio-panel__copy">
+            <p>作業のおとも、通勤のおともにどうぞ。Spotifyで無料で聴けます。フォローすると新着エピソードが自動で届きます。</p>
+            <a class="button" href="https://open.spotify.com/show/033Nx6hE7l69wFzdDq6xWj" target="_blank" rel="noopener noreferrer">Spotifyで聴く</a>
+          </div>
+          <iframe class="radio-panel__player" title="ラジオ・グンマサイタマ（Spotify）" src="https://open.spotify.com/embed/show/033Nx6hE7l69wFzdDq6xWj?utm_source=generator" width="100%" height="352" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
       </div>
     </section>
