@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ラジオ・グンマサイタマ｜毎朝の告知キット</title>
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="ラジオ・グンマサイタマの最新エピソードから、SNS投稿文・ワンタップ投稿・シェア画像を自動生成する社内用ページ。" />
+  <style>
+    :root {
+      --ink: #1c2227;
+      --muted: #5c6a72;
+      --paper: #fffdf7;
+      --cream: #f5efe2;
+      --green: #13785b;
+      --green-dark: #0d4d3d;
+      --red: #d84c3d;
+      --gold: #d8a640;
+      --line: #1c2227;
+      --shadow: rgba(28, 34, 39, .92);
+      --radius: 8px;
+      --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.8;
+      background:
+        linear-gradient(90deg, rgba(19,120,91,.08) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(19,120,91,.08) 1px, transparent 1px),
+        var(--paper);
+      background-size: 30px 30px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 20px clamp(14px, 4vw, 34px) 72px; }
+
+    .masthead {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+      padding: 13px 16px; border: 2px solid var(--line); border-radius: var(--radius);
+      background: var(--paper); box-shadow: 5px 5px 0 var(--shadow);
+    }
+    .brand { display: inline-flex; align-items: center; gap: 11px; font-weight: 900; }
+    .brand__mark {
+      display: grid; place-items: center; width: 38px; height: 38px; font-size: 19px;
+      background: var(--green); border: 2px solid var(--line); border-radius: 50%; box-shadow: 3px 3px 0 var(--gold);
+    }
+    .brand__name { font-size: 14px; line-height: 1.2; }
+    .brand__sub { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .16em; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .onair {
+      display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px;
+      border: 2px solid var(--line); border-radius: 999px; background: var(--red); color: #fff;
+      font-family: var(--mono); font-size: 11.5px; font-weight: 700; letter-spacing: .12em;
+    }
+    .onair__dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: blink 1.4s steps(1,end) infinite; }
+    @keyframes blink { 50% { opacity: .2; } }
+
+    .hero { padding: 34px 4px 8px; }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(23px, 4.6vw, 34px); font-weight: 900; line-height: 1.2; text-wrap: balance; }
+    .hero p { margin: 0; color: var(--muted); font-weight: 600; }
+
+    .episode {
+      margin-top: 22px; border: 2px solid var(--line); border-radius: 10px; background: var(--green-dark); color: #fff;
+      box-shadow: 7px 7px 0 var(--shadow); padding: clamp(18px, 3vw, 26px);
+    }
+    .episode__eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--gold); font-weight: 700; }
+    .episode__topic { margin: 10px 0 6px; font-size: clamp(20px, 3.6vw, 28px); font-weight: 900; line-height: 1.3; text-wrap: balance; }
+    .episode__date { margin: 0; font-family: var(--mono); font-size: 13px; color: rgba(255,255,255,.72); }
+    .episode__updated { margin: 12px 0 0; font-size: 11.5px; color: rgba(255,255,255,.55); }
+
+    section { margin-top: 34px; }
+    .sec-label { font-family: var(--mono); font-size: 12px; letter-spacing: .18em; color: var(--green-dark); font-weight: 700; text-transform: uppercase; }
+    .sec-title { margin: 6px 0 16px; font-size: clamp(18px, 3vw, 23px); font-weight: 900; }
+
+    /* one-tap share buttons */
+    .taps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .tap {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+      min-height: 52px; padding: 12px 14px; border: 2px solid var(--line); border-radius: var(--radius);
+      font-weight: 900; font-size: 15px; color: #fff; box-shadow: 4px 4px 0 var(--shadow);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .tap:hover { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--shadow); }
+    .tap:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+    .tap--x { background: #000; }
+    .tap--fb { background: #1877f2; }
+    .tap--line { background: #06c755; }
+    .taps__note { margin: 12px 0 0; font-size: 13px; color: var(--muted); font-weight: 600; }
+
+    /* copy blocks */
+    .copyblocks { display: grid; gap: 16px; }
+    .cb { border: 2px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: 5px 5px 0 var(--shadow); overflow: hidden; }
+    .cb__head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 11px 15px; border-bottom: 2px solid var(--line); background: var(--cream);
+    }
+    .cb__name { display: inline-flex; align-items: center; gap: 8px; font-weight: 900; font-size: 14px; }
+    .cb__badge { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; padding: 2px 8px; border-radius: 999px; background: rgba(19,120,91,.14); color: var(--green-dark); font-weight: 700; }
+    .cb__copy {
+      font: inherit; font-weight: 800; font-size: 13px; cursor: pointer;
+      padding: 7px 14px; border: 2px solid var(--line); border-radius: 999px; background: var(--gold); color: var(--ink);
+      box-shadow: 2px 2px 0 var(--shadow); transition: transform .12s ease;
+    }
+    .cb__copy:hover { transform: translate(1px,1px); }
+    .cb__copy.is-done { background: var(--green); color: #fff; }
+    .cb__body { margin: 0; padding: 15px; white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.85; font-family: var(--sans); }
+
+    /* images */
+    .imgcards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .imgcard { border: 2px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: 5px 5px 0 var(--shadow); padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+    .imgcard h3 { margin: 0; font-size: 14px; font-weight: 900; }
+    .imgcard h3 small { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+    .imgcard__preview { width: 100%; border: 1.5px solid var(--line); border-radius: 6px; background: var(--cream); display: block; }
+    .imgcard .dl {
+      align-self: flex-start; text-decoration: none; font-weight: 800; font-size: 13px;
+      padding: 9px 16px; border: 2px solid var(--line); border-radius: 999px; background: var(--ink); color: #fff;
+      box-shadow: 3px 3px 0 var(--shadow); cursor: pointer;
+    }
+    .imgcard .dl:hover { opacity: .88; }
+
+    .howto { border: 2px dashed var(--line); border-radius: 10px; padding: 18px 20px; background: rgba(245,239,226,.5); }
+    .howto h2 { margin: 0 0 10px; font-size: 16px; font-weight: 900; }
+    .howto ol { margin: 0; padding-left: 1.3em; }
+    .howto li { margin: 4px 0; font-weight: 600; }
+
+    .foot { margin-top: 46px; padding-top: 18px; border-top: 2px solid var(--line); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+    .foot a { color: var(--green-dark); font-weight: 700; }
+
+    .status { font-family: var(--mono); font-size: 13px; color: var(--red); font-weight: 700; }
+
+    @media (max-width: 640px) {
+      .taps { grid-template-columns: 1fr; }
+      .imgcards { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { .onair__dot { animation: none; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead">
+      <span class="brand">
+        <span class="brand__mark" aria-hidden="true">📻</span>
+        <span class="brand__name">ラジオ・グンマサイタマ
+          <span class="brand__sub">毎朝の告知キット / RADIO KIT</span>
+        </span>
+      </span>
+      <span class="onair"><span class="onair__dot" aria-hidden="true"></span>ON AIR</span>
+    </header>
+
+    <div class="hero">
+      <h1>今日の放送を、ワンタップで告知。</h1>
+      <p>最新エピソードから投稿文・シェア画像を自動生成。毎朝ここを開いて、ボタンを押すだけ。</p>
+    </div>
+
+    <div id="app">
+      <p class="status" id="status">最新エピソードを読み込み中…</p>
+    </div>
+
+    <div class="howto">
+      <h2>使い方</h2>
+      <ol>
+        <li>毎朝このページを開く（ブックマーク推奨）。最新エピソードが自動で反映されています。</li>
+        <li><b>ワンタップ投稿</b>ボタンで X / Facebook / LINE に投稿（内容は自動で下書き済み・投稿前に編集可）。</li>
+        <li>必要なら各<b>投稿文をコピー</b>して note などに貼り付け。</li>
+        <li><b>シェア画像を保存</b>して画像付き投稿に。</li>
+      </ol>
+    </div>
+
+    <footer class="foot">
+      <span>TEAM GUNMA SAITAMA GAME</span>
+      <span><a href="../">しゅんぺLP</a> ／ <a href="../team-gunma-saitama-game/">チームLP</a></span>
+    </footer>
+  </div>
+
+  <script>
+    const SHOW_URL_FALLBACK = "https://open.spotify.com/show/033Nx6hE7l69wFzdDq6xWj";
+    const HASHTAGS = "#群馬 #埼玉 #ポッドキャスト";
+
+    function esc(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+    function buildTexts(d){
+      const link = d.link || d.showUrl || SHOW_URL_FALLBACK;
+      const x =
+`📻 ラジオ・グンマサイタマ 今日の放送
+
+『${d.topic}』
+
+群馬と埼玉のローカルな話題を、AIが毎朝おとどけ。作業のおともにどうぞ☕
+
+▶ ${link}
+
+${HASHTAGS}`;
+      const note =
+`【ラジオ・グンマサイタマ ${d.date}】${d.topic}
+
+群馬と埼玉のローカルな話題を、AIが毎朝おとどけするポッドキャスト「ラジオ・グンマサイタマ」。
+今日の放送は『${d.topic}』。作業や家事のおともにどうぞ。
+
+▶ Spotifyで聴く：${link}
+
+${HASHTAGS} #ローカル #AIラジオ`;
+      const fb =
+`📻 今日のラジオ・グンマサイタマ（${d.date}）
+
+『${d.topic}』
+
+群馬と埼玉のローカルな話題を、AIが毎朝おとどけ。通勤・家事のおともにどうぞ。
+▶ ${link}`;
+      return { x, note, fb, link };
+    }
+
+    function shareUrls(t){
+      return {
+        x: "https://x.com/intent/tweet?text=" + encodeURIComponent(t.x),
+        fb: "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(t.link),
+        line: "https://social-plugins.line.me/lineit/share?url=" + encodeURIComponent(t.link),
+      };
+    }
+
+    // ===== Canvas share card =====
+    function wrapText(ctx, text, maxWidth){
+      const lines = []; let line = "";
+      for (const ch of text){
+        if (ch === "\n"){ lines.push(line); line = ""; continue; }
+        const test = line + ch;
+        if (ctx.measureText(test).width > maxWidth && line){ lines.push(line); line = ch; }
+        else line = test;
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+    function drawCard(canvas, w, h, d){
+      const ctx = canvas.getContext("2d");
+      canvas.width = w; canvas.height = h;
+      // bg
+      ctx.fillStyle = "#0d4d3d"; ctx.fillRect(0,0,w,h);
+      // grid
+      ctx.strokeStyle = "rgba(255,255,255,.07)"; ctx.lineWidth = 1;
+      const step = Math.round(w/22);
+      for (let x=0;x<=w;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+      for (let y=0;y<=h;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+      const pad = Math.round(w*0.075);
+      const portrait = h > w;
+      // top wordmark row
+      ctx.textBaseline = "alphabetic";
+      ctx.fillStyle = "#d8a640";
+      ctx.font = `900 ${Math.round(w*0.033)}px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.fillText("📻 ラジオ・グンマサイタマ", pad, pad + w*0.03);
+      // ON AIR pill
+      const pillY = pad + (portrait ? w*0.10 : w*0.075);
+      ctx.font = `700 ${Math.round(w*0.022)}px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.fillStyle = "rgba(216,76,61,1)";
+      const pillTxt = "毎朝 AI配信 / 群馬・埼玉";
+      const pillW = ctx.measureText(pillTxt).width + w*0.05;
+      ctx.fillRect(pad, pillY, pillW, w*0.048);
+      ctx.fillStyle = "#fff";
+      ctx.fillText(pillTxt, pad + w*0.025, pillY + w*0.033);
+      // topic (big)
+      const topSize = Math.round(w * (portrait ? 0.062 : 0.058));
+      ctx.font = `900 ${topSize}px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.fillStyle = "#ffffff";
+      const maxW = w - pad*2;
+      const lines = wrapText(ctx, "『" + d.topic + "』", maxW).slice(0, portrait ? 6 : 4);
+      const lineH = topSize * 1.28;
+      let startY = portrait ? h*0.42 : h*0.44;
+      lines.forEach((ln, i) => ctx.fillText(ln, pad, startY + i*lineH));
+      // date + accent bar bottom
+      ctx.fillStyle = "#d8a640"; ctx.fillRect(pad, h - pad - w*0.012, w*0.16, w*0.012);
+      ctx.fillStyle = "rgba(255,255,255,.82)";
+      ctx.font = `700 ${Math.round(w*0.026)}px ${getComputedStyle(document.body).fontFamily}`;
+      ctx.fillText(d.date + "  放送", pad, h - pad + w*0.006);
+    }
+
+    function attachDownload(btn, canvas, filename){
+      btn.addEventListener("click", () => {
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url; a.download = filename; a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }, "image/png");
+      });
+    }
+
+    function render(d){
+      const t = buildTexts(d);
+      const s = shareUrls(t);
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <div class="episode">
+          <p class="episode__eyebrow">最新エピソード / LATEST</p>
+          <h2 class="episode__topic">『${esc(d.topic)}』</h2>
+          <p class="episode__date">${esc(d.date)} 放送</p>
+          <p class="episode__updated">キット生成: ${esc((d.updatedAt||"").slice(0,10) || d.date)}</p>
+        </div>
+
+        <section>
+          <p class="sec-label">One-Tap Post</p>
+          <h2 class="sec-title">ワンタップ投稿</h2>
+          <div class="taps">
+            <a class="tap tap--x" href="${esc(s.x)}" target="_blank" rel="noopener noreferrer">𝕏 に投稿</a>
+            <a class="tap tap--fb" href="${esc(s.fb)}" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a class="tap tap--line" href="${esc(s.line)}" target="_blank" rel="noopener noreferrer">LINE</a>
+          </div>
+          <p class="taps__note">※ ボタンを押すと各SNSの投稿画面が開き、本文が下書き済みで入ります。投稿前に編集OK。APIキー不要。</p>
+        </section>
+
+        <section>
+          <p class="sec-label">Captions</p>
+          <h2 class="sec-title">投稿文（コピーして使う）</h2>
+          <div class="copyblocks">
+            ${copyBlock("X（旧Twitter）", "SHORT", t.x)}
+            ${copyBlock("note", "LONG", t.note)}
+            ${copyBlock("Facebook", "MEDIUM", t.fb)}
+          </div>
+        </section>
+
+        <section>
+          <p class="sec-label">Share Image</p>
+          <h2 class="sec-title">シェア画像</h2>
+          <div class="imgcards">
+            <div class="imgcard">
+              <h3>横（X / Facebook）<small>1200 × 630</small></h3>
+              <canvas class="imgcard__preview" id="c-yoko" width="1200" height="630"></canvas>
+              <button class="dl" id="dl-yoko" type="button">画像を保存 (PNG)</button>
+            </div>
+            <div class="imgcard">
+              <h3>縦（Stories / Shorts）<small>1080 × 1920</small></h3>
+              <canvas class="imgcard__preview" id="c-tate" width="1080" height="1920"></canvas>
+              <button class="dl" id="dl-tate" type="button">画像を保存 (PNG)</button>
+            </div>
+          </div>
+        </section>
+      `;
+
+      // copy buttons
+      app.querySelectorAll(".cb__copy").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const text = btn.closest(".cb").querySelector(".cb__body").textContent;
+          try { await navigator.clipboard.writeText(text); }
+          catch { const ta=document.createElement("textarea"); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); }
+          btn.textContent = "コピー完了 ✓"; btn.classList.add("is-done");
+          setTimeout(() => { btn.textContent = "コピー"; btn.classList.remove("is-done"); }, 1800);
+        });
+      });
+
+      // images
+      const cy = document.getElementById("c-yoko");
+      const ctn = document.getElementById("c-tate");
+      drawCard(cy, 1200, 630, d);
+      drawCard(ctn, 1080, 1920, d);
+      attachDownload(document.getElementById("dl-yoko"), cy, `radio-${d.date}-yoko.png`);
+      attachDownload(document.getElementById("dl-tate"), ctn, `radio-${d.date}-tate.png`);
+    }
+
+    function copyBlock(name, badge, text){
+      return `
+        <article class="cb">
+          <div class="cb__head">
+            <span class="cb__name">${esc(name)} <span class="cb__badge">${esc(badge)}</span></span>
+            <button class="cb__copy" type="button">コピー</button>
+          </div>
+          <pre class="cb__body">${esc(text)}</pre>
+        </article>`;
+    }
+
+    async function load(){
+      const status = document.getElementById("status");
+      try {
+        const res = await fetch("./latest.json?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("latest.json " + res.status);
+        const d = await res.json();
+        if (!d.topic || !d.date) throw new Error("データ不足");
+        render(d);
+      } catch (e) {
+        status.textContent = "最新エピソードの読み込みに失敗しました（" + e.message + "）。毎朝の自動更新（GitHub Actions）が未実行か、latest.json が未生成の可能性があります。";
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
