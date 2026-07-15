@@ -1,0 +1,39 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" fill="#f5f1ea"/>
+  <text x="60" y="150" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="2" fill="#6b6b6b">MUSIC APP</text>
+  <text x="60" y="220" font-family="'Helvetica Neue', Arial, sans-serif" font-size="64" font-weight="800" fill="#1a1a1a">1mm PIANO</text>
+  <text x="60" y="260" font-family="'Helvetica Neue', Arial, sans-serif" font-size="24" fill="#1a1a1a">左手コード、右手メロディー</text>
+
+  <g transform="translate(60,300)">
+    <rect x="0" y="0" width="680" height="110" rx="10" fill="#ffffff" stroke="#e3e3e3" stroke-width="2"/>
+    <g fill="#ffffff" stroke="#1a1a1a" stroke-width="1.5">
+      <rect x="10" y="10" width="42" height="90"/>
+      <rect x="52" y="10" width="42" height="90"/>
+      <rect x="94" y="10" width="42" height="90"/>
+      <rect x="136" y="10" width="42" height="90"/>
+      <rect x="178" y="10" width="42" height="90"/>
+      <rect x="220" y="10" width="42" height="90"/>
+      <rect x="262" y="10" width="42" height="90"/>
+      <rect x="304" y="10" width="42" height="90"/>
+      <rect x="346" y="10" width="42" height="90"/>
+      <rect x="388" y="10" width="42" height="90"/>
+      <rect x="430" y="10" width="42" height="90"/>
+      <rect x="472" y="10" width="42" height="90"/>
+      <rect x="514" y="10" width="42" height="90"/>
+      <rect x="556" y="10" width="42" height="90"/>
+      <rect x="598" y="10" width="42" height="90"/>
+      <rect x="628" y="10" width="42" height="90"/>
+    </g>
+    <g fill="#1a1a1a">
+      <rect x="38" y="10" width="26" height="56"/>
+      <rect x="122" y="10" width="26" height="56"/>
+      <rect x="164" y="10" width="26" height="56"/>
+      <rect x="206" y="10" width="26" height="56"/>
+      <rect x="290" y="10" width="26" height="56"/>
+      <rect x="374" y="10" width="26" height="56"/>
+      <rect x="416" y="10" width="26" height="56"/>
+      <rect x="458" y="10" width="26" height="56"/>
+      <rect x="542" y="10" width="26" height="56"/>
+    </g>
+  </g>
+</svg>
