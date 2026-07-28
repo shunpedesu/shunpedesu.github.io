@@ -729,7 +729,10 @@
 
     .contact-cta {
       margin-top: 30px;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
     .contact .button {
@@ -738,6 +741,13 @@
       border-color: #fff;
       box-shadow: 4px 4px 0 #fff;
       white-space: nowrap;
+    }
+
+    .contact .button--ghost {
+      background: transparent;
+      color: #fff;
+      border-color: #fff;
+      box-shadow: 4px 4px 0 #fff;
     }
 
     .footer {
@@ -1217,7 +1227,8 @@
         <p class="section-kicker">Quest Board</p>
         <h2>怪しい依頼、歓迎します</h2>
         <div class="contact-cta">
-          <a class="button" href="https://x.com/shunpedesu" target="_blank" rel="noopener noreferrer">しゅんぺに連絡する</a>
+          <a class="button" href="https://forms.gle/mxsyToEhEAvhdr13A" target="_blank" rel="noopener noreferrer">問い合わせフォーム</a>
+          <a class="button button--ghost" href="https://x.com/shunpedesu" target="_blank" rel="noopener noreferrer">Xで連絡する</a>
         </div>
       </div>
     </section>
