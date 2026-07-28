@@ -727,52 +727,9 @@
       color: #fff;
     }
 
-    .contact-box {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 24px;
-      align-items: center;
+    .contact-cta {
       margin-top: 30px;
-      padding: clamp(20px, 3vw, 30px);
-      border: 2px solid #fff;
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, .08);
-    }
-
-    .contact-box p {
-      margin: 0;
-      color: rgba(255, 255, 255, .82);
-      line-height: 1.8;
-      font-weight: 700;
-    }
-
-    .quest-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-top: 22px;
-    }
-
-    .quest-card {
-      padding: 16px;
-      border: 2px solid rgba(255, 255, 255, .82);
-      border-radius: var(--radius);
-      background: rgba(255, 255, 255, .09);
-    }
-
-    .quest-card strong {
-      display: block;
-      margin-bottom: 8px;
-      color: #fff;
-      font-size: 16px;
-    }
-
-    .quest-card span {
-      display: block;
-      color: rgba(255, 255, 255, .76);
-      line-height: 1.7;
-      font-size: 13px;
-      font-weight: 700;
+      text-align: center;
     }
 
     .contact .button {
@@ -833,8 +790,7 @@
       .section-head,
       .about-grid,
       .diagnosis-panel,
-      .radio-panel,
-      .contact-box {
+      .radio-panel {
         grid-template-columns: 1fr;
       }
 
@@ -843,12 +799,11 @@
       }
 
       .games,
-      .member-grid,
-      .quest-grid {
+      .member-grid {
         grid-template-columns: 1fr;
       }
 
-      .contact-box .button {
+      .contact-cta .button {
         width: 100%;
       }
     }
@@ -883,8 +838,7 @@
 
       .keyword-cloud,
       .case-file,
-      .member-loadout,
-      .quest-grid {
+      .member-loadout {
         display: none;
       }
 
@@ -1262,23 +1216,8 @@
       <div class="section-inner">
         <p class="section-kicker">Quest Board</p>
         <h2>怪しい依頼、歓迎します</h2>
-        <div class="contact-box">
-          <p>問い合わせ窓口は、運用しやすく迷惑メール対策もしやすいGoogleフォームがおすすめです。フォーム公開までは、しゅんぺのXまたはnoteを仮窓口にできます。</p>
+        <div class="contact-cta">
           <a class="button" href="https://x.com/shunpedesu" target="_blank" rel="noopener noreferrer">しゅんぺに連絡する</a>
-        </div>
-        <div class="quest-grid" aria-label="問い合わせ内容">
-          <div class="quest-card">
-            <strong>取材クエスト</strong>
-            <span>チームや作品について話を聞きたい方向け。</span>
-          </div>
-          <div class="quest-card">
-            <strong>制作相談クエスト</strong>
-            <span>地域、ゲーム、Web公開まわりの相談はこちら。</span>
-          </div>
-          <div class="quest-card">
-            <strong>感想を送る</strong>
-            <span>プレイ後のひとことが、次の作品の燃料になります。</span>
-          </div>
         </div>
       </div>
     </section>
