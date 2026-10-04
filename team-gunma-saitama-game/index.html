@@ -495,6 +495,23 @@
       box-shadow: 3px 3px 0 var(--ink);
     }
 
+    .game-card--featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    }
+
+    .game-card--featured .game-card__image {
+      height: 100%;
+      aspect-ratio: auto;
+      border-bottom: 0;
+      border-right: 2px solid var(--ink);
+    }
+
+    .game-card--featured h3 {
+      font-size: clamp(26px, 3.4vw, 36px);
+    }
+
     .game-card .button + .button {
       margin-top: 12px;
     }
@@ -813,8 +830,16 @@
       }
 
       .games,
-      .member-grid {
+      .member-grid,
+      .game-card--featured {
         grid-template-columns: 1fr;
+      }
+
+      .game-card--featured .game-card__image {
+        height: auto;
+        aspect-ratio: 16 / 10;
+        border-right: 0;
+        border-bottom: 2px solid var(--ink);
       }
 
       .contact-cta .button {
@@ -970,26 +995,27 @@
             <span style="--tilt:-2deg">謎解き</span>
           </div>
           <div class="hero__actions">
-            <a class="button" href="#games">ゲームを見る</a>
+            <a class="button" href="https://gunma-monsters.vercel.app/lp.html" target="_blank" rel="noopener noreferrer">群馬モンスターズを遊ぶ</a>
+            <a class="button button--ghost" href="#games">ゲームを見る</a>
             <a class="button button--ghost" href="#contact">問い合わせる</a>
           </div>
         </div>
         <div class="hero__stage" aria-label="代表作">
           <article class="hero-card">
-            <img class="hero-card__image" src="https://shunpedesu.github.io/img/gunma-hazard.png" alt="GUNMA HAZARD キービジュアル" />
+            <img class="hero-card__image" src="https://shunpedesu.github.io/img/gunma-monsters.png" alt="群馬モンスターズ キービジュアル" />
             <div class="hero-card__body">
-              <strong>GUNMA HAZARD</strong>
-              <span>廃旅館ホラー</span>
+              <strong>群馬モンスターズ</strong>
+              <span>GPS × 8bit / 公開中</span>
             </div>
           </article>
           <div class="hero-mini-grid">
             <article class="hero-mini">
-              <img src="https://shunpedesu.github.io/img/karakkaze.png" alt="からっかぜの夜 スクリーンショット" />
-              <span>温泉街ミステリー</span>
+              <img src="https://shunpedesu.github.io/img/gunma-hazard.png" alt="GUNMA HAZARD キービジュアル" />
+              <span>廃旅館ホラー</span>
             </article>
             <article class="hero-mini">
-              <img src="https://shunpedesu.github.io/img/gunma-monsters.png" alt="群馬モンスターズ キービジュアル" />
-              <span>GPS × 8bit</span>
+              <img src="https://shunpedesu.github.io/img/karakkaze.png" alt="からっかぜの夜 スクリーンショット" />
+              <span>温泉街ミステリー</span>
             </article>
           </div>
           <div class="stat-row" aria-label="活動概要">
@@ -1021,6 +1047,22 @@
         </header>
 
         <div class="games">
+          <article class="game-card game-card--featured">
+            <img class="game-card__image" src="https://shunpedesu.github.io/img/gunma-monsters-play.jpg" alt="群馬モンスターズ プレイ画面" />
+            <div class="game-card__body">
+              <span class="tag">公開中 / 一番の注目作</span>
+              <h3>群馬モンスターズ</h3>
+              <p>全国でも遊べて、群馬で深くなる。GPS、8bit、ローカル探索の本気を組み合わせたアプリ不要のブラウザゲーム。</p>
+              <div class="case-file" aria-label="群馬モンスターズ 指標">
+                <div class="case-file__row"><strong>探索度</strong><span class="meter">★★★★★</span></div>
+                <div class="case-file__row"><strong>8bit度</strong><span class="meter">★★★★★</span></div>
+                <div class="case-file__row"><strong>遊び方</strong><span>アプリ不要</span></div>
+              </div>
+              <a class="button" href="https://gunma-monsters.vercel.app/lp.html" target="_blank" rel="noopener noreferrer">プレイする</a>
+              <a class="button button--ghost" href="https://gunma-monsters.vercel.app/dex/" target="_blank" rel="noopener noreferrer">公開図鑑を見る</a>
+            </div>
+          </article>
+
           <article class="game-card">
             <img class="game-card__image" src="https://shunpedesu.github.io/img/gunma-hazard.png" alt="GUNMA HAZARD キービジュアル" />
             <div class="game-card__body">
@@ -1051,21 +1093,6 @@
             </div>
           </article>
 
-          <article class="game-card">
-            <img class="game-card__image" src="https://shunpedesu.github.io/img/gunma-monsters.png" alt="群馬モンスターズ キービジュアル" />
-            <div class="game-card__body">
-              <span class="tag">公開中</span>
-              <h3>群馬モンスターズ</h3>
-              <p>全国でも遊べて、群馬で深くなる。GPS、8bit、ローカル探索の本気を組み合わせたアプリ不要のブラウザゲーム。</p>
-              <div class="case-file" aria-label="群馬モンスターズ 指標">
-                <div class="case-file__row"><strong>探索度</strong><span class="meter">★★★★★</span></div>
-                <div class="case-file__row"><strong>8bit度</strong><span class="meter">★★★★★</span></div>
-                <div class="case-file__row"><strong>遊び方</strong><span>アプリ不要</span></div>
-              </div>
-              <a class="button" href="https://gunma-monsters.vercel.app/lp.html" target="_blank" rel="noopener noreferrer">プレイする</a>
-              <a class="button button--ghost" href="https://gunma-monsters.vercel.app/dex/" target="_blank" rel="noopener noreferrer">公開図鑑を見る</a>
-            </div>
-          </article>
         </div>
       </div>
     </section>
