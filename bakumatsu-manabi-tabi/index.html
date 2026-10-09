@@ -330,12 +330,16 @@ function bgmTick(){const c=AU.ctx,m=MOOD[AU.mood];if(!m)return;fxInit();const st
     const L=m.ld[0].length,pat=m.ld[Math.floor(i/L)%m.ld.length],n=pat[i%L];
     if(n>=0){const f=nf(m,n)*2;if(m.ins==='sham'){sham(f,t,.5,B);sham(f,t,.12,AU.send)}else if(m.ins==='flute'){let k=1;while(pat[(i+k)%L]<0&&k<12)k++;flute(f,t,st*k*.95,.3,B);flute(f,t,st*k*.9,.1,AU.send)}else{pluck(f,t,1.5,.5,B);pluck(f,t,1.2,.2,AU.send)}}
     AU.step++;AU.next+=st}}
-function bgm(){clearInterval(AU.timer);AU.timer=null;if(!AU.on||!AU.mood||!AU.ctx)return;AU.step=0;AU.next=AU.ctx.currentTime+.1;AU.timer=setInterval(()=>{try{bgmTick()}catch(e){}},90)}
-function setMood(m){if(AU.mood===m&&AU.timer)return;AU.mood=m;bgm()}
+/* 曲: opening=扉・オープニング・むすび / contents=旅と学びのあいだ(しゅんぺ作) */
+const TR={op:'music/opening_bakumatsu.mp3',main:'music/contents_bakumatsu.mp3'};AU.el={};
+function fadeOut(a){clearInterval(a._f);a._f=setInterval(()=>{if(a.volume>.06)a.volume-=.05;else{clearInterval(a._f);a.pause()}},60)}
+function bgm(){const want=AU.on?AU.mood:null;for(const k in TR){const a=AU.el[k]||(AU.el[k]=Object.assign(new Audio(TR[k]),{loop:true,preload:'none'}));
+  if(k===want){clearInterval(a._f);a.volume=.5;if(a.paused)a.play().catch(()=>{})}else if(!a.paused)fadeOut(a)}}
+function setMood(m){if(AU.mood===m&&AU.el[m]&&!AU.el[m].paused)return;AU.mood=m;bgm()}
 const sndBtn=document.getElementById('snd'),sndLabel=()=>{sndBtn.textContent=AU.on?'♪ 音あり':'♪ 音なし';sndBtn.setAttribute('aria-pressed',AU.on)};sndLabel();
 sndBtn.onclick=()=>{AU.on=!AU.on;try{localStorage.setItem('manabitabi_snd',AU.on?'on':'off')}catch(e){}sndLabel();if(AU.on){try{ac()}catch(e){}}bgm()};
-addEventListener('pointerdown',e=>{if(!AU.on)return;try{ac();if(!AU.timer)bgm()}catch(x){}if(e.target.closest&&e.target.closest('.btn,.fuda,.choice button,.ages button,.datsu button,#tabs button'))sfx('clack')},true);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(AU.timer);AU.timer=null}else bgm()});
+addEventListener('pointerdown',e=>{if(!AU.on)return;try{ac();bgm()}catch(x){}if(e.target.closest&&e.target.closest('.btn,.fuda,.choice button,.ages button,.datsu button,#tabs button'))sfx('clack')},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){for(const k in AU.el)AU.el[k].pause()}else bgm()});
 
 /* ---------- 扉絵 ---------- */
 const art=(pos='xMidYMax')=>`<svg class="art" viewBox="0 0 400 600" preserveAspectRatio="${pos} slice" aria-hidden="true"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14294a"/><stop offset=".45" stop-color="#3f6a94"/><stop offset=".78" stop-color="#e9d9b8"/><stop offset="1" stop-color="#f1e6cc"/></linearGradient></defs>
@@ -918,7 +922,7 @@ const SCHOOLS={nisshin:NISSHIN,teki:TEKI,shoka:SHOKA,kodo:KODO,shohei:SHOHEI,fuk
 function render(){
   const tabs=document.getElementById('tabs'),tabbed=!!S.me&&!['title','make','op','end'].includes(S.view);tabs.hidden=!tabbed;document.body.classList.toggle('tabbed',tabbed);
   tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='pass')===(S.view==='pass')));
-  setMood(S.view==='walk'?'walk':S.view==='school'?(S.school==='teki'?'night':'school'):'map');
+  setMood(['title','op','end','make'].includes(S.view)?'op':'main');
   if(S.view==='title')return viewTitle();
   if(S.view==='op')return slides(OP(),()=>{S.opSeen=1;save();S.view=S.me?'map':'make';render();scrollTo(0,0)});
   if(S.view==='end'&&S.me)return slides(ED(),()=>{S.endSeen=1;save();S.view='pass';render();scrollTo(0,0)});
