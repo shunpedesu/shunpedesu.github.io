@@ -230,6 +230,14 @@ h1,h2,.fuda .nm,.fuda .no,.big,.kyu,.seal,.shi,.okite .last{letter-spacing:.02em
 .goalist li.ok b{color:var(--shu)}
 .op .goalist li.ok b{color:#ff8a70}
 .goal{border-top:5px solid var(--shu)}
+.inbox{border:2px solid var(--shu)}.inbox p{font-size:15px;line-height:1.8}
+.itm{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:8px;background:var(--sumi);color:var(--washi);font-family:var(--f-brush);font-weight:400;font-size:16px;border-radius:3px;vertical-align:middle}
+.items{display:grid;gap:6px;font-size:14px;line-height:1.7}
+.items details{border-bottom:1px dashed var(--line);padding-bottom:4px}
+.items summary{list-style:none;font-weight:600}
+.items .q{display:inline-block;opacity:.3}
+.items{grid-template-columns:1fr}
+.jobs{display:grid;gap:10px}
 .srcb{border-top:1.5px solid var(--line);padding-top:10px;font-size:14px;line-height:1.75}
 .srcb ul{margin:2px 0 8px;padding-left:1.3em}
 .srcb .lk{font-size:13px;overflow-wrap:anywhere}
@@ -266,9 +274,9 @@ const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
 let S={view:'title',school:null,step:0,done:{},shi:'',notes:{},marks:[]};
-S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};
-try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
-const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen}))}catch(e){}};
+S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];
+try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
+const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox}))}catch(e){}};
 const UM={b:'武士{ぶし}の子{こ}',c:'商人{しょうにん}の子{こ}',n:'農家{のうか}の子{こ}',i:'医者{いしゃ}の子{こ}'};
 const UMD={b:'藩{はん}の学校{がっこう}に通{かよ}える家{いえ}。父{ちち}は刀{かたな}を二本{にほん}さしている。',c:'町{まち}の寺子屋{てらこや}で、読{よ}み書{か}きとそろばんを習{なら}った。',n:'村{むら}の寺子屋{てらこや}で学{まな}び、家{いえ}の田畑{たはた}も手{て}つだっている。',i:'家{いえ}には薬{くすり}と本{ほん}がある。蘭学{らんがく}にあこがれている。'};
 const AGE={10:'十歳{じっさい}',11:'十一歳{じゅういっさい}',12:'十二歳{じゅうにさい}',13:'十三歳{じゅうさんさい}',14:'十四歳{じゅうよんさい}',15:'十五歳{じゅうごさい}'};
@@ -388,20 +396,49 @@ function event(){const n=(S.vis[S.school]||0)+1,list=EV[S.school]||[],e=list.fin
   return h}
 /* ---------- 学びの記録 ---------- */
 const dkey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-function logDay(){const k=dkey();S.days[k]=(S.days[k]||0)+1;save()}
+function logDay(){const b=lv(),k=dkey();S.days[k]=(S.days[k]||0)+1;afterLearn(b)}
 function streak(){let n=0;const d=new Date();if(!S.days[dkey(d)])d.setDate(d.getDate()-1);while(S.days[dkey(d)]){n++;d.setDate(d.getDate()-1)}return n}
-const RANKS=[[0,'旅{たび}の書生{しょせい}'],[3,'遊学生{ゆうがくせい}'],[10,'塾{じゅく}の先輩{せんぱい}'],[20,'塾頭{じゅくとう}'],[40,'志{こころざし}ある人{ひと}']];
+const RANKS=[[0,'旅{たび}の書生{しょせい}'],[1,'遊学生{ゆうがくせい}'],[4,'塾{じゅく}の先輩{せんぱい}'],[11,'塾頭{じゅくとう}'],[23,'志{こころざし}ある人{ひと}']];
+/* ---------- レベル・門の解放・品 ---------- */
+const LV=[0,1,2,4,6,8,11,14,18,23];
+const xp=()=>Object.values(S.days).reduce((a,b)=>a+b,0),lvOf=x=>LV.filter(t=>t<=x).length,lv=()=>lvOf(xp());
+const NEED={shizu:2,kangi:2,teki:3,shoka:3,shohei:4,kodo:4,nisshin:5,goju:6,kaigun:7,fuku:8},START={b:'nisshin',c:'kangi',n:'shizu',i:'teki'};
+const unlocked=id=>!!S.done[id]||(S.me&&START[S.me.um]===id)||lv()>=NEED[id];
+const ITEMS={
+ s_nisshin:{g:'掟',n:'什{じゅう}の掟{おきて}の書{か}きつけ',f:'会津{あいづ}の子{こ}どもたちが毎日{まいにち}たしかめあった七{なな}つの決{き}まり。'},
+ s_kodo:{g:'拓',n:'『弘道館記{こうどうかんき}』の拓本{たくほん}',f:'学校{がっこう}のこころざしを石{いし}にきざんだ文{ぶん}。「文武不岐{ぶんぶふき}」のことばがあります。'},
+ s_shohei:{g:'褒',n:'素読吟味{そどくぎんみ}のほうび',f:'素読吟味{そどくぎんみ}でよくできた人{ひと}は、ほうびを受{う}けました。'},
+ s_fuku:{g:'洋',n:'『西洋事情{せいようじじょう}』',f:'福沢諭吉{ふくざわゆきち}が西洋{せいよう}のようすを紹介{しょうかい}した本{ほん}。'},
+ s_teki:{g:'辞',n:'ヅーフ辞書{じしょ}の写{うつ}し',f:'塾{じゅく}に一部{いちぶ}しかない辞書{じしょ}。塾生{じゅくせい}は必要{ひつよう}なところを自分{じぶん}で書{か}き写{うつ}しました。'},
+ s_shizu:{g:'瓦',n:'閑谷{しずたに}の赤{あか}い瓦{かわら}',f:'講堂{こうどう}の屋根{やね}をおおう瓦{かわら}。近{ちか}くの窯{かま}で焼{や}かれました。'},
+ s_shoka:{g:'孟',n:'『講孟余話{こうもうよわ}』',f:'松陰{しょういん}が『孟子{もうし}』を講義{こうぎ}した内容{ないよう}をまとめた本{ほん}。'},
+ s_kangi:{g:'評',n:'月旦評{げったんひょう}',f:'毎月{まいつき}の成績{せいせき}をしめす表{ひょう}。無級{むきゅう}から九級{きゅうきゅう}までありました。'},
+ s_kaigun:{g:'航',n:'航海術{こうかいじゅつ}の帳面{ちょうめん}',f:'伝習所{でんしゅうじょ}では、航海術{こうかいじゅつ}・測量{そくりょう}・算術{さんじゅつ}などを学{まな}びました。'},
+ s_goju:{g:'歌',n:'いろは歌{うた}の書{か}きつけ',f:'島津忠良{しまづただよし}の四十七首{よんじゅうななしゅ}。郷中{ごじゅう}の学{まな}びの手本{てほん}でした。'},
+ t_tegata:{g:'手',n:'通行手形{つうこうてがた}',f:'関所{せきしょ}を通{とお}るための書{か}きつけ。'},
+ t_kasa:{g:'笠',n:'菅笠{すげがさ}',f:'日{ひ}ざしや雨{あめ}をよける笠{かさ}。浮世絵{うきよえ}の旅人{たびびと}もかぶっています。'},
+ t_yatate:{g:'筆',n:'矢立{やたて}',f:'筆{ふで}と墨{すみ}つぼをひとつにした、持{も}ちはこべる筆記用具{ひっきようぐ}。'},
+ l_2:{g:'状',n:'はじめての紹介状{しょうかいじょう}',f:''},l_4:{g:'状',n:'藩校{はんこう}への紹介状{しょうかいじょう}',f:''},l_7:{g:'状',n:'長崎{ながさき}と江戸{えど}への紹介状{しょうかいじょう}',f:''},
+ j_i:{g:'礎',n:'いしずえ「医{い}」',f:''},j_u:{g:'礎',n:'いしずえ「海{うみ}」',f:''},j_g:{g:'礎',n:'いしずえ「学{がく}」',f:''},j_k:{g:'礎',n:'いしずえ「国{くに}」',f:''}};
+function give(id){if(S.items[id])return;S.items[id]=1;S.inbox.push(`<b class="itm">${ITEMS[id].g}</b>${R('品{しな}を手{て}に入{い}れた:'+ITEMS[id].n)}`)}
+function afterLearn(before){const now=lv(),nd=Object.keys(S.days).length;
+  if(now>before){const op=STATIONS.filter(s=>NEED[s.id]>before&&NEED[s.id]<=now&&!S.done[s.id]&&START[S.me.um]!==s.id).map(s=>s.nm);
+    S.inbox.push(R(`レベルが ${now} に上{あ}がった。`)+(op.length?R('先生{せんせい}が紹介状{しょうかいじょう}を書{か}いてくれた。新{あたら}しくたずねられる学{まな}び舎{や}:')+op.map(R).join('、'):''));
+    [2,4,7].forEach(t=>{if(before<t&&now>=t)give('l_'+t)});
+    JOBS.forEach(j=>{if(before<j.lv&&now>=j.lv)S.inbox.push(R('時代{じだい}の仕事{しごと}「'+j.t+'」に声{こえ}がかかった。'))})}
+  if(nd>=1)give('t_tegata');if(nd>=3)give('t_kasa');if(nd>=7)give('t_yatate');save()}
 const DAILY=()=>[...RONGO.map(r=>({p:r.p,s:'『論語{ろんご}』',m:r.m})),...GINMI.map(p=>({p,s:'素読吟味{そどくぎんみ}の文{ぶん}'})),{p:MOSHI,s:'『孟子{もうし}』'},{p:['己{おのれ}の','欲{ほっ}せざる所{ところ}は','人{ひと}に施{ほどこ}すこと','勿{な}かれ'],s:'『論語{ろんご}』'},{p:['弘道{こうどう}とは何{なん}ぞ','人{ひと}能{よ}く','道{みち}を弘{ひろ}むるなり'],s:'『弘道館記{こうどうかんき}』'},{p:['いにしへの','道{みち}を聞{き}きても','唱{とな}へても','わが行{おこな}ひに','せずばかひなし'],s:'日新公{じっしんこう}いろは歌{うた}'}];
 function myPage(){const tot=Object.values(S.days).reduce((a,b)=>a+b,0),rk=[...RANKS].reverse().find(r=>tot>=r[0]),nx=RANKS.find(r=>r[0]>tot),st=streak(),today=new Date();
   const cal=Array.from({length:14},(_,i)=>{const d=new Date(today);d.setDate(d.getDate()-13+i);return `<i class="${S.days[dkey(d)]?'on':''}" title="${dkey(d)}"></i>`}).join('');
   return `${S.resume?`<button class="btn" id="res">${R('学{まな}びのつづきにもどる')}</button>`:''}<section class="panel"><h2>${esc(S.me.name)}${R('の学{まな}びの記録{きろく}')}</h2>
-  <p class="big" style="text-align:left">${R(rk[1])}</p>
-  <p>${R(`これまでの学{まな}び ${tot}回{かい} ・ つづけて ${st}日{にち}`)}${nx?`<br><span style="font-size:14px">${R(`あと${nx[0]-tot}回{かい}で「${nx[1]}」`)}</span>`:''}</p>
+  <p class="big" style="text-align:left">${R('レベル'+lvOf(tot)+' '+rk[1])}</p>
+  <p>${R(`これまでの学{まな}び ${tot}回{かい} ・ つづけて ${st}日{にち}`)}${lvOf(tot)<10?`<br><span style="font-size:14px">${R(`あと${LV[lvOf(tot)]-tot}回{かい}でレベル${lvOf(tot)+1}`)}</span>`:''}</p>
   <div class="cal" aria-label="この14日間の記録">${cal}</div>
+  <h3>${R('持{も}ちもの')} ${Object.keys(S.items).length}/${Object.keys(ITEMS).length}</h3><div class="items">${Object.keys(ITEMS).map(k=>S.items[k]?`<details><summary><b class="itm">${ITEMS[k].g}</b>${R(ITEMS[k].n)}</summary>${ITEMS[k].f?`<p>${F(ITEMS[k].f)}</p>`:''}</details>`:`<div class="q"><b class="itm">?</b></div>`).join('')}</div>
   <h3>${R('今日{きょう}の素読{そどく}')}</h3><div id="daily"></div>
   <h3>${R('学{まな}び舎{や}ごとの記録{きろく}')}</h3>
   <ul class="rec">${STATIONS.map(s=>{const v=S.vis[s.id]||0,ev=EV[s.id]||[];return `<li><b>${R(s.nm)}</b><span>${v?R(`${v}回{かい}`):R('まだ')}</span><small>${ev.map(e=>S.ev[s.id+e.at]?R(e.n):'?').join(' ・ ')}</small></li>`}).join('')}</ul>
-  <p class="note">${F('当時{とうじ}の学{まな}びは、同{おな}じ文{ぶん}を毎日{まいにち}くり返{かえ}し声{こえ}に出{だ}すことが基本{きほん}でした。')}<br>${A('回数{かいすう}でかわるよび名{な}と、通{かよ}うと起{お}こるできごと。')}</p></section>`}
+  <p class="note">${F('当時{とうじ}の学{まな}びは、同{おな}じ文{ぶん}を毎日{まいにち}くり返{かえ}し声{こえ}に出{だ}すことが基本{きほん}でした。')}<br>${A('レベル、門{もん}がひらく順{じゅん}、品{しな}あつめ、通{かよ}うと起{お}こるできごと。品{しな}の説明{せつめい}は史実{しじつ}です。')}</p></section>`}
 function bindDaily(){const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{const r=S.resume;S.resume=null;S.view='school';S.school=r.school;S.step=r.step;render();scrollTo(0,0)};const box=app.querySelector('#daily');if(!box)return;const k=dkey();
   if(S.dailyDone===k){box.innerHTML=`<p>${R('今日{きょう}の素読{そどく}はすませた。また明日{あした}。')}</p>`;return}
   const pool=DAILY(),d=new Date(),q=pool[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%pool.length];
@@ -516,22 +553,26 @@ const NUM='一二三四五六七八九十';
 
 /* ---------- 道中図 ---------- */
 function viewMap(){
-  document.body.dataset.s='';if(Object.keys(S.done).length>=10&&!S.endSeen){S.view='end';return render()}
+  document.body.dataset.s='';if(Object.keys(S.done).length>=10&&Object.keys(S.jobs).length>=4&&!S.endSeen){S.view='end';return render()}
   const n=Object.keys(S.done).length;
   app.innerHTML=`
   <div class="banner">${art('xMidYMid')}<h1>${R('道中図{どうちゅうず}')}</h1></div>
   <div class="legend"><span>${F('ほんとうにあったこと')}</span><span>${A('遊{あそ}びやすくするために足{た}したこと')}</span></div>
   <div class="row"><button class="btn" id="pass">${R('マイページ')}(${n}/10)</button><button class="btn sub" id="me">${R('主人公{しゅじんこう}をかえる')}</button></div>
   <p>${R('旅{たび}の人{ひと}')}:${meLine()}<br><span style="font-size:14px">${R('行{い}きたい学{まな}び舎{や}をえらぶと、そこまで歩{ある}いて旅{たび}をします。どこから回{まわ}ってもかまいません。')}</span></p>
-  <section class="panel goal">${H('旅{たび}の目{め}あて')}${goalList(true)}<p style="font-size:14px">${R(n>=10?'十{とお}の印{しるし}がそろいました。これからは、通{かよ}うたびにかわる文{ぶん}と出会{であ}いを楽{たの}しもう。':'十{とお}の印{しるし}がそろうと「遊学免状{ゆうがくめんじょう}」がもらえます。')}</p></section>
-  <ol class="road">${STATIONS.map((s,i)=>`<li class="${s.id&&S.done[s.id]?'done':''}"><button class="fuda" ${s.open?`data-id="${s.id}"`:'disabled'}>
+  ${S.inbox.length?`<section class="panel inbox">${H('知{し}らせ')}${S.inbox.map(x=>`<p>${x}</p>`).join('')}<button class="btn" id="ibok">${R('わかった')}</button></section>`:''}
+  <section class="panel goal">${H('旅{たび}の目{め}あて')}${goalList(true)}<p style="font-size:14px">${R(n>=10?'十{とお}の印{しるし}がそろいました。レベルを上{あ}げて、時代{じだい}の仕事{しごと}を四{よっ}つやりとげると、旅{たび}のむすびをむかえます。':'十{とお}の印{しるし}がそろうと「遊学免状{ゆうがくめんじょう}」がもらえます。はじめは一校{いっこう}だけ。学{まな}んでレベルが上{あ}がると、紹介状{しょうかいじょう}をもらって次{つぎ}の門{もん}をたたけます。')}</p></section>
+  <section class="panel">${H('時代{じだい}の仕事{しごと}')}<p style="font-size:14px">${R('学{まな}んだことを使{つか}って、当時{とうじ}ほんとうにあった仕事{しごと}を手{て}つだいます。')}</p><div class="jobs">${JOBS.map(j=>{const ok=lv()>=j.lv&&S.done[j.need],dn=S.jobs[j.id];return `<button class="fuda" ${ok&&!dn?`data-job="${j.id}"`:'disabled'}><span class="no">${j.g}</span><span><span class="nm" style="font-size:17px">${R(j.t)}</span><br><span class="sub">${dn?R('やりとげた'):ok?R('手{て}つだえる'):R('レベル'+j.lv+'と、'+STATIONS.find(s=>s.id===j.need).nm+'の修了{しゅうりょう}が要{い}る')}</span></span>${dn?'<span class="seal">礎</span>':''}</button>`}).join('')}</div></section>
+  <ol class="road">${STATIONS.map((s,i)=>`<li class="${s.id&&S.done[s.id]?'done':''}"><button class="fuda" ${unlocked(s.id)?`data-id="${s.id}"`:'disabled'}>
     <span class="no">${NUM[i]}</span>
     <span><span class="nm">${R(s.nm)}</span><br><span class="sub">${R(s.pl)} ・ ${R(s.way)}${s.id===S.at?' <b class="ima">いまここ</b>':''}</span></span>
-    ${s.id&&S.done[s.id]?`<span class="seal">${s.seal}</span>`:`<span class="go">${s.open?R('入門{にゅうもん}する'):R('準備中{じゅんびちゅう}')}</span>`}
+    ${s.id&&S.done[s.id]?`<span class="seal">${s.seal}</span>`:`<span class="go">${unlocked(s.id)?R('入門{にゅうもん}する'):R('レベル'+NEED[s.id]+'で開{ひら}く')}</span>`}
   </button></li>`).join('')}</ol>
   <details><summary>${R('おうちの方{かた}・先生{せんせい}へ')}</summary><p>各校の学び方(素読・会読・討論・詮議など)と読んでいる文章は、当時の記録や広く知られた資料をもとにしています。画面の「史実」は記録にもとづく内容、「アプリの工夫」は遊びやすくするために加えた演出です。当時の学校の多くは武士の男子に限られていました。このアプリでは主人公の生まれを選び、各校の「入門札」で「だれが学べたか」を示しています。専門家の監修は受けていません。確認できた内容と出典は下のボタンから見られます。素読は、意味の説明より先に声に出すのが当時のやり方です。ぜひ一緒に声に出してお読みください。</p><button class="btn sub" id="srcb">出典と確認のようす</button></details>`;
   app.querySelector('#srcb').onclick=()=>{S.view='src';render();scrollTo(0,0)};
   app.querySelector('#me').onclick=()=>{S.view='make';render()};
+  const ib=app.querySelector('#ibok');if(ib)ib.onclick=()=>{S.inbox=[];save();render()};
+  app.querySelectorAll('[data-job]').forEach(b=>b.onclick=()=>{S.view='job';S.job=b.dataset.job;render();scrollTo(0,0)});
   app.querySelector('#pass').onclick=()=>{S.view='pass';render()};
   app.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;if(S.at===id)enter(id);else{S.view='walk';S.school=id;render();scrollTo(0,0)}});
 }
@@ -574,7 +615,7 @@ const KUROFUNE=`<svg class="ship" viewBox="0 0 400 230" role="img" aria-label="�
 <g stroke="#5f7da0" stroke-width="2" fill="none" opacity=".7"><path d="M20 190 q10 -6 20 0 t20 0 t20 0"/><path d="M250 204 q10 -6 20 0 t20 0 t20 0"/><path d="M130 214 q10 -6 20 0 t20 0"/></g></svg>`;
 const goalList=(live)=>{const n=Object.keys(S.done).length,tot=10+Object.values(EV).reduce((a,b)=>a+b.length,0),m=Object.keys(S.met).length+Object.keys(S.ev).length,days=Object.values(S.days).reduce((a,b)=>a+b,0),rk=[...RANKS].reverse().find(r=>days>=r[0]);
   const li=(t,v,ok)=>`<li class="${ok?'ok':''}"><span>${R(t)}</span>${live?`<b>${v}</b>`:''}</li>`;
-  return `<ol class="goalist">${li('歩{ある}いて十{とお}の学{まな}び舎{や}をめぐり、印{しるし}をあつめる',n+'/10',n>=10)}${li('その学{まな}び舎{や}のやり方{かた}で学{まな}ぶ。素読{そどく}、解読{かいどく}、話{はな}しあい、算術{さんじゅつ}',R(days+'回{かい}'),days>0)}${li('学{まな}び舎{や}で、歴史{れきし}にのこる人{ひと}に出会{であ}う',m+'/'+tot,m>=tot)}${li('松下村塾{しょうかそんじゅく}で、自分{じぶん}の志{こころざし}を書{か}く',S.shi?'✓':'まだ',!!S.shi)}${li('通{かよ}いつづけて、よび名{な}を上{あ}げる',R(rk[1]),days>=40)}</ol>`};
+  return `<ol class="goalist">${li('歩{ある}いて十{とお}の学{まな}び舎{や}をめぐり、印{しるし}をあつめる',n+'/10',n>=10)}${li('その学{まな}び舎{や}のやり方{かた}で学{まな}ぶ。素読{そどく}、解読{かいどく}、話{はな}しあい、算術{さんじゅつ}',R(days+'回{かい}'),days>0)}${li('学{まな}び舎{や}で、歴史{れきし}にのこる人{ひと}に出会{であ}う',m+'/'+tot,m>=tot)}${li('松下村塾{しょうかそんじゅく}で、自分{じぶん}の志{こころざし}を書{か}く',S.shi?'✓':'まだ',!!S.shi)}${li('学{まな}びをかさねて、レベルを上{あ}げる',R('レベル'+lvOf(days)+' '+rk[1]),days>=23)}${live?li('時代{じだい}の仕事{しごと}で、いしずえを築{きず}く',Object.keys(S.jobs).length+'/4',Object.keys(S.jobs).length>=4):li('力{ちから}をつけたら、時代{じだい}の仕事{しごと}を手{て}つだう','',false)}</ol>`};
 const OP=()=>[
  {art:KUROFUNE,t:['<p class="big">時{とき}は、一八五三年{ねん}。</p>','浦賀{うらが}の沖{おき}に、黒{くろ}い煙{けむり}をはく船{ふね}があらわれた。アメリカからやって来{き}た、四{よん}せきの軍艦{ぐんかん}だった。']},
  {t:['そのころ世界{せかい}では、蒸気{じょうき}の力{ちから}で船{ふね}や車{くるま}が走{はし}りはじめていた。','となりの清{しん}は、イギリスとの戦{たたか}いにやぶれた。','強{つよ}い国{くに}ぐにの船{ふね}が、アジアの海{うみ}に次々{つぎつぎ}とあらわれていた。']},
@@ -583,12 +624,23 @@ const OP=()=>[
  {t:['<p class="big">あなたも、そのひとりだ。</p>','学問{がくもん}で身{み}を立{た}てようと、評判{ひょうばん}の学{まな}び舎{や}をたずねて旅{たび}に出{で}る。','この国{くに}のこれからと、自分{じぶん}の志{こころざし}をさがす旅{たび}に。']},
  {t:['<p class="big">この旅{たび}ですること</p>'],h:goalList(false)+`<p style="font-size:15px;line-height:1.9">${R('十{とお}の印{しるし}がそろうと「遊学免状{ゆうがくめんじょう}」がもらえます。そのあとも、通{かよ}うたびに読{よ}む文{ぶん}と出会{であ}う人{ひと}がかわります。当時{とうじ}の若者{わかもの}と同{おな}じように、毎日{まいにち}すこしずつ声{こえ}に出{だ}して読{よ}むのが、いちばんの楽{たの}しみ方{かた}です。')}</p>`,end:R('旅{たび}じたくへ')}];
 const ED=()=>[
- {t:['<p class="big">十{とお}の学{まな}び舎{や}を、めぐり終{お}えた。</p>','そして一八六八年{ねん}、年号{ねんごう}は明治{めいじ}にかわった。']},
- {t:['学{まな}び舎{や}で出会{であ}った若者{わかもの}たちは、それぞれの道{みち}へ進{すす}んだ。','新{あたら}しい国{くに}のしくみをつくった人{ひと}。学校{がっこう}をひらいた人{ひと}。海{うみ}をわたった人{ひと}。','志{こころざし}の半{なか}ばで、たおれた人{ひと}もいた。']},
+ {t:['<p class="big">十{とお}の学{まな}び舎{や}をめぐり、四{よっ}つのいしずえを築{きず}いた。</p>','そして一八六八年{ねん}、年号{ねんごう}は明治{めいじ}にかわった。']},
+ {t:['学{まな}び舎{や}で出会{であ}った若者{わかもの}たちは、それぞれの道{みち}へ進{すす}んだ。','病{やまい}をふせいだ人{ひと}。海{うみ}をわたった人{ひと}。学校{がっこう}をひらいた人{ひと}。国{くに}のしくみをつくった人{ひと}。あなたは、その四{よっ}つのいしずえを手{て}つだった。','志{こころざし}の半{なか}ばで、たおれた人{ひと}もいた。']},
  {t:['あなたが声{こえ}に出{だ}して読{よ}んだことばは、今{いま}も読{よ}みつがれている。',S.shi?'あなたの志{こころざし}:「'+esc(S.shi)+'」':'松下村塾{しょうかそんじゅく}で、あなたの志{こころざし}を書{か}きのこそう。','旅{たび}はここでひと区切{くぎ}り。けれど、学{まな}びに卒業{そつぎょう}はない。'],end:R('免状{めんじょう}を受{う}けとる')}];
 function slides(list,done){let i=0;document.body.dataset.s='';const show=()=>{const sl=list[i];
   app.innerHTML=`<section class="op"><div>${sl.art||''}</div><div class="optx">${sl.t.map((x,k)=>x.startsWith('<p')?x.replace('<p ','<p style="animation-delay:'+k*.8+'s" ').replace(/>([^<]+)</,(m,g)=>'>'+R(g)+'<'):`<p style="animation-delay:${k*.8}s">${R(x)}</p>`).join('')}${sl.h||''}</div><div class="opnav"><span>${i+1}/${list.length}</span><button class="btn sub" id="sk">${R('とばす')}</button><button class="btn" id="nx">${i<list.length-1?R('つぎへ'):sl.end||R('はじめる')}</button></div></section>`;
   app.querySelector('#nx').onclick=()=>{if(++i<list.length){show();scrollTo(0,0)}else done()};app.querySelector('#sk').onclick=done};show()}
+const JOBS=[
+ {id:'i',g:'医',lv:7,need:'teki',t:'種痘{しゅとう}をひろめる',who:()=>CH.teki,l:['大坂{おおさか}の除痘館{じょとうかん}。天然痘{てんねんとう}をふせぐ種痘{しゅとう}を、こわがる人{ひと}も多{おお}い。','洪庵{こうあん}先生{せんせい}といっしょに、町{まち}の人{ひと}にしくみを話{はな}してまわる。','今日{きょう}も、子{こ}どもたちが種痘{しゅとう}を受{う}けに来{き}た。'],f:'緒方洪庵{おがたこうあん}は一八四九年{ねん}に除痘館{じょとうかん}をひらき、種痘{しゅとう}を広{ひろ}めました。'},
+ {id:'u',g:'海',lv:8,need:'kaigun',t:'太平洋{たいへいよう}をわたる',who:()=>CH.kaigun,l:['一八六〇年{ねん}。咸臨丸{かんりんまる}は、アメリカをめざして海{うみ}へ出{で}る。','伝習所{でんしゅうじょ}で学{まな}んだ算術{さんじゅつ}で、船{ふね}の進{すす}んだ道{みち}のりをたしかめる。','長{なが}い航海{こうかい}のすえ、サンフランシスコの港{みなと}が見{み}えた。'],f:'一八六〇年{ねん}、勝海舟{かつかいしゅう}は咸臨丸{かんりんまる}でアメリカへわたりました。福沢諭吉{ふくざわゆきち}も乗{の}っていました。'},
+ {id:'g',g:'学',lv:9,need:'fuku',t:'学{まな}び舎{や}をつくる',who:()=>CH.fuku,l:['一八六八年{ねん}。塾{じゅく}を新{あたら}しい場所{ばしょ}にうつし、名前{なまえ}をつけることになった。','塾{じゅく}のきまりを書{か}き、版{はん}にすって、ひとりひとりにくばる。','上野{うえの}で戦{たたか}いがあった日{ひ}も、講義{こうぎ}はつづいた。'],f:'福沢{ふくざわ}は慶応{けいおう}四年{よねん}に塾{じゅく}を芝{しば}の新銭座{しんせんざ}へうつし、慶應義塾{けいおうぎじゅく}と名{な}づけました。塾{じゅく}のきまりは版本{はんぽん}にしてくばりました。'},
+ {id:'k',g:'国',lv:10,need:'shoka',t:'国{くに}のしくみを考{かんが}える',who:()=>EV.shoka[2],l:['時代{じだい}は明治{めいじ}へ。国{くに}のしくみを、いちからつくることになった。','松下村塾{しょうかそんじゅく}でしたように、意見{いけん}を出{だ}しあい、文{ぶん}にまとめていく。','一八八五年{ねん}、内閣{ないかく}のしくみができあがった。'],f:'松下村塾{しょうかそんじゅく}で学{まな}んだ伊藤博文{いとうひろぶみ}は、一八八五年{ねん}に初代{しょだい}の内閣総理大臣{ないかくそうりだいじん}になりました。'}];
+function viewJob(){document.body.dataset.s='';const j=JOBS.find(x=>x.id===S.job);let i=0;
+  const show=()=>{app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button><section class="panel">${H('時代{じだい}の仕事{しごと}:'+j.t)}${charaC(j.who(),j.l[i])}
+   <div class="row"><span class="dots">${j.l.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('')}</span><button class="btn" id="hp">${R(i<j.l.length-1?'手{て}つだう':'やりとげる')}</button></div>
+   <p class="note">${F(j.f)}<br>${A('あなたが手{て}つだう場面{ばめん}は想像{そうぞう}です。歴史{れきし}のできごとそのものは変{か}えていません。')}</p></section>`;
+   app.querySelector('#back').onclick=()=>{S.view='map';render()};
+   app.querySelector('#hp').onclick=()=>{if(i<j.l.length-1){i++;sfx('ok');show()}else{S.jobs[j.id]=1;give('j_'+j.id);sfx('stamp');save();S.view='map';render();scrollTo(0,0)}}};show()}
 function enter(id){S.counted=false;S.view='school';S.school=id;S.step=0;S.marks=[];render();scrollTo(0,0)}
 
 /* ---------- 主人公をきめる ---------- */
@@ -674,7 +726,7 @@ function viewPass(){
   ${S.endSeen?`<button class="btn sub" id="reed">${R('旅{たび}のむすびをもう一度{いちど}見{み}る')}</button>`:''}
   <button class="btn sub" id="rs">${R('はじめからやりなおす')}</button>`;
   bindDaily();const re=app.querySelector('#reed');if(re)re.onclick=()=>{S.view='end';render();scrollTo(0,0)};
-  const rs=app.querySelector('#rs');let arm=false;rs.onclick=()=>{if(!arm){arm=true;rs.innerHTML=R('ほんとうに消{け}す? もう一度{いちど}おす');return}S.done={};S.shi='';S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.endSeen=0;S.opSeen=0;save();S.view='title';render()};
+  const rs=app.querySelector('#rs');let arm=false;rs.onclick=()=>{if(!arm){arm=true;rs.innerHTML=R('ほんとうに消{け}す? もう一度{いちど}おす');return}S.done={};S.shi='';S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];S.endSeen=0;S.opSeen=0;save();S.view='title';render()};
   app.querySelector('#back').onclick=()=>{S.view='map';render()};
 }
 
@@ -700,7 +752,7 @@ function frame(sc,body,total,canNext){
 }
 const unlock=()=>{app.querySelector('#next').disabled=false;sfx('ok')};
 function finish(seal,title,who,src){
-  if(!S.counted){S.counted=true;S.vis[S.school]=(S.vis[S.school]||0)+1;logDay()}S.done[S.school]=1;save();setTimeout(()=>sfx('stamp'),250);
+  if(!S.counted){S.counted=true;S.vis[S.school]=(S.vis[S.school]||0)+1;give('s_'+S.school);logDay()}S.done[S.school]=1;save();setTimeout(()=>sfx('stamp'),250);
   return chara(S.school,CH[S.school].bye)+`<p class="big">${R(title)}</p><div style="align-self:center"><span class="seal" style="width:72px;height:72px;font-size:40px">${seal}</span></div>
   <p>${F(who)}</p><p class="note">${R('もとにした本{ほん}・資料{しりょう}')}:${src}</p>
   <button class="btn" id="home">${R('道中図{どうちゅうず}へもどる')}</button>`;
@@ -930,6 +982,7 @@ function render(){
   if(S.view==='school'){document.body.dataset.s=S.school;SCHOOLS[S.school][S.step]()}
   else if(S.view==='walk')viewWalk();
   else if(S.view==='src')viewSrc();
+  else if(S.view==='job')viewJob();
   else if(S.view==='pass')viewPass(); else viewMap();
 }
 document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b||S.view===b.dataset.v)return;clearTimeout(T);WK++;try{speechSynthesis.cancel()}catch(x){}
