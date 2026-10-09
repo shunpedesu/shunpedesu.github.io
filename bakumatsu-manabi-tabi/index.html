@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="幕末の十の学び舎を、歩いてめぐる追体験アプリ">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>幕末まなび旅</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Antique&family=Klee+One:wght@400;600&display=swap">
+<style>
+/* layout: 浮世絵の道中図 → 学び舎ごとに空気(光・床・色)が切り替わる一画面の舞台。単一テーマ(和紙)を意図して採用 */
+:root{
+  color-scheme:light;
+  --washi:#e8e1cf; --washi-2:#d9d0b8; --sumi:#1c1a17; --usuzumi:#5d574c;
+  --ai:#1f3a5c; --shu:#c0391f; --matsu:#3f5b46; --kaki:#8f5527;
+  --bg:var(--washi); --fg:var(--sumi); --panel:#f1ecdd; --panel-fg:var(--sumi); --line:#b9ae93;
+  --f-brush:"Dela Gothic One","Hiragino Kaku Gothic StdN","Yu Gothic",sans-serif;
+  --f-book:"Zen Antique","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Klee One","Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;
+}
+body[data-s="nisshin"]{--bg:#cfd3d1;--fg:#1b1e22;--line:#9aa3a3}
+body[data-s="teki"]{--bg:#12141a;--fg:#e9dfc6;--panel:#231f1a;--panel-fg:#efe4c8;--line:#4a4032}
+body[data-s="shoka"]{--bg:#d6cf9f;--fg:#231d12;--panel:#f3ecd2;--line:#a89d6a}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+html{background:#14233a}
+body{background:#14233a radial-gradient(circle at 50% 100%,transparent 9px,#1d3352 10px 11px,transparent 12px 16px,#1d3352 17px 18px,transparent 19px) 0 0/40px 20px;color:var(--fg);font-family:var(--f-body);font-weight:600;font-size:17px;line-height:1.9}
+#app{max-width:520px;min-height:100dvh;margin:0 auto;padding-inline:16px;padding-block:20px 56px;display:flex;flex-direction:column;gap:20px;background:var(--bg);color:var(--fg);box-shadow:0 0 70px #000a;transition:background .6s,color .6s;overflow-x:clip}
+ruby rt{font-size:.5em;letter-spacing:0;font-family:var(--f-body);font-weight:500}
+h1,h2,h3{font-family:var(--f-brush);font-weight:400;margin:0;line-height:1.5;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--shu);outline-offset:3px}
+
+/* 道中図 */
+.sky{margin:-20px -16px 0;padding:36px 16px 44px;background:linear-gradient(#17304f 0,#2d5078 34%,#8fa9b5 70%,var(--washi) 100%);color:#f3ecd9;text-align:center;position:relative}
+.sky h1{font-size:clamp(40px,11vw,64px);letter-spacing:.08em}
+.sky p{font-size:15px;opacity:.95}
+.sky .sun{position:absolute;right:9%;top:26px;width:46px;height:46px;border-radius:50%;background:var(--shu);opacity:.9}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:14px;align-items:center}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:0 8px;line-height:1.8;border:1.5px solid currentColor;margin-right:6px;vertical-align:middle;white-space:nowrap}
+.chip.f{color:var(--ai)} .chip.a{color:var(--kaki);border-style:dashed}
+body[data-s="teki"] .chip.f{color:#9db9dc} body[data-s="teki"] .chip.a{color:#d9a56a}
+.road{list-style:none;margin:0;padding:0 0 0 26px;border-left:3px dotted var(--usuzumi);display:flex;flex-direction:column;gap:14px}
+.road li{position:relative}
+.road li::before{content:"";position:absolute;left:-35px;top:22px;width:15px;height:15px;border-radius:50%;background:var(--washi);border:3px solid var(--sumi)}
+.road li.done::before{background:var(--shu);border-color:var(--shu)}
+.fuda{width:100%;text-align:left;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:12px 16px;background:var(--panel);border:1.5px solid var(--sumi);border-radius:3px;box-shadow:3px 3px 0 var(--washi-2)}
+.fuda .no{font-family:var(--f-brush);font-size:28px;color:var(--ai);width:1.3em;text-align:center}
+.fuda .nm{font-family:var(--f-brush);font-size:24px;line-height:1.6}
+.fuda .sub{font-size:13px;color:var(--usuzumi);line-height:1.5}
+.fuda .go{font-size:13px;font-weight:700;background:var(--sumi);color:var(--washi);padding:2px 10px;border-radius:2px;white-space:nowrap}
+.fuda[disabled]{opacity:.55;cursor:default;box-shadow:none;border-style:dashed}
+.fuda[disabled] .go{background:none;color:var(--usuzumi)}
+button.fuda:not([disabled]):hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--washi-2)}
+.seal{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;border:3px solid var(--shu);color:var(--shu);font-family:var(--f-brush);font-size:24px;transform:rotate(-8deg)}
+
+/* 舞台 */
+.scene{position:relative;height:200px;margin:-20px -16px 0;overflow:hidden}
+.scene .name{position:absolute;right:20px;top:16px;writing-mode:vertical-rl;font-family:var(--f-brush);font-size:34px;letter-spacing:.12em;line-height:1.2;z-index:3}
+.scene .where{position:absolute;left:16px;bottom:10px;font-size:13px;z-index:3;font-weight:700}
+/* 日新館: 雪の朝・しっくい壁・板の間 */
+.sc-nisshin{background:linear-gradient(#e6e8e4 0 62%,#6f5236 62% 64%,#8a6a47 64%)}
+.sc-nisshin::after{content:"";position:absolute;inset:64% 0 0;background:repeating-linear-gradient(90deg,transparent 0 78px,#5e4429 78px 80px)}
+.sc-nisshin .win{position:absolute;left:8%;top:18px;width:46%;max-width:260px;height:96px;border:5px solid #4a3622;background:#b9c6cf;overflow:hidden}
+.sc-nisshin .win::before{content:"";position:absolute;inset:-100px 0 0;background-image:radial-gradient(#fff 1.6px,transparent 2px),radial-gradient(#fff 1.2px,transparent 1.6px);background-size:38px 46px,27px 33px;animation:snow 7s linear infinite}
+.sc-nisshin .win::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 30px,#4a3622 30px 33px)}
+@keyframes snow{to{transform:translateY(92px)}}
+/* 適塾: 夜・行灯・格子 */
+.sc-teki{background:#0d0f14;color:#e9dfc6}
+.sc-teki::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 24% 62%,#e8a54a66 0,#b8601f33 22%,transparent 52%);animation:flick 2.6s ease-in-out infinite}
+.sc-teki .lamp{position:absolute;left:calc(24% - 22px);top:78px;width:44px;height:64px;background:linear-gradient(#f6d89a,#e9a850);border:3px solid #2a1c10;box-shadow:0 0 40px #f2b25e}
+.sc-teki .lamp::after{content:"";position:absolute;left:-9px;right:-9px;bottom:-16px;height:13px;background:#2a1c10}
+.sc-teki .kou{position:absolute;right:92px;left:46%;top:20px;height:112px;background:repeating-linear-gradient(90deg,#2b2318 0 7px,#141a2a 7px 20px);border:4px solid #2b2318}
+.sc-teki::after{content:"";position:absolute;inset:78% 0 0;background:repeating-linear-gradient(90deg,#3b3a22 0 3px,#33321d 3px 6px)}
+@keyframes flick{0%,100%{opacity:1}43%{opacity:.82}50%{opacity:.95}71%{opacity:.76}}
+/* 松下村塾: 昼下がり・障子・八畳 */
+.sc-shoka{background:linear-gradient(#efe6c4 0 66%,#b9ac6a 66%)}
+.sc-shoka .shoji{position:absolute;left:6%;top:14px;width:50%;max-width:280px;height:112px;background:#fbf6e2;border:5px solid #6b4a2a;background-image:linear-gradient(#6b4a2a 2px,transparent 2px),linear-gradient(90deg,#6b4a2a 2px,transparent 2px);background-size:100% 37px,46px 100%;box-shadow:0 0 50px #fff6c8}
+.sc-shoka::before{content:"";position:absolute;inset:0;background:linear-gradient(112deg,transparent 30%,#fff8cf88 31% 46%,transparent 47%);z-index:1}
+.sc-shoka::after{content:"";position:absolute;inset:66% 0 0;background:repeating-linear-gradient(90deg,transparent 0 118px,#5c5a2c 118px 121px)}
+
+/* 追加七校の舞台 */
+body[data-s="kodo"]{--bg:#eadfd6} body[data-s="shohei"]{--bg:#c6ccc4} body[data-s="fuku"]{--bg:#d3d6d2}
+body[data-s="shizu"]{--bg:#d8d6bd} body[data-s="kangi"]{--bg:#cfd3c2} body[data-s="kaigun"]{--bg:#c2d5db} body[data-s="goju"]{--bg:#dcd2c0}
+.scene .name{max-height:176px}
+.roof{position:absolute;left:6%;bottom:28%;width:54%;max-width:300px;height:100px;clip-path:polygon(8% 0,92% 0,100% 40%,95% 40%,95% 100%,5% 100%,5% 40%,0 40%)}
+.sc-kodo{background:linear-gradient(#f6e9e6 0 72%,#cdc3a8 72%)}
+.sc-kodo .roof{background:linear-gradient(#2c2c2c 0 40%,#f5f2e9 40%)}
+.sc-kodo .ume{position:absolute;right:70px;top:0;width:44%;height:120px;background-image:radial-gradient(#cf3f6b 3.5px,transparent 4.5px),radial-gradient(#fff 3px,transparent 4px),linear-gradient(160deg,transparent 48%,#3a2a22 48% 51%,transparent 51%);background-size:44px 36px,58px 50px,100% 100%}
+.sc-shohei{background:linear-gradient(#b7c3c8 0 72%,#8b8878 72%)}
+.sc-shohei .roof{background:linear-gradient(#4b7a66 0 40%,#191919 40%)}
+.sc-fuku{background:linear-gradient(#d3dde0 0 58%,#5f8496 58% 72%,#b5a787 72%)}
+.sc-fuku .roof{background:linear-gradient(#3b3b3b 0 40%,#ece5d3 40%)}
+.sc-shizu{background:linear-gradient(#e2e8d8 0 26%,#58774c 26% 72%,#b9ae8c 72%)}
+.sc-shizu .roof{background:linear-gradient(#a8522c 0 46%,#eadcc3 46%)}
+.sc-kangi{background:linear-gradient(#e9ece2 0 40%,#a9b8a4 40% 72%,#b3a985 72%)}
+.sc-kangi .roof{background:linear-gradient(#8b7a48 0 52%,#e7ddc3 52%);clip-path:polygon(20% 0,80% 0,100% 52%,94% 52%,94% 100%,6% 100%,6% 52%,0 52%)}
+.sc-kaigun{background:linear-gradient(#d4e3e8 0 58%,#2e5f7b 58%)}
+.sc-kaigun .ship{position:absolute;left:12%;bottom:32%;width:48%;max-width:270px;height:112px;animation:bob 4s ease-in-out infinite;background:linear-gradient(90deg,transparent 22%,#1c1a17 22% 24%,transparent 24% 49%,#1c1a17 49% 51%,transparent 51% 76%,#1c1a17 76% 78%,transparent 78%) top/100% 82px no-repeat}
+.sc-kaigun .ship::after{content:"";position:absolute;left:0;right:0;bottom:0;height:30px;background:#1c1a17;clip-path:polygon(0 0,100% 0,90% 100%,8% 100%)}
+@keyframes bob{50%{transform:translateY(5px) rotate(-1deg)}}
+.sc-goju{background:linear-gradient(#efe3d2 0 60%,#3d6a82 60% 74%,#b8ac8c 74%)}
+.sc-goju .yama{position:absolute;left:4%;bottom:38%;width:62%;max-width:340px;height:92px;background:#4b5563;clip-path:polygon(0 100%,24% 34%,36% 22%,44% 30%,56% 8%,66% 14%,100% 100%)}
+.sc-goju .kemuri{position:absolute;left:32%;top:8px;width:70px;height:44px;border-radius:50%;background:#9a9591;opacity:.75;filter:blur(5px)}
+.mato{position:relative;height:44px;background:var(--bg);border:1.5px solid var(--fg)}
+.mato::before{content:"";position:absolute;left:41%;width:18%;top:0;bottom:0;background:var(--shu);opacity:.8}
+.mato .ya{position:absolute;top:5px;width:6px;height:32px;background:var(--fg);animation:ya 1.2s linear infinite alternate!important}
+@keyframes ya{from{left:0}to{left:calc(100% - 6px)}}
+.yuka{height:96px;background:#3a1c13;position:relative;overflow:hidden;border:1.5px solid var(--line)}
+.yuka i{position:absolute;inset:0;background:linear-gradient(100deg,transparent 22%,#fff9 40%,#ffe9b0aa 48%,transparent 66%);opacity:0;transition:opacity .4s}
+.datsu{display:grid;gap:10px}
+.datsu button{text-align:left;padding:10px 14px;background:var(--bg);border:1.5px solid var(--fg);border-radius:3px;color:var(--fg)}
+.datsu button[disabled]{text-decoration:line-through;opacity:.45}
+.kyu{font-family:var(--f-brush);font-size:20px}
+.kyu b{color:var(--shu);font-weight:400;font-size:1.3em}
+.eng{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.3}
+.panel{background:var(--panel);color:var(--panel-fg);border:1.5px solid var(--line);padding:20px 18px;display:flex;flex-direction:column;gap:14px;border-radius:3px}
+.panel h2{font-size:26px}
+.note{font-size:14px;line-height:1.75;border-top:1px dashed var(--line);padding-top:10px}
+.tate{writing-mode:vertical-rl;font-family:var(--f-book);font-weight:700;font-size:clamp(21px,5.6vw,27px);line-height:2.3;letter-spacing:.08em;height:15em;max-width:100%;overflow-x:auto;margin-inline:auto;padding:8px 4px}
+.tate span{transition:color .3s,opacity .3s;opacity:.28}
+.tate span.on{opacity:1}
+.tate span.now{color:var(--shu)}
+.tate.all span{opacity:1}
+.btn{background:var(--sumi);color:var(--washi);border:0;padding:10px 22px;border-radius:3px;font-weight:700;font-size:17px;align-self:flex-start}
+body[data-s="teki"] .btn{background:#e9dfc6;color:#12141a}
+.btn.sub{background:none;color:inherit;border:1.5px solid currentColor}
+body[data-s="teki"] .btn.sub{background:none;color:inherit}
+.btn[disabled]{opacity:.35;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.dots{display:flex;gap:7px}
+.dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid currentColor;opacity:.6}
+.dots i.on{background:currentColor;opacity:1}
+.ans{min-height:58px;border-bottom:2px solid var(--line);display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;padding-bottom:6px;font-family:var(--f-book);font-weight:700;font-size:20px}
+.tiles{display:flex;flex-wrap:wrap;gap:10px}
+.tile{font-family:var(--f-book);font-weight:700;font-size:20px;line-height:2;padding:4px 14px;background:var(--bg);color:var(--fg);border:1.5px solid var(--fg);border-radius:3px}
+.tile.used{visibility:hidden}
+.tile.ng{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.okite{font-family:var(--f-book);font-weight:700;font-size:clamp(18px,4.8vw,22px);line-height:2.2;margin:0;padding:0;list-style:none;min-height:9em}
+.okite li{animation:rise .5s}
+.okite .last{font-family:var(--f-brush);font-size:1.25em;color:var(--shu);margin-top:6px}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+.nl{display:flex;flex-wrap:wrap;gap:10px;font-family:Georgia,"Times New Roman",serif;font-size:24px}
+.nl button{background:none;border:0;border-bottom:2px dotted currentColor;padding:2px 4px;display:flex;flex-direction:column;align-items:center;line-height:1.4}
+.nl small{font-family:var(--f-body);font-size:12px;min-height:1.6em;color:#e0b070}
+.wait{height:8px;background:var(--line);overflow:hidden}
+.wait b{display:block;height:100%;width:0;background:#e8a54a}
+.marks{font-size:30px;letter-spacing:.3em;font-family:var(--f-book)}
+.usu{display:grid;place-items:center;gap:8px}
+.kine{width:26px;height:110px;background:#7a5633;border-radius:6px 6px 12px 12px;transform-origin:50% 0;transition:transform .12s}
+.kine.hit{transform:translateY(26px)}
+.mortar{width:130px;height:54px;background:#5a4630;border-radius:8px 8px 40px 40px;border-top:10px solid #efe9d6}
+.plan{width:150px;max-width:100%}
+.plan rect{fill:#c9c07a;stroke:#4f4a22;stroke-width:2}
+.choice{display:grid;gap:10px}
+.choice button{text-align:left;padding:10px 14px;background:var(--bg);border:1.5px solid var(--fg);border-radius:3px;color:var(--fg)}
+.choice button.sel{background:var(--fg);color:var(--bg)}
+textarea{font:inherit;width:100%;min-height:92px;padding:10px;background:#fffdf3;color:#1c1a17;border:1.5px solid var(--line);border-radius:3px;resize:vertical}
+.voices{display:grid;gap:8px;font-size:15px}
+.voices p{border-left:4px solid var(--matsu);padding-left:10px}
+.tegata{align-self:center;width:min(100%,380px);background:linear-gradient(90deg,#b98a54,#c99b63 40%,#b58449);color:#231708;border-radius:46px 46px 6px 6px;padding:34px 22px 24px;text-align:center;display:flex;flex-direction:column;gap:14px;box-shadow:0 4px 0 #6f4d27;position:relative}
+.tegata::before{content:"";position:absolute;top:12px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--washi)}
+.tegata h2{font-size:34px;letter-spacing:.2em}
+.stamps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;justify-items:center}
+.stamps .seal{width:46px;height:46px}
+.stamps .none{border:2px dashed #7a5a34;color:transparent;transform:none}
+.shi{font-family:var(--f-brush);font-size:20px;line-height:1.7;overflow-wrap:anywhere}
+.big{font-family:var(--f-brush);font-size:30px;text-align:center}
+.cv{width:100%;height:250px;display:block;border:1.5px solid var(--sumi);background:#efe6d0}
+#go{touch-action:none;user-select:none;-webkit-user-select:none}
+.nfuda{border:2px solid var(--panel-fg);padding:10px 14px;font-size:15px;line-height:1.8;background:var(--bg);color:var(--fg)}
+.nfuda b.t{font-family:var(--f-brush);font-weight:400;font-size:20px;margin-right:8px}
+.ima{color:var(--shu);font-weight:700;white-space:nowrap}
+input[type=text]{font:inherit;width:100%;max-width:280px;padding:8px 10px;background:#fffdf3;color:#1c1a17;border:1.5px solid var(--line);border-radius:3px}
+.choice small{display:block;font-size:13px;line-height:1.6;opacity:.85}
+.ages{display:flex;flex-wrap:wrap;gap:8px}
+.ages button{padding:4px 14px;background:var(--bg);border:1.5px solid var(--fg);border-radius:3px;color:var(--fg)}
+.ages button.sel{background:var(--fg);color:var(--bg)}
+.menjo{align-self:center;width:min(100%,460px);background:#f6f1e1;border:6px double var(--sumi);padding:24px 20px;text-align:center;display:flex;flex-direction:column;gap:10px}
+.menjo h2{font-size:38px;letter-spacing:.25em}
+details{font-size:14px;line-height:1.8}
+details summary{cursor:pointer;font-weight:700}
+/* 第四版: 書体・スマホ主体・扉絵・人物・音 */
+h1,h2,.fuda .nm,.fuda .no,.big,.kyu,.seal,.shi,.okite .last{letter-spacing:.02em}
+.tate,.tile,.ans,.okite,.marks{font-weight:400}
+.panel h2{font-size:23px}.fuda .nm{font-size:20px}.fuda .no{font-size:24px}.big{font-size:26px}.kyu{font-size:17px}.shi{font-size:18px}
+.btn{min-height:48px}.choice button,.datsu button,.tile{min-height:46px}
+.nav{position:sticky;bottom:0;z-index:5;background:var(--bg);margin-inline:-16px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1.5px solid var(--line)}
+#back{align-self:flex-end}
+#snd{position:fixed;z-index:20;top:calc(8px + env(safe-area-inset-top,0px));left:max(8px,calc(50% - 252px));min-height:38px;padding:0 12px;border:1.5px solid #e8e1cf;border-radius:19px;background:#1c1a17d9;color:#e8e1cf;font:600 13px var(--f-body)}
+.art{position:absolute;inset:0;width:100%;height:100%}
+.title{position:relative;margin:-20px -16px -56px;min-height:max(620px,100dvh);overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:24px 20px calc(26px + env(safe-area-inset-bottom,0px));color:#f3ecd9}
+.title h1{position:absolute;right:20px;top:40px;writing-mode:vertical-rl;font-size:clamp(46px,14vw,64px);letter-spacing:.08em;line-height:1.15;color:#fff;text-shadow:4px 4px 0 #14294a;animation:rise 1s both}
+.title .lead{position:absolute;right:calc(34px + clamp(46px,14vw,64px));top:48px;writing-mode:vertical-rl;font-size:16px;letter-spacing:.24em;text-shadow:0 1px 6px #14294a;animation:rise 1s .4s both}
+.tbox{position:relative;z-index:2;display:flex;flex-direction:column;gap:12px;background:#14294ae6;border:1.5px solid #e8e1cf;padding:16px;border-radius:4px;animation:rise .8s .7s both}
+.tbox p{font-size:14px;line-height:1.7}
+.tbox .btn{align-self:stretch;font-size:19px;background:var(--shu);color:#fff}
+.tbox .btn.sub{background:none;color:#f3ecd9;font-size:16px}
+.tseals{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.tseals .seal{width:30px;height:30px;font-size:15px;border-width:2px;opacity:.3;color:#f3ecd9;border-color:#f3ecd9;transform:none}
+.tseals .seal.got{opacity:1;color:#ff8a70;border-color:#ff8a70}
+.petal{position:absolute;top:-20px;width:11px;height:8px;background:#f4bcc6;border-radius:80% 10% 80% 10%;animation:fall linear infinite;z-index:1}
+@keyframes fall{to{transform:translate(-70px,110vh) rotate(540deg)}}
+.banner{position:relative;margin:-20px -16px 0;height:150px;overflow:hidden}
+.banner h1{position:absolute;right:18px;bottom:10px;color:#fff;font-size:34px;text-shadow:3px 3px 0 #14294a}
+.chara{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:start}
+.chara>div{min-width:0}
+.chara svg{width:84px;height:84px;display:block}
+.chara b{font-family:var(--f-brush);font-weight:400;font-size:17px;line-height:1.6;display:block}
+.chara small{display:block;font-size:13px;line-height:1.5;opacity:.85}
+.fuki{background:var(--bg);color:var(--fg);border:1.5px solid currentColor;border-radius:4px 14px 14px 14px;padding:8px 12px;margin-top:6px;font-size:16px;line-height:1.75}
+.met{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;text-align:center;font-size:12px;line-height:1.4;width:100%}
+.met svg{width:62px;height:62px;margin:0 auto;display:block}
+.met .q{opacity:.25}
+img.pt{border-radius:50%;border:2px solid #1c1a17;display:block;object-fit:cover}
+.chara img.pt{width:84px;height:84px}
+.met img.pt{width:62px;height:62px;margin:0 auto}
+#tabs{position:fixed;z-index:15;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,520px);display:grid;grid-template-columns:1fr 1fr;background:#1c1a17;padding-bottom:env(safe-area-inset-bottom,0px)}
+#tabs button{min-height:54px;background:none;border:0;border-top:4px solid transparent;color:#cfc7b3;font:600 15px var(--f-body)}
+#tabs button.on{border-top-color:var(--shu);color:#fff;background:#2e2a24}
+body.tabbed #app{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+body.tabbed .nav{bottom:calc(54px + env(safe-area-inset-bottom,0px))}
+.evt{border:2px solid var(--shu);padding:12px;display:flex;flex-direction:column;gap:10px;animation:rise .6s}
+.evt b.t{font-family:var(--f-brush);font-weight:400;color:var(--shu);font-size:17px}
+.cal{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}
+.cal i{aspect-ratio:1;border:1.5px solid var(--line);border-radius:50%}
+.cal i.on{background:var(--shu);border-color:var(--shu)}
+.panel h3{font-size:18px;margin-top:6px}
+.rec{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.rec li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-top:1px dashed var(--line);font-size:15px;line-height:1.7}
+.rec small{grid-column:1/-1;font-size:13px;opacity:.85}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<button id="snd" type="button" aria-pressed="true">♪ 音あり</button>
+<div id="app"></div>
+<nav id="tabs" hidden aria-label="画面の切りかえ"><button type="button" data-v="map">道中図</button><button type="button" data-v="pass">マイページ</button></nav>
+
+<script>
+const R=s=>s.replace(/([一-鿿々ヶ]+)\{([^}]+)\}/g,'<ruby>$1<rt>$2</rt></ruby>');
+const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
+const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
+const app=document.getElementById('app');
+let S={view:'title',school:null,step:0,done:{},shi:'',notes:{},marks:[]};
+S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};
+try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
+const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone}))}catch(e){}};
+const UM={b:'武士{ぶし}の子{こ}',c:'商人{しょうにん}の子{こ}',n:'農家{のうか}の子{こ}',i:'医者{いしゃ}の子{こ}'};
+const UMD={b:'藩{はん}の学校{がっこう}に通{かよ}える家{いえ}。父{ちち}は刀{かたな}を二本{にほん}さしている。',c:'町{まち}の寺子屋{てらこや}で、読{よ}み書{か}きとそろばんを習{なら}った。',n:'村{むら}の寺子屋{てらこや}で学{まな}び、家{いえ}の田畑{たはた}も手{て}つだっている。',i:'家{いえ}には薬{くすり}と本{ほん}がある。蘭学{らんがく}にあこがれている。'};
+const AGE={10:'十歳{じっさい}',11:'十一歳{じゅういっさい}',12:'十二歳{じゅうにさい}',13:'十三歳{じゅうさんさい}',14:'十四歳{じゅうよんさい}',15:'十五歳{じゅうごさい}'};
+const meLine=()=>`${esc(S.me.name)} ・ ${R(UM[S.me.um])} ・ ${R(AGE[S.me.age])}`;
+/* だれが学べたか(史実) o: all=身分を問わない / b=武士だけ / most=多くは武士 */
+const ADM={nisshin:{w:'会津藩{あいづはん}の武士{ぶし}の子{こ}。十歳{じっさい}で入学{にゅうがく}',o:'b'},kodo:{w:'水戸藩{みとはん}の武士{ぶし}とその子{こ}。十五歳{じゅうごさい}から',o:'b'},shohei:{w:'幕府{ばくふ}の家来{けらい}の子{こ}。素読吟味{そどくぎんみ}を受{う}けたのは十代{じゅうだい}の子{こ}',o:'b'},fuku:{w:'はじめは藩{はん}の武士{ぶし}の若者{わかもの}が中心{ちゅうしん}',o:'most'},teki:{w:'身分{みぶん}は問{と}われず全国{ぜんこく}から。医者{いしゃ}の家{いえ}の子{こ}が多{おお}かった',o:'all'},shizu:{w:'武士{ぶし}でない家{いえ}の子{こ}も学{まな}べた',o:'all'},shoka:{w:'武士{ぶし}の子{こ}も、そうでない家{いえ}の子{こ}も',o:'all'},kangi:{w:'年{とし}も身分{みぶん}も問{と}わない',o:'all'},kaigun:{w:'幕府{ばくふ}や藩{はん}からえらばれた武士{ぶし}の若者{わかもの}',o:'b'},goju:{w:'薩摩藩{さつまはん}の武士{ぶし}の男{おとこ}の子{こ}。六{ろく}、七歳{ななさい}から',o:'b'}};
+function nyumon(){const a=ADM[S.school],b=S.me.um==='b';
+  const v=a.o==='all'?F('きみの生{う}まれでも、ほんとうに入門{にゅうもん}できました。'):a.o==='most'?F('塾生{じゅくせい}の多{おお}くは武士{ぶし}の若者{わかもの}でした。')+A('きみも塾生{じゅくせい}としてむかえます。'):b?A('きみを、ここの武士{ぶし}の子{こ}としてむかえます。'):F('きみの生{う}まれでは、ほんとうは入門{にゅうもん}できませんでした。')+A('今日{きょう}は特別{とくべつ}に門{もん}をあけてもらいます。');
+  return `<div class="nfuda"><b class="t">${R('入門札{にゅうもんふだ}')}</b>${meLine()}<br>${F('ここで学{まな}べた人{ひと}:'+a.w)}<br>${v}</div>`}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- 音: 音楽と効果音(すべてその場で合成) ---------- */
+const AU={on:true,ctx:null,mood:null,timer:null,step:0,next:0};
+try{AU.on=localStorage.getItem('manabitabi_snd')!=='off'}catch(e){}
+function ac(){if(!AU.ctx){const C=window.AudioContext||window.webkitAudioContext;AU.ctx=new C();AU.bgm=AU.ctx.createGain();AU.bgm.gain.value=.13;AU.bgm.connect(AU.ctx.destination);AU.sfx=AU.ctx.createGain();AU.sfx.gain.value=.55;AU.sfx.connect(AU.ctx.destination)}
+  if(AU.ctx.state==='suspended')AU.ctx.resume();return AU.ctx}
+function env(g,t,v,d,a=.006){g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+d)}
+function pluck(f,t,d,v,out){const c=AU.ctx,g=c.createGain();env(g,t,v,d);g.connect(out);[['triangle',1,1],['sine',2,.35],['sine',3.01,.12]].forEach(([w,m,k])=>{const o=c.createOscillator(),h=c.createGain();o.type=w;o.frequency.value=f*m;h.gain.value=k;o.connect(h).connect(g);o.start(t);o.stop(t+d+.05)})}
+function flute(f,t,d,v,out){const c=AU.ctx,o=c.createOscillator(),g=c.createGain(),l=c.createOscillator(),lg=c.createGain();o.type='sine';o.frequency.value=f;l.frequency.value=5;lg.gain.value=f*.012;l.connect(lg).connect(o.frequency);
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.12);g.gain.setValueAtTime(v,t+d*.7);g.gain.linearRampToValueAtTime(.0001,t+d);o.connect(g).connect(out);o.start(t);l.start(t);o.stop(t+d+.05);l.stop(t+d+.05)}
+function drum(t,v,out,f=120){const c=AU.ctx,o=c.createOscillator(),g=c.createGain();o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(42,t+.2);env(g,t,v,.3,.004);o.connect(g).connect(out);o.start(t);o.stop(t+.35)}
+function hiss(t,d,v,out,fq=1800){const c=AU.ctx,n=c.createBufferSource(),b=c.createBuffer(1,c.sampleRate*d,c.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1;n.buffer=b;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=fq;const g=c.createGain();env(g,t,v,d,.004);n.connect(f).connect(g).connect(out);n.start(t)}
+function tok(f=520,d=.09){if(!AU.on)return;try{const c=ac();pluck(f,c.currentTime,Math.max(d,.12)*2,.5,AU.sfx)}catch(e){}}
+function sfx(k){if(!AU.on)return;try{const c=ac(),t=c.currentTime,o=AU.sfx;
+  if(k==='ok'){pluck(587,t,.5,.4,o);pluck(880,t+.11,.7,.4,o)}
+  else if(k==='clack'){hiss(t,.05,.5,o,2600);pluck(1400,t,.06,.18,o)}
+  else if(k==='stamp'){drum(t,.9,o,150);hiss(t,.12,.35,o,700);pluck(294,t+.18,1.2,.35,o);pluck(440,t+.3,1.2,.3,o);pluck(587,t+.42,1.6,.3,o)}
+  else if(k==='arrive'){[294,392,440,587,784].forEach((f,i)=>pluck(f,t+i*.1,.9,.35,o));drum(t+.5,.6,o)}
+  else if(k==='boom'){drum(t,1,o,70);hiss(t,.6,.5,o,200)}
+  else if(k==='step'){hiss(t,.06,.22,o,900)}}catch(e){}}
+/* 音階: 都節(しっとり)と陽音階(あかるい)。数字は音階の何番目か、-1は休み */
+const SC={in:[0,1,5,7,8,12,13,17,19,20],yo:[0,2,5,7,9,12,14,17,19,21]},_=-1;
+const MOOD={
+ map:{bpm:80,sc:'in',base:293.66,fl:[4,_,_,_,5,_,4,_,2,_,_,_,1,_,2,_,4,_,_,_,5,_,7,_,5,_,_,_,4,_,_,_, 7,_,_,_,5,_,4,_,5,_,_,_,2,_,1,_,2,_,_,_,4,_,2,_,0,_,_,_,_,_,_,_],ko:[0,_,3,_,5,_,3,_,0,_,2,_,4,_,2,_],dr:[]},
+ walk:{bpm:118,sc:'yo',base:293.66,fl:[],ko:[5,_,5,7,8,_,7,5,3,_,5,_,3,2,0,_, 2,_,3,5,3,_,2,0,2,_,3,_,5,_,_,_, 5,_,7,8,9,_,8,7,5,_,7,_,5,3,2,_, 3,_,5,3,2,_,0,_,2,3,2,0,0,_,_,_],dr:[1,_,_,2,1,_,2,_]},
+ school:{bpm:58,sc:'yo',base:220,fl:[],ko:[0,_,_,3,_,_,5,_,_,_,4,_,_,2,_,_, 3,_,_,5,_,_,7,_,_,_,5,_,_,3,_,_],dr:[]},
+ night:{bpm:50,sc:'in',base:196,fl:[5,_,_,_,_,_,4,_,2,_,_,_,_,_,_,_,1,_,_,_,2,_,_,_,0,_,_,_,_,_,_,_],ko:[0,_,_,_,_,_,2,_,_,_,_,_,3,_,_,_],dr:[]}};
+const nf=(m,i)=>m.base*Math.pow(2,SC[m.sc][i]/12);
+function bgmTick(){const c=AU.ctx,m=MOOD[AU.mood];if(!m)return;const st=30/m.bpm;
+  while(AU.next<c.currentTime+.25){const i=AU.step,t=Math.max(AU.next,c.currentTime+.02);
+    const k=m.ko.length?m.ko[i%m.ko.length]:_;if(k>=0)pluck(nf(m,k),t,1.4,.5,AU.bgm);
+    const f=m.fl.length?m.fl[i%m.fl.length]:_;if(f>=0){let n=1;while(m.fl[(i+n)%m.fl.length]<0&&n<8)n++;flute(nf(m,f)*2,t,st*n*.95,.32,AU.bgm)}
+    const d=m.dr.length?m.dr[i%m.dr.length]:_;if(d===1)drum(t,.8,AU.bgm);else if(d===2)hiss(t,.05,.35,AU.bgm,2400);
+    AU.step++;AU.next=t+st}}
+function bgm(){clearInterval(AU.timer);AU.timer=null;if(!AU.on||!AU.mood||!AU.ctx)return;AU.step=0;AU.next=AU.ctx.currentTime+.1;AU.timer=setInterval(()=>{try{bgmTick()}catch(e){}},90)}
+function setMood(m){if(AU.mood===m&&AU.timer)return;AU.mood=m;bgm()}
+const sndBtn=document.getElementById('snd'),sndLabel=()=>{sndBtn.textContent=AU.on?'♪ 音あり':'♪ 音なし';sndBtn.setAttribute('aria-pressed',AU.on)};sndLabel();
+sndBtn.onclick=()=>{AU.on=!AU.on;try{localStorage.setItem('manabitabi_snd',AU.on?'on':'off')}catch(e){}sndLabel();if(AU.on){try{ac()}catch(e){}}bgm()};
+addEventListener('pointerdown',e=>{if(!AU.on)return;try{ac();if(!AU.timer)bgm()}catch(x){}if(e.target.closest&&e.target.closest('.btn,.fuda,.choice button,.ages button,.datsu button,#tabs button'))sfx('clack')},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInterval(AU.timer);AU.timer=null}else bgm()});
+
+/* ---------- 扉絵 ---------- */
+const art=(pos='xMidYMax')=>`<svg class="art" viewBox="0 0 400 600" preserveAspectRatio="${pos} slice" aria-hidden="true"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14294a"/><stop offset=".45" stop-color="#3f6a94"/><stop offset=".78" stop-color="#e9d9b8"/><stop offset="1" stop-color="#f1e6cc"/></linearGradient></defs>
+<rect width="400" height="600" fill="url(#sk)"/><circle cx="108" cy="252" r="54" fill="#c0391f"/>
+<g fill="#f1e6cc" opacity=".85"><rect x="-20" y="290" width="210" height="9" rx="4.5"/><rect x="50" y="306" width="250" height="7" rx="3.5"/><rect x="250" y="238" width="190" height="8" rx="4"/></g>
+<path d="M150 440 L262 292 Q272 284 282 292 L400 426 V600 H150Z" fill="#2d4f78"/><path d="M244 316 L262 292 Q272 284 282 292 L302 316 L290 309 L280 320 L270 307 L258 320Z" fill="#f4eee0"/>
+<path d="M0 444 Q60 392 120 432 T250 424 T400 448 V600 H0Z" fill="#3f5b46"/><path d="M0 484 Q90 452 190 480 T400 472 V600 H0Z" fill="#587a55"/><path d="M0 524 Q200 492 400 524 V600 H0Z" fill="#cdbf98"/>
+<path d="M150 610 Q214 552 182 524 Q160 502 236 488" stroke="#b09f76" stroke-width="22" fill="none" stroke-linecap="round"/>
+<g fill="#1d3a2c"><rect x="52" y="470" width="7" height="74" fill="#3a2a1c"/><path d="M20 494h72l-36-34zM26 472h60l-30-30zM32 452h48l-24-28z"/><rect x="336" y="486" width="6" height="56" fill="#3a2a1c"/><path d="M312 504h54l-27-26zM317 487h44l-22-22zM322 471h34l-17-19z"/></g>
+<g transform="translate(186,548)" stroke="#1c1a17" stroke-width="5" stroke-linecap="round" fill="#1c1a17"><path d="M0 -30 L-8 0 M0 -30 L9 0 M0 -30 V-58 M0 -50 L14 -38" fill="none"/><path d="M16 -60 V0" stroke-width="2.5" fill="none"/><circle cy="-66" r="7" stroke="none"/><path d="M-19 -68 H19 L0 -84Z" fill="#cdb98a" stroke="none"/><rect x="-16" y="-58" width="10" height="16" fill="#8f5527" stroke="none"/></g></svg>`;
+
+/* ---------- 出会う人(実在の人物。絵とせりふは想像) ---------- */
+const CH={
+ nisshin:{n:'山川健次郎{やまかわけんじろう}',r:'日新館{にっしんかん}で学{まな}ぶ少年{しょうねん}',h:'boy',k:'#3b5a7a',hi:'きみも今日{きょう}からか。素読{そどく}は声{こえ}が小{ちい}さいとしかられるぞ。腹{はら}から出{だ}せ。',bye:'ならぬことはならぬ。わすれるなよ。',f:'一八五四年{ねん}生{う}まれ。会津藩士{あいづはんし}の子{こ}で、日新館{にっしんかん}で学{まな}びました。'},
+ kodo:{n:'藤田東湖{ふじたとうこ}',r:'水戸藩{みとはん}の学者{がくしゃ}',h:'mage',k:'#5a4a3a',hi:'よく来{き}た。本{ほん}ばかりでも、剣{けん}ばかりでもいかん。両方{りょうほう}やって一人前{いちにんまえ}じゃ。',bye:'よく学{まな}んだら、梅{うめ}を見{み}て休{やす}め。',f:'藩主{はんしゅ}の斉昭{なりあき}をささえた学者{がくしゃ}。『弘道館記{こうどうかんき}』の下書{したが}きを書{か}いたといわれます。'},
+ shohei:{n:'佐藤一斎{さとういっさい}',r:'学問所{がくもんじょ}の先生{せんせい}',h:'white',k:'#4f4a44',hi:'かたくなっておるな。ふだんどおり、はっきり読{よ}めばよい。',bye:'学{まな}びは一生{いっしょう}つづくものじゃ。',f:'昌平坂学問所{しょうへいざかがくもんじょ}の先生{せんせい}。「若{わか}いときに学{まな}べば、大人{おとな}になって役{やく}に立{た}つ」ということばをのこしました。'},
+ fuku:{n:'福沢諭吉{ふくざわゆきち}',r:'塾{じゅく}の先生{せんせい}',h:'mage',k:'#2f4f4f',hi:'やあ、よく来{き}たね。ここでだいじなのは、学{まな}ぶ気{き}があるかどうかだ。',bye:'世{よ}の中{なか}がさわがしいときほど、本{ほん}を読{よ}もう。',f:'中津藩{なかつはん}の武士{ぶし}の子{こ}。適塾{てきじゅく}で学{まな}び、一八六〇年{ねん}には咸臨丸{かんりんまる}でアメリカへ行{い}きました。'},
+ teki:{n:'緒方洪庵{おがたこうあん}',r:'適塾{てきじゅく}の先生{せんせい}・医者{いしゃ}',h:'sou',k:'#4a4a5a',hi:'遠{とお}くからよく来{き}ました。わからないところは、まず自分{じぶん}で調{しら}べること。それがここのやり方{かた}です。',bye:'学{まな}んだことは、人{ひと}のために使{つか}いなさい。',f:'大坂{おおさか}の医者{いしゃ}。天然痘{てんねんとう}をふせぐ種痘{しゅとう}を広{ひろ}めました。'},
+ shizu:{n:'大鳥圭介{おおとりけいすけ}',r:'閑谷学校{しずたにがっこう}で学{まな}ぶ少年{しょうねん}',h:'boy',k:'#6b5a3a',hi:'ぼくは医者{いしゃ}の家{いえ}の子{こ}。きみも、まず床{ゆか}みがきからだよ。',bye:'ぼくはいつか大坂{おおさか}で蘭学{らんがく}を学{まな}ぶんだ。',f:'播磨{はりま}の医者{いしゃ}の子{こ}。少年{しょうねん}のころ閑谷学校{しずたにがっこう}で学{まな}びました。'},
+ shoka:{n:'吉田松陰{よしだしょういん}',r:'松下村塾{しょうかそんじゅく}の先生{せんせい}',h:'sou',k:'#5a5a4a',hi:'よく来{き}てくれました。ここでは、わたしが教{おし}えるのではありません。いっしょに学{まな}びましょう。',bye:'あなたの志{こころざし}を、たいせつに。',f:'長州藩{ちょうしゅうはん}の武士{ぶし}。塾生{じゅくせい}にもていねいなことばで話{はな}したとつたわります。'},
+ kangi:{n:'広瀬淡窓{ひろせたんそう}',r:'咸宜園{かんぎえん}の先生{せんせい}',h:'white',k:'#4a5a4a',hi:'年{とし}も身分{みぶん}も、ここでは関係{かんけい}ない。みな同{おな}じところから始{はじ}めるのじゃ。',bye:'来月{らいげつ}の月旦評{げったんひょう}を楽{たの}しみにしておるぞ。',f:'日田{ひた}の商人{しょうにん}の家{いえ}に生{う}まれた学者{がくしゃ}で、詩人{しじん}でもありました。'},
+ kaigun:{n:'勝麟太郎{かつりんたろう}',r:'伝習生{でんしゅうせい}のまとめ役{やく}。のちの勝海舟{かつかいしゅう}',h:'mage',k:'#2a3a5a',hi:'おう、新入{しんい}りかい。船{ふね}は算術{さんじゅつ}で動{うご}くんだ。まずは計算{けいさん}からだぜ。',bye:'いつかこの船{ふね}で、海{うみ}の向{む}こうへ行{い}くぜ。',f:'幕府{ばくふ}の家来{けらい}。オランダ語{ご}ができたので、伝習生{でんしゅうせい}のまとめ役{やく}をつとめました。'},
+ goju:{n:'西郷吉之助{さいごうきちのすけ}',r:'郷中{ごじゅう}の二才頭{にせがしら}。のちの西郷隆盛{さいごうたかもり}',h:'mage',big:1,k:'#33312e',hi:'よう来{き}た。ここでは年上{としうえ}が年下{としした}のめんどうを見{み}る。わからんことは、何{なん}でも聞{き}け。',bye:'負{ま}けるな。うそを言{い}うな。弱{よわ}い者{もの}をいじめるな。',f:'下加治屋町{したかじやまち}の郷中{ごじゅう}で、若者{わかもの}のまとめ役{やく}「二才頭{にせがしら}」をつとめました。'}};
+/* ---------- 通いつづけると起こるできごと(at=何回目の入門か) ---------- */
+const EV={
+ shoka:[{at:2,n:'高杉晋作{たかすぎしんさく}',r:'塾生{じゅくせい}',h:'mage',k:'#3a3f55',line:'おもしろいやつが入{はい}ったと聞{き}いた。きみか。こんど、ぼくと議論{ぎろん}をしよう。',f:'長州藩士{ちょうしゅうはんし}の子{こ}。松下村塾{しょうかそんじゅく}で学{まな}び、のちに身分{みぶん}を問{と}わない軍隊{ぐんたい}「奇兵隊{きへいたい}」をつくりました。'},
+  {at:3,n:'久坂玄瑞{くさかげんずい}',r:'塾生{じゅくせい}',h:'sou',k:'#4a5a3a',line:'高杉{たかすぎ}とはよく言{い}いあいになる。だが、あいつがいるから、ぼくも本{ほん}を読{よ}むんだ。',f:'医者{いしゃ}の家{いえ}の子{こ}。高杉{たかすぎ}とならんで塾{じゅく}の「双璧{そうへき}」とよばれました。'},
+  {at:5,n:'伊藤利助{いとうりすけ}',r:'塾生{じゅくせい}。のちの伊藤博文{いとうひろぶみ}',h:'boy',k:'#5a4a3a',line:'ぼくの家{いえ}は身分{みぶん}が低{ひく}い。それでも先生{せんせい}は、同{おな}じように教{おし}えてくれるんだ。',f:'農家{のうか}の生{う}まれ。松下村塾{しょうかそんじゅく}で学{まな}び、のちに初代{しょだい}の内閣総理大臣{ないかくそうりだいじん}になりました。'}],
+ teki:[{at:2,n:'福沢諭吉{ふくざわゆきち}',r:'塾頭{じゅくとう}(塾生{じゅくせい}のまとめ役{やく})',h:'mage',k:'#2f4f4f',line:'辞書{じしょ}はあいたかい? ぼくは夜{よる}どおし写{うつ}していたら、まくらをしたことがないと気{き}づいたよ。',f:'一八五五年{ねん}に適塾{てきじゅく}に入{はい}り、のちに塾頭{じゅくとう}になりました。'},
+  {at:4,n:'村田蔵六{むらたぞうろく}',r:'かつての塾頭{じゅくとう}。のちの大村益次郎{おおむらますじろう}',h:'sou',k:'#4a4038',line:'……訳{やく}は、短{みじか}く正{ただ}しく。それだけです。',f:'長州{ちょうしゅう}の医者{いしゃ}の子{こ}。適塾{てきじゅく}で塾頭{じゅくとう}をつとめ、のちに軍隊{ぐんたい}のしくみを西洋式{せいようしき}に改{あらた}めました。'}],
+ nisshin:[{at:2,n:'山本覚馬{やまもとかくま}',r:'日新館{にっしんかん}の先生{せんせい}',h:'mage',k:'#3a4a4a',line:'漢学{かんがく}だけでは足{た}りぬ。これからは西洋{せいよう}の学問{がくもん}も要{い}る。',f:'会津藩士{あいづはんし}。日新館{にっしんかん}で学{まな}び、のちに蘭学{らんがく}を教{おし}える場{ば}をつくりました。'}],
+ kodo:[{at:2,n:'徳川斉昭{とくがわなりあき}',r:'水戸藩主{みとはんしゅ}',h:'mage',k:'#5a3a3a',line:'よく通{かよ}っておるな。学{まな}びに終{お}わりはないぞ。',f:'弘道館{こうどうかん}と偕楽園{かいらくえん}をつくった藩主{はんしゅ}。'},
+  {at:4,n:'七郎麻呂{しちろうまろ}',r:'斉昭{なりあき}の子{こ}。のちの徳川慶喜{とくがわよしのぶ}',h:'boy',k:'#4a3a5a',line:'わたしも毎朝{まいあさ}、素読{そどく}をしている。いっしょに読{よ}もう。',f:'子{こ}どものころ水戸{みと}で育{そだ}ち、弘道館{こうどうかん}で学{まな}びました。のちに最後{さいご}の将軍{しょうぐん}になります。'}],
+ shohei:[{at:2,n:'安積艮斎{あさかごんさい}',r:'学問所{がくもんじょ}の先生{せんせい}',h:'white',k:'#4a4a3a',line:'また来{き}たか。くり返{かえ}し読{よ}めば、意味{いみ}はしぜんと見{み}えてくる。',f:'福島{ふくしま}の神社{じんじゃ}の家{いえ}に生{う}まれ、学問所{がくもんじょ}の先生{せんせい}になった学者{がくしゃ}。'}],
+ fuku:[{at:2,n:'小幡篤次郎{おばたとくじろう}',r:'塾{じゅく}の先輩{せんぱい}',h:'mage',k:'#3a4a3a',line:'ぼくも中津{なかつ}から出{で}てきたんだ。英語{えいご}は、まず声{こえ}に出{だ}すことだよ。',f:'福沢{ふくざわ}と同{おな}じ中津藩{なかつはん}の出身{しゅっしん}。塾{じゅく}で学{まな}び、のちに先生{せんせい}として塾{じゅく}をささえました。'}],
+ shizu:[{at:2,n:'津田永忠{つだながただ}',r:'学校{がっこう}を建{た}てた人{ひと}',h:'mage',k:'#5a4a2a',line:'この学校{がっこう}は、百年{ひゃくねん}たってもくずれぬように建{た}てた。きみたちが学{まな}びつづけるためじゃ。',f:'池田光政{いけだみつまさ}の家来{けらい}。命{めい}じられて、長{なが}い年月{としつき}をかけて閑谷学校{しずたにがっこう}を建{た}てました。'}],
+ kangi:[{at:2,n:'村田蔵六{むらたぞうろく}',r:'塾生{じゅくせい}。のちの大村益次郎{おおむらますじろう}',h:'sou',k:'#4a4038',line:'ここで漢学{かんがく}をおさめたら、つぎは大坂{おおさか}で蘭学{らんがく}です。',f:'若{わか}いころ咸宜園{かんぎえん}で学{まな}び、そのあと大坂{おおさか}の適塾{てきじゅく}へ進{すす}みました。'}],
+ kaigun:[{at:2,n:'カッテンディーケ',r:'オランダ海軍{かいぐん}の先生{せんせい}',h:'sou',k:'#1f2f55',hc:'#8a6a3a',line:'(通詞{つうじ}の声{こえ})「きみたちは、よく学{まな}ぶ。だが、海{うみ}の上{うえ}では時間{じかん}を守{まも}ること」',f:'伝習所{でんしゅうじょ}で教{おし}えたオランダの海軍士官{かいぐんしかん}。日本{にほん}でのくらしを本{ほん}に書{か}きのこしました。'},
+  {at:4,n:'榎本釜次郎{えのもとかまじろう}',r:'伝習生{でんしゅうせい}。のちの榎本武揚{えのもとたけあき}',h:'mage',k:'#2a4a4a',line:'機関{きかん}のしくみは、手{て}をよごして覚{おぼ}えるのがいちばんさ。',f:'幕府{ばくふ}の家来{けらい}の子{こ}。伝習所{でんしゅうじょ}で学{まな}び、のちにオランダへ留学{りゅうがく}しました。'}],
+ goju:[{at:2,n:'大久保正助{おおくぼしょうすけ}',r:'同{おな}じ郷中{ごじゅう}の二才{にせ}。のちの大久保利通{おおくぼとしみち}',h:'mage',k:'#2f3540',line:'吉之助{きちのすけ}さんとは、子{こ}どものころからの仲間{なかま}だ。きみも、ここの仲間{なかま}だ。',f:'西郷{さいごう}と同{おな}じ下加治屋町{したかじやまち}の郷中{ごじゅう}で育{そだ}ちました。'}]};
+const charaC=(c,line)=>`<div class="chara">${face(c)}<div><b>${R(c.n)}</b><small>${R(c.r)}</small><p class="fuki">${R(line)}</p></div></div>`;
+function event(){const n=(S.vis[S.school]||0)+1,list=EV[S.school]||[],e=list.find(x=>x.at===n),nx=list.find(x=>x.at>n);
+  let h=`<p class="kyu">${R(`${n}回目{かいめ}の入門{にゅうもん}`)}</p>`;
+  if(e){S.ev[S.school+e.at]=1;save();setTimeout(()=>sfx('arrive'),700);h+=`<div class="evt"><b class="t">${R('できごと')}</b>${charaC(e,e.line)}<p class="note">${F(e.f)}<br>${A('出会{であ}いの場面{ばめん}とせりふは想像{そうぞう}です。年代{ねんだい}のちがう人{ひと}にも出会{であ}います。')}</p></div>`}
+  else if(nx)h+=`<p style="font-size:14px">${R(`あと${nx.at-n}回{かい}通{かよ}うと、だれかに出会{であ}えそうだ。`)}</p>`;
+  return h}
+/* ---------- 学びの記録 ---------- */
+const dkey=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+function logDay(){const k=dkey();S.days[k]=(S.days[k]||0)+1;save()}
+function streak(){let n=0;const d=new Date();if(!S.days[dkey(d)])d.setDate(d.getDate()-1);while(S.days[dkey(d)]){n++;d.setDate(d.getDate()-1)}return n}
+const RANKS=[[0,'旅{たび}の書生{しょせい}'],[3,'遊学生{ゆうがくせい}'],[10,'塾{じゅく}の先輩{せんぱい}'],[20,'塾頭{じゅくとう}'],[40,'志{こころざし}ある人{ひと}']];
+const DAILY=()=>[...RONGO.map(r=>({p:r.p,s:'『論語{ろんご}』',m:r.m})),...GINMI.map(p=>({p,s:'素読吟味{そどくぎんみ}の文{ぶん}'})),{p:MOSHI,s:'『孟子{もうし}』'},{p:['己{おのれ}の','欲{ほっ}せざる所{ところ}は','人{ひと}に施{ほどこ}すこと','勿{な}かれ'],s:'『論語{ろんご}』'},{p:['弘道{こうどう}とは何{なん}ぞ','人{ひと}能{よ}く','道{みち}を弘{ひろ}むるなり'],s:'『弘道館記{こうどうかんき}』'},{p:['いにしへの','道{みち}を聞{き}きても','唱{とな}へても','わが行{おこな}ひに','せずばかひなし'],s:'日新公{じっしんこう}いろは歌{うた}'}];
+function myPage(){const tot=Object.values(S.days).reduce((a,b)=>a+b,0),rk=[...RANKS].reverse().find(r=>tot>=r[0]),nx=RANKS.find(r=>r[0]>tot),st=streak(),today=new Date();
+  const cal=Array.from({length:14},(_,i)=>{const d=new Date(today);d.setDate(d.getDate()-13+i);return `<i class="${S.days[dkey(d)]?'on':''}" title="${dkey(d)}"></i>`}).join('');
+  return `${S.resume?`<button class="btn" id="res">${R('学{まな}びのつづきにもどる')}</button>`:''}<section class="panel"><h2>${esc(S.me.name)}${R('の学{まな}びの記録{きろく}')}</h2>
+  <p class="big" style="text-align:left">${R(rk[1])}</p>
+  <p>${R(`これまでの学{まな}び ${tot}回{かい} ・ つづけて ${st}日{にち}`)}${nx?`<br><span style="font-size:14px">${R(`あと${nx[0]-tot}回{かい}で「${nx[1]}」`)}</span>`:''}</p>
+  <div class="cal" aria-label="この14日間の記録">${cal}</div>
+  <h3>${R('今日{きょう}の素読{そどく}')}</h3><div id="daily"></div>
+  <h3>${R('学{まな}び舎{や}ごとの記録{きろく}')}</h3>
+  <ul class="rec">${STATIONS.map(s=>{const v=S.vis[s.id]||0,ev=EV[s.id]||[];return `<li><b>${R(s.nm)}</b><span>${v?R(`${v}回{かい}`):R('まだ')}</span><small>${ev.map(e=>S.ev[s.id+e.at]?R(e.n):'?').join(' ・ ')}</small></li>`}).join('')}</ul>
+  <p class="note">${F('当時{とうじ}の学{まな}びは、同{おな}じ文{ぶん}を毎日{まいにち}くり返{かえ}し声{こえ}に出{だ}すことが基本{きほん}でした。')}<br>${A('回数{かいすう}でかわるよび名{な}と、通{かよ}うと起{お}こるできごと。')}</p></section>`}
+function bindDaily(){const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{const r=S.resume;S.resume=null;S.view='school';S.school=r.school;S.step=r.step;render();scrollTo(0,0)};const box=app.querySelector('#daily');if(!box)return;const k=dkey();
+  if(S.dailyDone===k){box.innerHTML=`<p>${R('今日{きょう}の素読{そどく}はすませた。また明日{あした}。')}</p>`;return}
+  const pool=DAILY(),d=new Date(),q=pool[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%pool.length];
+  box.innerHTML=`<p style="font-size:14px">${R(q.s)}${R('より。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="dg"></div>`;
+  orderGame(box.querySelector('#dg'),q.p,()=>{S.dailyDone=k;logDay();sfx('stamp');setTimeout(()=>{if(S.view==='pass')render()},900)})}
+const plain=t=>t.replace(/\{[^}]+\}/g,'');
+/* 顔のつくり: 肖像画や写真でつたわる特徴(輪郭・眉・目・年ごろ)を数値にしたもの
+   rx,ry=顔の幅と長さ cw=あごの幅 br=[眉の太さ,つり上がり] e=目(n細い s切れ長 g穏やか b大きい) ns=鼻の長さ ho=こけた頬 old=しわ fh=広いひたい mu=ひげ nk=首の太さ */
+const FACE={'山川健次郎':{rx:17,ry:18,e:'b'},'藤田東湖':{rx:21,ry:20,cw:13,br:[4,2],ns:7,nk:16},'佐藤一斎':{rx:17,ry:22,cw:8,br:[2.4,-2],ns:10,ho:1,old:1},
+ '福沢諭吉':{rx:17,ry:23,cw:9,br:[3.4,0],ns:9,fh:1},'緒方洪庵':{rx:18,ry:21,cw:10,br:[2,-1],e:'g',ns:7},'大鳥圭介':{rx:17,ry:18,e:'b'},
+ '吉田松陰':{rx:15.5,ry:23,cw:6,br:[2,2],e:'s',ns:9,ho:1},'広瀬淡窓':{rx:16,ry:22,cw:7,br:[2,-2],e:'g',ns:8,old:1,ho:1},'勝麟太郎':{rx:16,ry:21,cw:7,br:[2.6,3],e:'s',ns:8},
+ '西郷吉之助':{rx:22,ry:21,cw:15,br:[5.5,0],e:'b',ns:7,nk:19},'高杉晋作':{rx:15,ry:24,cw:7,br:[2.4,2],e:'s',ns:10},'久坂玄瑞':{rx:17,ry:21,cw:9,br:[2.6,1],ns:8},
+ '伊藤利助':{rx:17,ry:18,e:'b'},'村田蔵六':{rx:19,ry:24,cw:9,br:[5,0],ns:8,fh:1},'山本覚馬':{rx:19,ry:21,cw:11,br:[3.4,1],ns:8},'徳川斉昭':{rx:18,ry:22,cw:9,br:[3,2],ns:9,old:1},
+ '七郎麻呂':{rx:16,ry:18,e:'b'},'安積艮斎':{rx:18,ry:21,cw:10,br:[2.4,-1],e:'g',ns:8,old:1},'小幡篤次郎':{rx:17,ry:21,cw:9,br:[2.4,0],ns:8},'津田永忠':{rx:19,ry:21,cw:11,br:[3,1],ns:8,old:1},
+ 'カッテンディーケ':{rx:17,ry:22,cw:9,br:[3,0],ns:10,mu:1,west:1},'榎本釜次郎':{rx:17,ry:21,cw:9,br:[3,1],ns:8},'大久保正助':{rx:16,ry:23,cw:8,br:[2.8,2],e:'s',ns:9}};
+/* 画像生成でつくった肖像(肖像画・写真の特徴をもとにした絵) */
+const IMG={'西郷吉之助':'data:image/jpeg;base64,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',
+'勝麟太郎':'data:image/jpeg;base64,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',
+'福沢諭吉':'data:image/jpeg;base64,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',
+'吉田松陰':'data:image/jpeg;base64,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',
+'緒方洪庵':'data:image/jpeg;base64,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'};
+function face(c){const im=IMG[plain(c.n)];if(im)return `<img class="pt" src="${im}" alt="${plain(c.n)}">`;const f=Object.assign({rx:18,ry:21,cw:10,br:[2,0],e:'n',ns:7,nk:12},FACE[plain(c.n)]||{}),hc=c.hc||(c.h==='white'?'#b9b5ad':'#1c1a17'),sk=f.west?'#f0d2b4':'#ecc9a2',cy=40,L=48-f.rx,Rr=48+f.rx,top=cy-f.ry,bot=cy+f.ry,hl=top+(f.fh?7:3);
+  const head=`<path d="M${L} ${cy} Q${L} ${top-2} 48 ${top} Q${Rr} ${top-2} ${Rr} ${cy} Q${Rr} ${cy+f.ry*.62} ${48+f.cw} ${cy+f.ry*.84} Q48 ${bot+3} ${48-f.cw} ${cy+f.ry*.84} Q${L} ${cy+f.ry*.62} ${L} ${cy}Z" fill="${sk}"/>`;
+  const ears=`<ellipse cx="${L-1}" cy="${cy+3}" rx="3" ry="5" fill="${sk}"/><ellipse cx="${Rr+1}" cy="${cy+3}" rx="3" ry="5" fill="${sk}"/>`;
+  const hair=f.west?`<path d="M${L-2} ${cy+8} Q${L-5} ${top-8} 48 ${top-5} Q${Rr+5} ${top-8} ${Rr+2} ${cy+8} L${Rr-2} ${cy-4} Q${Rr-4} ${hl+2} 48 ${hl+3} Q${L+4} ${hl+2} ${L+2} ${cy-4}Z" fill="${hc}"/>`
+   :c.h==='mage'?`<path d="M${L-1} ${cy+3} Q${L-3} ${top-1} 48 ${top-2} Q${Rr+3} ${top-1} ${Rr+1} ${cy+3} Q${Rr-3} ${hl+6} 58 ${hl+7} V${hl} H38 V${hl+7} Q${L+3} ${hl+6} ${L-1} ${cy+3}Z" fill="${hc}"/><path d="M38 ${hl+7} V${hl} H58 V${hl+7}Z" fill="#cfd6c4" opacity=".55"/><rect x="44" y="${top-12}" width="8" height="19" rx="3.5" fill="${hc}"/>`
+   :`<path d="M${L-1} ${cy+3} Q${L-4} ${top-5} 48 ${top-4} Q${Rr+4} ${top-5} ${Rr+1} ${cy+3} Q${Rr-4} ${hl+5} 48 ${hl+4} Q${L+4} ${hl+5} ${L-1} ${cy+3}Z" fill="${hc}"/><circle cx="48" cy="${top-9}" r="6" fill="${hc}"/>${c.h==='boy'?`<path d="M${L+2} ${hl+10} Q48 ${hl} ${Rr-2} ${hl+10} V${hl+3} Q48 ${hl-6} ${L+2} ${hl+3}Z" fill="${hc}"/>`:''}`;
+  const ey=cy+2,t=f.br[1],by=ey-6-(f.e==='b'?1:0);
+  const eyes=f.e==='b'?`<circle cx="41" cy="${ey}" r="2.7" fill="#1c1a17" stroke="none"/><circle cx="55" cy="${ey}" r="2.7" fill="#1c1a17" stroke="none"/>`
+   :f.e==='s'?`<path d="M37 ${ey+1} L45 ${ey-1} M51 ${ey-1} L59 ${ey+1}" stroke-width="2.4"/>`
+   :f.e==='g'?`<path d="M37.5 ${ey+1} q3.5 -3 7 0 M51.5 ${ey+1} q3.5 -3 7 0" stroke-width="2.2"/>`
+   :`<path d="M38 ${ey}h7M51 ${ey}h7" stroke-width="2.4"/>`;
+  return `<svg viewBox="0 0 96 96" role="img" aria-label="${plain(c.n)}"><circle cx="48" cy="48" r="46.5" fill="#e8e1cf" stroke="#1c1a17" stroke-width="2"/><path d="M10 95 Q14 72 36 68 L48 82 L60 68 Q82 72 86 95Z" fill="${c.k}"/><path d="M36 68 L48 84 L60 68 L56 65 L48 76 L40 65Z" fill="#f4eee0"/><rect x="${48-f.nk/2}" y="${bot-6}" width="${f.nk}" height="${74-bot}" fill="${sk}"/>${ears}${head}${hair}
+  ${c.h==='boy'?`<circle cx="37" cy="${ey+7}" r="3.4" fill="#e79a8a" opacity=".6"/><circle cx="59" cy="${ey+7}" r="3.4" fill="#e79a8a" opacity=".6"/>`:''}
+  <g stroke="#1c1a17" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M37 ${by+t*.5} L45 ${by-t*.5+ (t<0?-t:0)*0} M51 ${by-t*.5} L59 ${by+t*.5}" stroke-width="${f.br[0]}" ${c.h==='white'?'stroke="#8d8982"':''}/>${eyes}
+  <path d="M48 ${ey+1} v${f.ns} h-2.5" stroke-width="1.6" opacity=".7"/><path d="M43.5 ${ey+f.ns+6} ${c.h==='boy'?'q4.5 3 9 0':'h9'}" stroke-width="2"/>
+  ${f.ho?`<path d="M${L+4} ${ey+7} q2 5 4 9 M${Rr-4} ${ey+7} q-2 5 -4 9" stroke-width="1.2" opacity=".45"/>`:''}
+  ${f.old?`<path d="M41 ${hl+9} h14 M42.5 ${hl+12.5} h11 M40 ${ey+f.ns+1} q-2 3 -1 6 M56 ${ey+f.ns+1} q2 3 1 6" stroke-width="1" opacity=".5"/>`:''}
+  ${f.mu?`<path d="M41 ${ey+f.ns+3.5} q7 -4 14 0" stroke="${hc}" stroke-width="3.4"/>`:''}</g></svg>`}
+const chara=(id,line)=>{const c=CH[id];return `<div class="chara">${face(c)}<div><b>${R(c.n)}</b><small>${R(c.r)}</small><p class="fuki">${R(line)}</p></div></div>`};
+function meet(){const c=CH[S.school];S.met[S.school]=1;save();return chara(S.school,c.hi)+`<p class="note">${F(c.f)}<br>${A('絵{え}とせりふは、記録{きろく}をもとに思{おも}いえがいたものです。')}</p>`}
+function speak(kana){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(kana);u.lang='ja-JP';u.rate=.75;u.pitch=.8;speechSynthesis.speak(u)}catch(e){}}
+
+const STATIONS=[
+ {id:'nisshin',nm:'日新館{にっしんかん}',pl:'会津{あいづ}',way:'素読{そどく}と什{じゅう}の掟{おきて}',seal:'会',open:1},
+ {id:'kodo',seal:'水',open:1,nm:'弘道館{こうどうかん}',pl:'水戸{みと}',way:'文{ぶん}と武{ぶ}の両方{りょうほう}'},
+ {id:'shohei',seal:'昌',open:1,nm:'昌平坂学問所{しょうへいざかがくもんじょ}',pl:'江戸{えど}',way:'素読吟味{そどくぎんみ}の試験{しけん}'},
+ {id:'fuku',seal:'慶',open:1,nm:'福沢塾{ふくざわじゅく}',pl:'江戸{えど}',way:'英語{えいご}の本{ほん}を読{よ}む'},
+ {id:'teki',nm:'適塾{てきじゅく}',pl:'大坂{おおさか}',way:'オランダ語{ご}の解読{かいどく}と会読{かいどく}',seal:'適',open:1},
+ {id:'shizu',seal:'閑',open:1,nm:'閑谷学校{しずたにがっこう}',pl:'備前{びぜん}',way:'講堂{こうどう}での素読{そどく}'},
+ {id:'shoka',nm:'松下村塾{しょうかそんじゅく}',pl:'長州{ちょうしゅう}・萩{はぎ}',way:'話{はな}しあいと志{こころざし}',seal:'松',open:1},
+ {id:'kangi',seal:'咸',open:1,nm:'咸宜園{かんぎえん}',pl:'豊後{ぶんご}・日田{ひた}',way:'月旦評{げったんひょう}で級{きゅう}を上{あ}げる'},
+ {id:'kaigun',seal:'海',open:1,nm:'長崎海軍伝習所{ながさきかいぐんでんしゅうじょ}',pl:'長崎{ながさき}',way:'算術{さんじゅつ}で船{ふね}を動{うご}かす'},
+ {id:'goju',seal:'薩',open:1,nm:'郷中教育{ごじゅうきょういく}',pl:'薩摩{さつま}',way:'年上{としうえ}が年下{としした}に教{おし}える'}
+];
+const NUM='一二三四五六七八九十';
+
+/* ---------- 道中図 ---------- */
+function viewMap(){
+  document.body.dataset.s='';
+  const n=Object.keys(S.done).length;
+  app.innerHTML=`
+  <div class="banner">${art('xMidYMid')}<h1>${R('道中図{どうちゅうず}')}</h1></div>
+  <div class="legend"><span>${F('ほんとうにあったこと')}</span><span>${A('遊{あそ}びやすくするために足{た}したこと')}</span></div>
+  <div class="row"><button class="btn" id="pass">${R('マイページ')}(${n}/10)</button><button class="btn sub" id="me">${R('主人公{しゅじんこう}をかえる')}</button></div>
+  <p>${R('旅{たび}の人{ひと}')}:${meLine()}<br><span style="font-size:14px">${R('行{い}きたい学{まな}び舎{や}をえらぶと、そこまで歩{ある}いて旅{たび}をします。どこから回{まわ}ってもかまいません。')}</span></p>
+  <ol class="road">${STATIONS.map((s,i)=>`<li class="${s.id&&S.done[s.id]?'done':''}"><button class="fuda" ${s.open?`data-id="${s.id}"`:'disabled'}>
+    <span class="no">${NUM[i]}</span>
+    <span><span class="nm">${R(s.nm)}</span><br><span class="sub">${R(s.pl)} ・ ${R(s.way)}${s.id===S.at?' <b class="ima">いまここ</b>':''}</span></span>
+    ${s.id&&S.done[s.id]?`<span class="seal">${s.seal}</span>`:`<span class="go">${s.open?R('入門{にゅうもん}する'):R('準備中{じゅんびちゅう}')}</span>`}
+  </button></li>`).join('')}</ol>
+  <details><summary>${R('おうちの方{かた}・先生{せんせい}へ')}</summary><p>各校の学び方(素読・会読・討論・詮議など)と読んでいる文章は、当時の記録や広く知られた資料をもとにしています。画面の「史実」は記録にもとづく内容、「アプリの工夫」は遊びやすくするために加えた演出です。当時の学校の多くは武士の男子に限られていました。このアプリでは主人公の生まれを選び、各校の「入門札」で「だれが学べたか」を示しています。専門家の監修は受けていません。素読は、意味の説明より先に声に出すのが当時のやり方です。ぜひ一緒に声に出してお読みください。</p></details>`;
+  app.querySelector('#me').onclick=()=>{S.view='make';render()};
+  app.querySelector('#pass').onclick=()=>{S.view='pass';render()};
+  app.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{const id=b.dataset.id;if(S.at===id)enter(id);else{S.view='walk';S.school=id;render();scrollTo(0,0)}});
+}
+function viewTitle(){
+  document.body.dataset.s='';const n=Object.keys(S.done).length;
+  app.innerHTML=`<section class="title">${art()}${[8,22,37,51,66,80,93].map((l,i)=>`<i class="petal" style="left:${l}%;animation-duration:${9+i%4*2.5}s;animation-delay:${-i*1.7}s"></i>`).join('')}
+  <h1>幕末まなび旅</h1><p class="lead">${R('十{とお}の学{まな}び舎{や}を歩{ある}いてめぐる')}</p>
+  <div class="tbox"><p>${R('黒船{くろふね}が来{き}たころの日本{にほん}へ。旅{たび}をして、当時{とうじ}の子{こ}どもと同{おな}じやり方{かた}で学{まな}ぼう。')}</p>
+  <div class="tseals">${STATIONS.map(s=>`<span class="seal ${S.done[s.id]?'got':''}">${s.seal}</span>`).join('')}</div>
+  ${S.me?`<button class="btn" id="go1">${R('旅{たび}のつづき')}(${n}/10)</button><button class="btn sub" id="go2">${R('主人公{しゅじんこう}をえらびなおす')}</button>`:`<button class="btn" id="go1">${R('旅{たび}をはじめる')}</button>`}
+  <p style="font-size:12px;text-align:center">${R('音楽{おんがく}と音{おと}が出{で}ます。左上{ひだりうえ}のボタンで消{け}せます。')}</p></div></section>`;
+  app.querySelector('#go1').onclick=()=>{S.view=S.me?'map':'make';render();scrollTo(0,0)};
+  const g2=app.querySelector('#go2');if(g2)g2.onclick=()=>{S.view='make';render();scrollTo(0,0)};
+}
+function enter(id){S.counted=false;S.view='school';S.school=id;S.step=0;S.marks=[];render();scrollTo(0,0)}
+
+/* ---------- 主人公をきめる ---------- */
+function viewMake(){
+  document.body.dataset.s='';
+  const m=S.me||{name:'',um:'n',age:12};
+  app.innerHTML=`<div class="banner">${art('xMidYMid')}<h1>${R('旅{たび}じたく')}</h1></div>
+  <section class="panel">${H('きみは、だれ?')}
+  <p>${R('時{とき}は幕末{ばくまつ}。黒船{くろふね}が来{き}て、世{よ}の中{なか}が大{おお}きく動{うご}きはじめたころ。きみは学問{がくもん}で身{み}を立{た}てようと、評判{ひょうばん}の学{まな}び舎{や}をたずねて旅{たび}に出{で}る。')}</p>
+  <label for="nm">${R('名前{なまえ}')}</label><input type="text" id="nm" maxlength="10" value="${esc(m.name)}" placeholder="なまえ">
+  <p>${R('生{う}まれた家{いえ}')}</p><div class="choice" id="um">${Object.keys(UM).map(k=>`<button data-k="${k}" class="${k===m.um?'sel':''}">${R(UM[k])}<small>${R(UMD[k])}</small></button>`).join('')}</div>
+  <p>${R('年{とし}')}</p><div class="ages" id="ag">${Object.keys(AGE).map(k=>`<button data-k="${k}" class="${+k===m.age?'sel':''}">${R(AGE[k])}</button>`).join('')}</div>
+  <button class="btn" id="dep">${R('旅立{たびだ}つ')}</button>
+  <p class="note">${F('江戸時代{えどじだい}は、生{う}まれた家{いえ}によって入{はい}れる学校{がっこう}がちがいました。学問{がくもん}のために遠{とお}くの塾{じゅく}へ旅{たび}することを「遊学{ゆうがく}」といいます。')}<br>${A('どの生{う}まれをえらんでも十校{じっこう}すべてを体験{たいけん}できます。ほんとうは入{はい}れたかどうかは、門{もん}の前{まえ}の入門札{にゅうもんふだ}でわかります。')}</p></section>`;
+  const pickIn=(sel,key)=>app.querySelectorAll(sel+' button').forEach(b=>b.onclick=()=>{app.querySelectorAll(sel+' button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');m[key]=key==='age'?+b.dataset.k:b.dataset.k;tok()});
+  pickIn('#um','um');pickIn('#ag','age');
+  app.querySelector('#dep').onclick=()=>{m.name=app.querySelector('#nm').value.trim()||'たびびと';S.me=m;save();S.view='map';render();scrollTo(0,0)};
+}
+
+/* ---------- 道中(歩いて旅をする) ---------- */
+const PL={edo:[35.68,139.77],nisshin:[37.49,139.93],kodo:[36.37,140.47],shohei:[35.70,139.77],fuku:[35.67,139.77],teki:[34.69,135.50],shizu:[34.80,134.22],shoka:[34.41,131.40],kangi:[33.32,130.94],kaigun:[32.75,129.87],goju:[31.60,130.55]};
+const plName=id=>id==='edo'?'江戸{えど}・日本橋{にほんばし}':STATIONS.find(s=>s.id===id).pl;
+const hav=(a,b)=>{const r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dg=r(b[1]-a[1]),h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dg/2)**2;return 12742*Math.asin(Math.sqrt(h))};
+const TIPS=['旅人{たびびと}は、一日{いちにち}に十里{じゅうり}(およそ四十{よんじゅう}キロ)ほど歩{ある}いたといわれます。','街道{かいどう}には一里{いちり}ごとに「一里塚{いちりづか}」という土{つち}の山{やま}があり、道{みち}のりの目{め}じるしでした。','関所{せきしょ}では通行手形{つうこうてがた}を見{み}せて通{とお}りました。'];
+let WK=0;
+function viewWalk(){
+  document.body.dataset.s='';const id=S.school,to=STATIONS.find(s=>s.id===id),km=hav(PL[S.at]||PL.edo,PL[id]),near=km<8;
+  const ri=Math.max(1,Math.round(km/3.93)),days=Math.max(1,Math.round(ri/10)),dur=near?3.5:7+Math.min(7,days*.4),total=dur*150;
+  app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button>
+  <section class="panel"><h2>${R(plName(S.at))} → ${R(to.pl)}</h2>
+  <p>${near?R('同{おな}じ江戸{えど}の町{まち}の中{なか}。歩{ある}いてすぐだ。'):R(`およそ${ri}里{り}。歩{ある}いて${days}日{にち}ほどの旅{たび}になる。`)}</p>
+  <canvas id="cv" class="cv" role="img" aria-label="街道を歩く旅人"></canvas><p id="st" class="kyu"></p><p id="tip" style="min-height:4em;font-size:15px"></p>
+  <div class="row" id="ctl"><button class="btn" id="go">${R('歩{ある}く(おしつづける)')}</button><button class="btn sub" id="skip">${R('ひとっとび')}</button></div>
+  <p class="note">${F('このころの旅{たび}は、ほとんどが歩{ある}きでした。')}<br>${A('道{みち}のりは地図{ちず}の上{うえ}でまっすぐ測{はか}ったおおよその数{かず}です。ほんとうの街道{かいどう}はもっと長{なが}く、海{うみ}は舟{ふね}でわたりました。')}</p></section>`;
+  const cv=app.querySelector('#cv'),g=cv.getContext('2d'),tk=++WK,st=app.querySelector('#st'),tip=app.querySelector('#tip'),go=app.querySelector('#go');
+  let p=0,walking=false,last=performance.now(),arrived=false,stride=0,W=0,Hh=0,tipN=-1;
+  const size=()=>{const d=window.devicePixelRatio||1;W=cv.clientWidth||320;Hh=cv.clientHeight||250;cv.width=W*d;cv.height=Hh*d;g.setTransform(d,0,0,d,0,0)};size();
+  const on=()=>{walking=true},off=()=>{walking=false};
+  go.onpointerdown=e=>{e.preventDefault();on()};go.onpointerup=go.onpointerleave=go.onpointercancel=off;go.oncontextmenu=e=>e.preventDefault();
+  go.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();on()}};go.onkeyup=off;go.onblur=off;
+  app.querySelector('#skip').onclick=()=>{p=1};
+  app.querySelector('#back').onclick=()=>{WK++;S.view='map';render()};
+  const mix=(a,b,t)=>`rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`;
+  function draw(t){
+    const sc=p*total,cyc=near?0:Math.min(days,3),ph=(p*cyc)%1,b=cyc?.5+.5*Math.cos(ph*6.283):1,gy=Hh*.74;
+    const sky=g.createLinearGradient(0,0,0,gy);sky.addColorStop(0,mix([23,48,79],[70,116,160],b));sky.addColorStop(1,mix([70,84,112],[239,230,208],b));g.fillStyle=sky;g.fillRect(0,0,W,gy);
+    g.fillStyle=b>.45?'#c0391f':'#f1ecdd';g.beginPath();g.arc(W*(.2+.6*((ph+.5)%1)),Hh*(.4-.24*b),13,0,7);g.fill();
+    const hill=(k,amp,base,col)=>{g.fillStyle=col;g.beginPath();g.moveTo(0,gy);for(let x=0;x<=W;x+=8){const u=x+sc*k;g.lineTo(x,base-amp*(Math.sin(u/95)+.5*Math.sin(u/41+1)+.25*Math.sin(u/17)))}g.lineTo(W,gy);g.fill()};
+    hill(.12,26,Hh*.5,mix([36,52,78],[108,134,160],b));hill(.35,16,Hh*.62,mix([30,48,44],[74,104,82],b));
+    g.fillStyle=mix([92,86,68],[203,191,156],b);g.fillRect(0,gy,W,Hh-gy);g.fillStyle=mix([78,72,56],[179,164,127],b);g.fillRect(0,Hh*.82,W,Hh*.1);
+    for(let x=-((sc*.8)%240)-30;x<W+60;x+=240){g.fillStyle='#3a2a1c';g.fillRect(x+8,gy-34,5,38);g.fillStyle=mix([20,40,30],[47,82,58],b);for(let i=0;i<3;i++){g.beginPath();g.moveTo(x-12+i*3,gy-22-i*16);g.lineTo(x+32-i*3,gy-22-i*16);g.lineTo(x+10,gy-44-i*16);g.fill()}}
+    for(let x=-((sc)%900)+700;x<W+80;x+=900){g.fillStyle=mix([40,52,40],[98,122,86],b);g.beginPath();g.arc(x,Hh*.82,24,Math.PI,0);g.fill()}
+    const gx=W*.66+(total-sc);if(gx<W+80){g.fillStyle='#1c1a17';g.fillRect(gx,Hh*.82-70,8,70);g.fillRect(gx+62,Hh*.82-70,8,70);g.fillRect(gx-12,Hh*.82-80,94,10);g.fillRect(gx-4,Hh*.82-62,78,5);
+      g.strokeStyle='#c0391f';g.lineWidth=3;g.beginPath();g.arc(gx+35,Hh*.82-104,16,0,7);g.stroke();g.fillStyle='#c0391f';g.font='20px "Dela Gothic One",sans-serif';g.textAlign='center';g.fillText(to.seal,gx+35,Hh*.82-97)}
+    const x=W*.28,y=Hh*.88,s=walking&&p<1?Math.sin(t/95):0;g.strokeStyle='#1c1a17';g.fillStyle='#1c1a17';g.lineWidth=4;g.lineCap='round';
+    g.beginPath();g.moveTo(x,y-26);g.lineTo(x-9*s,y);g.moveTo(x,y-26);g.lineTo(x+9*s,y);g.moveTo(x,y-26);g.lineTo(x,y-50);g.moveTo(x,y-44);g.lineTo(x+12,y-34+3*s);g.stroke();
+    g.lineWidth=2;g.beginPath();g.moveTo(x+13,y-52+3*s);g.lineTo(x+13,y);g.stroke();
+    g.fillStyle='#8f5527';g.fillRect(x-13,y-50,9,14);g.fillStyle='#1c1a17';g.beginPath();g.arc(x,y-56,6,0,7);g.fill();g.fillStyle='#cdb98a';g.beginPath();g.moveTo(x-16,y-58);g.lineTo(x+16,y-58);g.lineTo(x,y-70);g.fill();
+    if(id==='nisshin'&&p>.55){g.fillStyle='#fff';for(let i=0;i<40;i++)g.fillRect((i*83+t*.03*(1+i%3))%W,(i*47+t*.05*(1+i%4))%gy,2,2)}
+    if(b<1){g.fillStyle=`rgba(13,20,40,${(1-b)*.4})`;g.fillRect(0,0,W,Hh)}
+  }
+  function tick(t){if(tk!==WK||!cv.isConnected)return;const dt=Math.min(.1,(t-last)/1000);last=t;
+    if(cv.clientWidth&&cv.clientWidth!==W)size();
+    if(walking&&p<1){p=Math.min(1,p+dt/dur);stride+=dt;if(stride>.38){stride=0;sfx('step')}}
+    draw(t);
+    if(!arrived){if(!near){st.innerHTML=R(`${Math.min(days,Math.floor(p*days)+1)}日目{にちめ} ・ あと${Math.max(0,Math.round(ri*(1-p)))}里{り}`);const n=p>.75?2:p>.45?1:p>.15?0:-1;if(n!==tipN&&n>=0){tipN=n;tip.innerHTML=F(TIPS[n])}}
+      if(p>=1){arrived=true;S.at=id;save();sfx('arrive');st.innerHTML=R(`${to.pl}に着{つ}いた。`);app.querySelector('#ctl').innerHTML=`<button class="btn" id="in">${R('門{もん}をくぐる')}</button>`;app.querySelector('#in').onclick=()=>{WK++;enter(id)}}}
+    requestAnimationFrame(tick)}
+  requestAnimationFrame(tick);
+}
+
+/* ---------- 通行手形 ---------- */
+function viewPass(){
+  document.body.dataset.s='';
+  app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button>
+  ${myPage()}
+  <div class="tegata"><h2>通行手形</h2><p style="font-size:14px">${R('学{まな}び舎{や}をひとつ修{おさ}めるごとに、印{しるし}がふえます')}</p>
+  <div class="stamps">${STATIONS.map(s=>s.id&&S.done[s.id]?`<span class="seal">${s.seal}</span>`:`<span class="seal none">・</span>`).join('')}</div>
+  ${S.shi?`<p style="font-size:13px">${R('わたしの志{こころざし}')}</p><p class="shi">${esc(S.shi)}</p>`:`<p style="font-size:14px">${R('松下村塾{しょうかそんじゅく}で志{こころざし}を書{か}くと、ここにのこります')}</p>`}</div>
+  <h2>${R('出会{であ}った人{ひと}')}</h2><div class="met">${STATIONS.map(s=>{const c=CH[s.id];return S.met[s.id]?`<div>${face(c)}${R(c.n)}</div>`:`<div class="q">${face({h:'sou',k:'#777',n:'まだ'})}?</div>`}).join('')}</div>
+  ${Object.keys(S.done).length>=10?`<div class="menjo"><h2>遊学免状</h2><p class="shi">${esc(S.me.name)}</p><p>${R('右{みぎ}の者{もの}、全国{ぜんこく}十{とお}の学{まな}び舎{や}をめぐり、よく読{よ}み、よく考{かんが}え、よく歩{ある}いたことを、ここに証{しょう}する。')}</p><p>${new Date().toLocaleDateString('ja-JP',{year:'numeric',month:'long',day:'numeric'})}</p><p style="font-size:13px">${A('この免状{めんじょう}はアプリのごほうびです。')}</p></div>`:''}
+  <p class="note">${F('江戸時代{えどじだい}、関所{せきしょ}を通{とお}るには通行手形{つうこうてがた}が必要{ひつよう}でした。')}<br>${A('スタンプ帳{ちょう}として使{つか}っています。')}</p>
+  <button class="btn sub" id="rs">${R('はじめからやりなおす')}</button>`;
+  bindDaily();
+  const rs=app.querySelector('#rs');let arm=false;rs.onclick=()=>{if(!arm){arm=true;rs.innerHTML=R('ほんとうに消{け}す? もう一度{いちど}おす');return}S.done={};S.shi='';S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};save();S.view='make';render()};
+  app.querySelector('#back').onclick=()=>{S.view='map';render()};
+}
+
+/* ---------- 部品 ---------- */
+function orderGame(box,parts,done){
+  let next=0,miss=0;const idx=parts.map((_,i)=>i);
+  do{idx.sort(()=>Math.random()-.5)}while(parts.length>1&&idx.every((v,i)=>v===i));
+  box.innerHTML=`<div class="ans"></div><div class="tiles">${idx.map(i=>`<button class="tile" data-i="${i}">${R(parts[i])}</button>`).join('')}</div>`;
+  const ans=box.querySelector('.ans');
+  box.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{
+    if(+t.dataset.i===next){tok(440+next*60);ans.insertAdjacentHTML('beforeend',`<span>${R(parts[next])}</span>`);t.classList.add('used');next++;if(next===parts.length)done(miss)}
+    else{miss++;tok(160,.15);t.classList.remove('ng');void t.offsetWidth;t.classList.add('ng')}
+  });
+}
+function frame(sc,body,total,canNext){
+  const st=STATIONS.find(s=>s.id===S.school);
+  clearTimeout(T);const nm=st.nm.replace(/\{[^}]+\}/g,'');
+  app.innerHTML=`<div class="scene sc-${S.school}">${sc}<div class="name" ${nm.length>5?'style="font-size:24px"':''}>${nm}</div></div>
+  <section class="panel">${S.step===0?nyumon()+meet()+event():''}${body}</section>
+  <div class="nav"><button class="btn sub" id="quit">← ${R('道中図{どうちゅうず}')}</button><span class="dots">${Array.from({length:total},(_,i)=>`<i class="${i<=S.step?'on':''}"></i>`).join('')}</span><button class="btn" id="next" ${canNext?'':'disabled'}>${R('つぎへ')} →</button></div>`;
+  app.querySelector('#quit').onclick=()=>{try{speechSynthesis.cancel()}catch(e){};S.view='map';render()};
+  app.querySelector('#next').onclick=()=>{S.step++;render();scrollTo(0,0)};
+}
+const unlock=()=>{app.querySelector('#next').disabled=false;sfx('ok')};
+function finish(seal,title,who,src){
+  if(!S.counted){S.counted=true;S.vis[S.school]=(S.vis[S.school]||0)+1;logDay()}S.done[S.school]=1;save();setTimeout(()=>sfx('stamp'),250);
+  return chara(S.school,CH[S.school].bye)+`<p class="big">${R(title)}</p><div style="align-self:center"><span class="seal" style="width:72px;height:72px;font-size:40px">${seal}</span></div>
+  <p>${F(who)}</p><p class="note">${R('もとにした本{ほん}・資料{しりょう}')}:${src}</p>
+  <button class="btn" id="home">${R('道中図{どうちゅうず}へもどる')}</button>`;
+}
+const bindHome=()=>{app.querySelector('#home').onclick=()=>{S.view='map';render();scrollTo(0,0)};app.querySelector('#next').hidden=true};
+
+/* ---------- 日新館 ---------- */
+const OKITE=['一、年長者{としうえのひと}の言{い}ふことに背{そむ}いてはなりませぬ','二、年長者{としうえのひと}には御辞儀{おじぎ}をしなければなりませぬ','三、虚言{うそ}を言{い}ふ事{こと}はなりませぬ','四、卑怯{ひきょう}な振舞{ふるまい}をしてはなりませぬ','五、弱{よわ}い者{もの}をいぢめてはなりませぬ','六、戸外{そと}で物{もの}を食{た}べてはなりませぬ','七、戸外{そと}で婦人{おんなのひと}と言葉{ことば}を交{まじ}へてはなりませぬ'];
+const RONGO=[
+ {p:['子{し}曰{いわ}く','学{まな}びて','時{とき}に之{これ}を習{なら}う','亦{また}説{よろこ}ばしからずや'],k:'しいわく、まなびて、ときにこれをならう、またよろこばしからずや',m:'先生{せんせい}は言{い}った。学{まな}んだことを、おりにふれておさらいする。それはうれしいことではないか。'},
+ {p:['朋{とも}有{あ}り','遠方{えんぽう}より来{き}たる','亦{また}楽{たの}しからずや'],k:'ともあり、えんぽうよりきたる、またたのしからずや',m:'友{とも}だちが遠{とお}くからたずねてくる。それは楽{たの}しいことではないか。'},
+ {p:['人{ひと}知{し}らずして','慍{うら}みず','亦{また}君子{くんし}ならずや'],k:'ひとしらずして、うらみず、またくんしならずや',m:'人{ひと}にわかってもらえなくても、おこらない。それこそりっぱな人{ひと}ではないか。'}];
+const win='<div class="win"></div><div class="where">会津・雪の朝</div>';
+const NISSHIN=[
+ ()=>{frame(win,`<h2>${R('入門{にゅうもん}')}</h2>
+  <p>${R('今日{きょう}から日新館{にっしんかん}に通{かよ}う。板{いた}の間{ま}はつめたく、外{そと}は雪{ゆき}。みんな正座{せいざ}でしずかに待{ま}っている。')}</p>
+  <p class="note">${F('日新館{にっしんかん}は一八〇三年{ねん}にできた会津藩{あいづはん}の学校{がっこう}。藩士{はんし}の子{こ}は十歳{じっさい}で入{はい}りました。入{はい}る前{まえ}の六{ろく}〜九歳{きゅうさい}は、近所{きんじょ}の十人{じゅうにん}ほどの組{くみ}「什{じゅう}」で毎日{まいにち}あつまりました。')}<br>${F('当時{とうじ}、通{かよ}えたのは武士{ぶし}の男{おとこ}の子{こ}だけでした。')} ${A('きみはだれでも入門{にゅうもん}できます。')}</p>`,4,true)},
+ ()=>{frame(win,`<h2>${R('什{じゅう}の掟{おきて}を唱{とな}える')}</h2><p>${R('声{こえ}に出{だ}して読{よ}んでから、ボタンをおそう。')}</p><ul class="okite" id="ok"></ul>
+  <button class="btn" id="say">${R('唱{とな}える')}</button>
+  <p class="note" id="okn" hidden>${F('「什{じゅう}」の子{こ}どもたちが毎日{まいにち}たしかめあった決{き}まりです。六{ろく}と七{なな}のように、今{いま}のくらしには合{あ}わないものもあります。決{き}まりは時代{じだい}でかわります。きみの組{くみ}なら、どんな掟{おきて}にする?')}</p>`,4,false);
+  let i=0;const ul=app.querySelector('#ok'),b=app.querySelector('#say');
+  b.onclick=()=>{tok(300,.2);if(i<7){ul.innerHTML=`<li>${R(OKITE[i])}</li>`;i++}else{ul.innerHTML=`<li class="last">${R('ならぬことは<br>ならぬものです')}</li>`;b.hidden=true;app.querySelector('#okn').hidden=false;unlock()}}},
+ ()=>{let q=0;const go=()=>{const r=RONGO[q];
+  frame(win,`<h2>${R('素読{そどく}')} ${q+1}/3</h2><p>${R('意味{いみ}はまだ考{かんが}えなくていい。先生{せんせい}のあとについて、大{おお}きな声{こえ}で。')}</p>
+  <div class="tate" id="tt">${r.p.map(x=>`<span>${R(x)}、</span>`).join('')}</div>
+  <div class="row"><button class="btn" id="tch">${R('先生{せんせい}の読{よ}みをきく')}</button></div><div id="og"></div>
+  <p class="note">${F('素読{そどく}は、意味{いみ}の説明{せつめい}より先{さき}に、声{こえ}に出{だ}してくり返{かえ}し読{よ}む学{まな}び方{かた}。先生{せんせい}は「字突{じつ}き棒{ぼう}」で一字{いちじ}ずつ指{さ}しました。読{よ}んでいるのは『論語{ろんご}』のはじめの文{ぶん}です。')}<br>${A('読{よ}む順{じゅん}にならべるあそびと、機械{きかい}の声{こえ}。')}</p>`,4,false);
+  const sp=[...app.querySelectorAll('#tt span')];
+  app.querySelector('#tch').onclick=e=>{e.target.disabled=true;speak(r.k);let j=0;const t=setInterval(()=>{sp.forEach(s=>s.classList.remove('now'));if(j<sp.length){sp[j].classList.add('on','now');tok(700,.05);j++}else{clearInterval(t);
+    app.querySelector('#og').innerHTML=`<p>${R('きみの番{ばん}。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="og2"></div>`;
+    orderGame(app.querySelector('#og2'),r.p,()=>{q++;if(q<3)setTimeout(go,700);else unlock()})}},1100)}};go()},
+ ()=>{frame(win,`<h2>${R('意味{いみ}は、あとからわかる')}</h2><div class="tate all" style="height:13em;font-size:19px">${RONGO.map(r=>`<span>${R(r.p.join('、'))}。</span>`).join('')}</div>
+  ${RONGO.map(r=>`<p>${R(r.m)}</p>`).join('')}
+  ${finish('会','日新館{にっしんかん} 修了{しゅうりょう}','ここで学{まな}んだ山川健次郎{やまかわけんじろう}は、のちにアメリカで物理学{ぶつりがく}を学{まな}び、東京帝国大学{とうきょうていこくだいがく}の総長{そうちょう}になりました。','『論語{ろんご}』学而{がくじ}第一{だいいち}、会津藩{あいづはん}「什{じゅう}の掟{おきて}」')}`,4,false);bindHome()}
+];
+
+/* ---------- 適塾 ---------- */
+const DICT={De:'「その」のしるし',zon:'太陽{たいよう}',is:'〜である',een:'ひとつの',grote:'大{おお}きな',ster:'星{ほし}',Het:'「その」のしるし',hart:'心臓{しんぞう}',spier:'筋肉{きんにく}',Ik:'わたし',lees:'読{よ}む',boek:'本{ほん}'};
+const NL=[{w:['De','zon','is','een','grote','ster'],j:['太陽{たいよう}は','大{おお}きな','星{ほし}','である']},
+ {w:['Het','hart','is','een','spier'],j:['心臓{しんぞう}は','筋肉{きんにく}','である']},
+ {w:['Ik','lees','een','boek'],j:['わたしは','本{ほん}を','読{よ}む']}];
+const lamp='<div class="kou"></div><div class="lamp"></div><div class="where">大坂・夜ふけ</div>';
+const TEKI=[
+ ()=>{S.notes={};S.marks=[];frame(lamp,`<h2>${R('入門{にゅうもん}')}</h2>
+  <p>${R('夜{よる}の大坂{おおさか}。行灯{あんどん}のあかりの下{した}で、塾生{じゅくせい}たちがオランダ語{ご}の本{ほん}とにらめっこしている。きみの場所{ばしょ}は、畳{たたみ}一枚{いちまい}ぶん。そこで読{よ}み、そこで寝{ね}る。')}</p>
+  <p class="note">${F('適塾{てきじゅく}は医者{いしゃ}の緒方洪庵{おがたこうあん}が一八三八年{ねん}にひらいた蘭学{らんがく}の塾{じゅく}。先生{せんせい}が教{おし}える時間{じかん}は少{すく}なく、自分{じぶん}の力{ちから}で読{よ}みとくのが決{き}まりでした。辞書{じしょ}『ヅーフ・ハルマ』は塾{じゅく}に一{ひと}そろいだけ。置{お}いてある「ヅーフ部屋{べや}」は夜{よる}どおし人{ひと}がいたそうです。')}</p>`,5,true)},
+ ...NL.map((s,n)=>()=>{let looks=0;
+  frame(lamp,`<h2>${R('解読{かいどく}')} ${n+1}/3</h2><p>${R('知{し}らないことばをおして、辞書{じしょ}を引{ひ}こう。一度{いちど}引{ひ}いたことばは、きみの帳面{ちょうめん}にのこる。')}</p>
+  <div class="nl">${s.w.map(w=>`<button data-w="${w}">${w}<small>${S.notes[w]?R(DICT[w]):''}</small></button>`).join('')}</div>
+  <p id="msg" style="min-height:1.9em;font-size:15px"></p><div class="wait"><b id="bar"></b></div><div id="og"></div>
+  <p class="note">${n===2?F('オランダ語{ご}は「わたし・読{よ}む・本{ほん}」の順{じゅん}。日本語{にほんご}とはならび方{かた}がちがいます。塾生{じゅくせい}はこのちがいとたたかいました。')+'<br>':''}${A('文{ぶん}はやさしく作{つく}ったものです。本物{ほんもの}の塾生{じゅくせい}は医学{いがく}や物理{ぶつり}の本{ほん}を読{よ}みました。')}</p>`,5,false);
+  const msg=app.querySelector('#msg'),bar=app.querySelector('#bar');let busy=false;
+  const check=()=>{if(s.w.every(w=>S.notes[w])&&!app.querySelector('#og').innerHTML){msg.innerHTML=R('ことばはそろった。日本語{にほんご}の順{じゅん}にならべて、訳{やく}をつくろう。');
+    orderGame(app.querySelector('#og'),s.j,miss=>{const m=miss===0?'△':miss<3?'○':'●';S.marks.push(m);msg.innerHTML=R(`会読{かいどく}のしるし: <b style="font-size:24px">${m}</b>`);unlock()})}};
+  app.querySelectorAll('.nl button').forEach(b=>b.onclick=()=>{const w=b.dataset.w;if(busy||S.notes[w])return;busy=true;looks++;
+    msg.innerHTML=R(looks%2?'ヅーフ部屋{べや}へ。先{さき}に来{き}た人{ひと}が辞書{じしょ}を使{つか}っている……':'ヅーフ部屋{べや}へ。辞書{じしょ}の頁{ぺーじ}をめくる……');
+    bar.style.transition='none';bar.style.width='0';void bar.offsetWidth;bar.style.transition='width 1.5s linear';bar.style.width='100%';
+    setTimeout(()=>{S.notes[w]=1;b.querySelector('small').innerHTML=R(DICT[w]);tok(620);busy=false;msg.textContent='';bar.style.transition='none';bar.style.width='0';check()},1550)});
+  check()}),
+ ()=>{const pt=S.marks.reduce((a,m)=>a+(m==='△'?3:m==='○'?1:0),0);
+  frame(lamp,`<h2>${R('会読{かいどく}の結果{けっか}')}</h2><p class="marks">${S.marks.join(' ')}</p>
+  <p>${R(`きみの点{てん}は ${pt}。点{てん}の高{たか}い人{ひと}から、畳{たたみ}の場所{ばしょ}をえらべる。`)}${R(pt>=7?'明{あ}かりに近{ちか}い、いちばんいい畳{たたみ}をえらんだ。':'壁{かべ}ぎわの畳{たたみ}になった。つぎこそ。')}</p>
+  <p class="note">${F('月{つき}に六回{ろっかい}ほどの「会読{かいどく}」で、順番{じゅんばん}に訳{やく}しました。できれば白{しろ}い丸{まる}、できなければ黒{くろ}い丸{まる}、すらすら読{よ}めたら三角{さんかく}。三角{さんかく}は丸{まる}の三倍{さんばい}ねうちがありました。成績{せいせき}の順{じゅん}に畳{たたみ}の場所{ばしょ}をえらびました。')}</p>
+  ${finish('適','適塾{てきじゅく} 修了{しゅうりょう}','塾生{じゅくせい}だった福沢諭吉{ふくざわゆきち}は、のちに慶應義塾{けいおうぎじゅく}をひらきました。このくらしぶりは、本人{ほんにん}が『福翁自伝{ふくおうじでん}』に書{か}きのこしています。','福沢諭吉{ふくざわゆきち}『福翁自伝{ふくおうじでん}』')}`,5,false);bindHome()}
+];
+
+/* ---------- 松下村塾 ---------- */
+const MOSHI=['至誠{しせい}にして','動{うご}かざる者{もの}は','未{いま}だ','之{こ}れ有{あ}らざるなり'];
+const NEWS=['アメリカと貿易{ぼうえき}をはじめる条約{じょうやく}がむすばれた(一八五八年{ねん})','長崎{ながさき}に、オランダ人{じん}が教{おし}える海軍{かいぐん}の学校{がっこう}ができた(一八五五年{ねん})','江戸{えど}で大{おお}きな地震{じしん}があった(一八五五年{ねん})'];
+const sho='<div class="shoji"></div><div class="where">萩・松本村の昼下がり</div>';
+const plan='<svg class="plan" viewBox="0 0 124 124" role="img" aria-label="八畳の間取り"><rect x="2" y="2" width="60" height="30"/><rect x="62" y="2" width="60" height="30"/><rect x="2" y="32" width="30" height="60"/><rect x="32" y="32" width="30" height="60"/><rect x="62" y="32" width="30" height="60"/><rect x="92" y="32" width="30" height="60"/><rect x="2" y="92" width="60" height="30"/><rect x="62" y="92" width="60" height="30"/></svg>';
+let pick=null,stance=null;
+const SHOKA=[
+ ()=>{frame(sho,`<h2>${R('入門{にゅうもん}')}</h2>
+  <div class="row" style="flex-wrap:nowrap;align-items:flex-start">${plan}<p style="min-width:0">${R('教室{きょうしつ}はこの八畳{はちじょう}だけ。時間割{じかんわり}はなく、来{き}たい人{ひと}が来{き}たいときに来{く}る。先生{せんせい}の吉田松陰{よしだしょういん}は、きみを「友{とも}」とよぶ。')}</p></div>
+  <p class="note">${F('松陰{しょういん}が教{おし}えたのは一八五七年{ねん}ごろからの短{みじか}い間{あいだ}。はじめは八畳{はちじょう}ひと間{ま}で、人{ひと}がふえると塾生{じゅくせい}といっしょに建{た}て増{ま}しました。武士{ぶし}でない家{いえ}の子{こ}も通{かよ}いました。松陰{しょういん}は塾生{じゅくせい}を「諸友{しょゆう}」とよびました。')}</p>`,5,true)},
+ ()=>{frame(sho,`<h2>${R('米{こめ}をつきながら読{よ}む')}</h2><p>${R('杵{きね}をふむたびに、ことばがひとつずつ出{で}てくる。声{こえ}に出{だ}して読{よ}もう。')}</p>
+  <div class="row" style="justify-content:space-around"><div class="usu"><div class="kine" id="kn"></div><div class="mortar"></div><button class="btn" id="tk">${R('つく')}</button></div>
+  <div class="tate" id="ms" style="height:11em;margin:0">${MOSHI.map(x=>`<span>${R(x)}</span>`).join('')}</div></div>
+  <p id="im" hidden>${R('意味{いみ}:まごころをつくして、心{こころ}を動{うご}かされない人{ひと}は、今{いま}までひとりもいない。')}</p>
+  <p class="note">${F('松陰{しょういん}がたいせつにした『孟子{もうし}』のことば。塾{じゅく}では畑{はたけ}しごとや米{こめ}つきをしながら本{ほん}を読{よ}んだ、とつたわります。')}</p>`,5,false);
+  let c=0;const sp=[...app.querySelectorAll('#ms span')],kn=app.querySelector('#kn');
+  app.querySelector('#tk').onclick=e=>{c++;tok(140,.18);kn.classList.add('hit');setTimeout(()=>kn.classList.remove('hit'),130);
+   if(c%2===0&&sp[c/2-1])sp[c/2-1].classList.add('on');if(c>=8){e.target.disabled=true;app.querySelector('#im').hidden=false;unlock()}}},
+ ()=>{pick=null;frame(sho,`<h2>${R('飛耳長目{ひじちょうもく}')}</h2><p>${R('塾{じゅく}の帳面{ちょうめん}に、各地{かくち}の知{し}らせが書{か}きこまれている。今日{きょう}みんなで話{はな}しあいたいのは、どれ?')}</p>
+  <div class="choice">${NEWS.map((n,i)=>`<button data-i="${i}">${R(n)}</button>`).join('')}</div>
+  <p class="note">${F('「飛耳長目{ひじちょうもく}」は、遠{とお}くのことをよく聞{き}き、よく見{み}るという意味{いみ}。塾{じゅく}には旅{たび}の人{ひと}や手紙{てがみ}から集{あつ}めた知{し}らせの帳面{ちょうめん}がありました。三{みっ}つの知{し}らせはどれもほんとうのできごとです。')}<br>${A('どれをえらんでも正解{せいかい}です。')}</p>`,5,false);
+  app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.choice button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');pick=+b.dataset.i;tok();unlock()})},
+ ()=>{stance=null;frame(sho,`<h2>${R('話{はな}しあい')}</h2><p>${R('松陰{しょういん}がたずねる。「外国{がいこく}の大{おお}きな船{ふね}が、つぎつぎにやって来{く}る。きみなら、どうする?」')}</p>
+  <div class="choice"><button>${R('もっと知{し}るために、外国{がいこく}のことを学{まな}ぶ')}</button><button>${R('まず、自分{じぶん}の国{くに}の守{まも}りをかためる')}</button><button>${R('会{あ}って、話{はな}しあってみる')}</button></div>
+  <label for="why">${R('そう考{かんが}えたわけを、きみのことばで')}</label><textarea id="why"></textarea>
+  <button class="btn" id="say" disabled>${R('意見{いけん}を言{い}う')}</button><div id="vo"></div>`,5,false);
+  const say=app.querySelector('#say');
+  app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.choice button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');say.disabled=false});
+  say.onclick=()=>{say.hidden=true;tok();app.querySelector('#vo').innerHTML=`<div class="voices"><p>${R('「知{し}らない相手{あいて}とは、たたかうことも話{はな}すこともできない。まず学{まな}ぶべきだ」')}</p><p>${R('「学{まな}んでいるあいだに攻{せ}められたら? 守{まも}りが先{さき}だ」')}</p><p>${R('「どちらも要{い}る。では、今日{きょう}から何{なに}をする?」')}</p></div>
+   <p class="note">${A('三{みっ}つの声{こえ}は、塾{じゅく}の話{はな}しあいのようすを思{おも}いえがいて作{つく}ったものです。')}<br>${F('松陰{しょういん}自身{じしん}は一八五四年{ねん}、世界{せかい}を自分{じぶん}の目{め}で見{み}ようと、下田{しもだ}でアメリカの船{ふね}に乗{の}りこもうとしました。正{ただ}しい答{こた}えはひとつではなく、塾{じゅく}ではみんなが意見{いけん}を出{だ}しあいました。')}</p>`;unlock()}},
+ ()=>{frame(sho,`<h2>${R('きみの志{こころざし}は?')}</h2><p>${R('松陰{しょういん}は塾生{じゅくせい}ひとりひとりにたずねた。大{おお}きくなくていい。きみがやってみたいことを書{か}こう。')}</p>
+  <label for="shi">${R('わたしの志{こころざし}')}</label><textarea id="shi" maxlength="80">${esc(S.shi)}</textarea><button class="btn" id="wr">${R('手形{てがた}に書{か}きこむ')}</button>
+  <p class="note">${F('松陰{しょういん}は「志{こころざし}を立{た}てることが、すべてのはじまり」と書{か}きのこしています。')}</p><div id="fin"></div>`,5,false);
+  app.querySelector('#wr').onclick=()=>{const v=app.querySelector('#shi').value.trim();if(!v){app.querySelector('#shi').focus();return}S.shi=v;tok(300,.25);
+   app.querySelector('#wr').hidden=true;app.querySelector('#fin').innerHTML=finish('松','松下村塾{しょうかそんじゅく} 修了{しゅうりょう}','この小{ちい}さな塾{じゅく}から、高杉晋作{たかすぎしんさく}や、のちに初代{しょだい}の内閣総理大臣{ないかくそうりだいじん}になる伊藤博文{いとうひろぶみ}が育{そだ}ちました。','『孟子{もうし}』離婁{りろう}上{じょう}、吉田松陰{よしだしょういん}「士規七則{しきしちそく}」');bindHome()}}
+];
+/* ---------- 追加七校の共通部品 ---------- */
+const H=t=>`<h2>${R(t)}</h2>`;
+const intro=(sc,t,n,tot)=>()=>frame(sc,`${H('入門{にゅうもん}')}<p>${R(t)}</p><p class="note">${n}</p>`,tot,true);
+const sodoku=(sc,title,lead,parts,after,note,tot)=>()=>{frame(sc,`${H(title)}<p>${R(lead)}</p><div id="og"></div><p id="im" hidden>${R(after)}</p><p class="note">${note}</p>`,tot,false);
+  orderGame(app.querySelector('#og'),parts,()=>{app.querySelector('#im').hidden=false;unlock()})};
+const fin=(sc,seal,title,who,src,tot,pre='')=>()=>{frame(sc,pre+finish(seal,title,who,src),tot,false);bindHome()};
+/* 正解のある問いを順に出す */
+const quizStep=(sc,title,qs,note,tot)=>()=>{let i=0;const go=()=>{const q=qs[i];
+  frame(sc,`${H(title)} ${q.head||''}<p>${R(q.q)}</p><div class="choice">${q.o.map((o,k)=>`<button data-k="${k}">${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(q.x)}</p><button class="btn" id="nq" hidden>${R('つぎの問{と}い')}</button><p class="note">${note}</p>`,tot,false);
+  app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{if(+b.dataset.k===q.a){tok(620);b.classList.add('sel');app.querySelectorAll('.choice button').forEach(x=>x.disabled=true);app.querySelector('#ex').hidden=false;
+    if(++i<qs.length){const n=app.querySelector('#nq');n.hidden=false;n.onclick=go}else unlock()}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}})};go()};
+/* 正解のない問い */
+const choiceStep=(sc,title,q,opts,after,note,tot,snd)=>()=>{frame(sc,`${H(title)}<p>${R(q)}</p><div class="choice">${opts.map(o=>`<button>${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(after)}</p><p class="note">${note}</p>`,tot,false);
+  if(snd)setTimeout(()=>sfx('boom'),400);
+  app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.choice button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');tok();app.querySelector('#ex').hidden=false;unlock()})};
+
+/* ---------- 弘道館 ---------- */
+const kodoSc='<div class="roof"></div><div class="ume"></div><div class="where">水戸・梅のころ</div>';
+const KODO=[
+ intro(kodoSc,'今日{きょう}から弘道館{こうどうかん}に通{かよ}う。本{ほん}を読{よ}む文館{ぶんかん}と、弓{ゆみ}や剣{けん}をみがく武館{ぶかん}。どちらか片方{かたほう}だけでは、ここでは一人前{いちにんまえ}になれない。',
+  F('一八四一年{ねん}に藩主{はんしゅ}の徳川斉昭{とくがわなりあき}がひらいた、とても大{おお}きな藩校{はんこう}。学問{がくもん}と武芸{ぶげい}は分{わ}けられないという「文武不岐{ぶんぶふき}」が合{あ}いことばでした。卒業{そつぎょう}はなく、大人{おとな}になっても通{かよ}いました。'),4),
+ sodoku(kodoSc,'文{ぶん}:素読{そどく}','声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。',['弘道{こうどう}とは何{なん}ぞ','人{ひと}能{よ}く','道{みち}を弘{ひろ}むるなり'],'意味{いみ}:弘道{こうどう}とは何{なに}か。人{ひと}が、正{ただ}しい道{みち}をひろめていくことだ。',
+  F('学校{がっこう}の名前{なまえ}のわけを書{か}いた『弘道館記{こうどうかんき}』のはじめの文{ぶん}です。'),4),
+ ()=>{frame(kodoSc,`${H('武{ぶ}:弓{ゆみ}')}<p>${R('矢{や}が赤{あか}い的{まと}にかさなったときに放{はな}とう。三本{さんぼん}。')}</p><div class="mato"><i class="ya" id="ya"></i></div><div class="row"><button class="btn" id="sh">${R('放{はな}つ')}</button><span id="hit" class="kyu"></span></div>
+  <p class="note">${F('武館{ぶかん}では弓{ゆみ}・剣{けん}・槍{やり}・馬{うま}などをけいこしました。')}<br>${A('的{まと}あてのあそび。当{あ}たらなくても先{さき}へ進{すす}めます。')}</p>`,4,false);
+  let n=0,h=0;app.querySelector('#sh').onclick=e=>{const m=app.querySelector('.mato').getBoundingClientRect(),y=app.querySelector('#ya').getBoundingClientRect(),p=(y.left+3-m.left)/m.width;n++;
+   if(p>.41&&p<.59){h++;tok(700,.2)}else tok(160,.15);app.querySelector('#hit').innerHTML=R(`${n}本{ほん}のうち ${h}本{ほん} 命中{めいちゅう}`);if(n>=3){e.target.disabled=true;unlock()}}},
+ fin(kodoSc,'水','弘道館{こうどうかん} 修了{しゅうりょう}','最後{さいご}の将軍{しょうぐん}になる徳川慶喜{とくがわよしのぶ}も、子{こ}どものころここで学{まな}びました。','『弘道館記{こうどうかんき}』',4,
+  `<p>${F('斉昭{なりあき}は、学{まな}ぶ場所{ばしょ}の弘道館{こうどうかん}と、休{やす}む場所{ばしょ}の偕楽園{かいらくえん}を、ふたつでひと組{くみ}として作{つく}りました。弓{ゆみ}は張{は}りっぱなしではだめになる。がんばったら、梅{うめ}を見{み}て休{やす}もう。')}</p>`)
+];
+
+/* ---------- 昌平坂学問所 ---------- */
+const shoSc='<div class="roof"></div><div class="where">江戸・湯島の坂の上</div>';
+const GINMI=[['大学{だいがく}の道{みち}は','明徳{めいとく}を明{あき}らかにするに在{あ}り','民{たみ}に親{した}しむに在{あ}り','至善{しぜん}に止{とど}まるに在{あ}り'],['巧言令色{こうげんれいしょく}','鮮{すく}なし','仁{じん}'],['過{あやま}ちて','改{あらた}めざる','是{これ}を過{あやま}ちと謂{い}う']];
+let T,gm=0;
+const SHOHEI=[
+ intro(shoSc,'江戸{えど}・湯島{ゆしま}の坂{さか}の上{うえ}。黒{くろ}い建物{たてもの}がならぶ、幕府{ばくふ}の学問所{がくもんじょ}。今日{きょう}は「素読吟味{そどくぎんみ}」の日{ひ}。役人{やくにん}の前{まえ}にひとりで進{すす}み出{で}て、指{さ}されたところを読{よ}む。',
+  F('昌平坂学問所{しょうへいざかがくもんじょ}は一七九七年{ねん}に幕府{ばくふ}がじかに運営{うんえい}する学校{がっこう}になりました。「素読吟味{そどくぎんみ}」は幕府{ばくふ}の家来{けらい}の子{こ}どもが受{う}けた試験{しけん}で、よくできるとほうびが出{で}ました。全国{ぜんこく}の藩{はん}からも秀才{しゅうさい}が集{あつ}まり、寮{りょう}でくらしました。'),3),
+ ()=>{gm=0;let q=0;const go=()=>{frame(shoSc,`${H('素読吟味{そどくぎんみ}')} ${q+1}/3<p>${R('線{せん}がのびきる前{まえ}に、つっかえずに読{よ}みきろう。')}</p><div class="wait"><b id="bar"></b></div><div id="og"></div>
+  <p class="note">${F('読{よ}んでいるのは『大学{だいがく}』と『論語{ろんご}』。四書{ししょ}とよばれる本{ほん}です。')}<br>${A('時間{じかん}のきまりと、順{じゅん}にならべるあそび。')}</p>`,3,false);
+  const bar=app.querySelector('#bar');void bar.offsetWidth;bar.style.transition='width 30s linear';bar.style.width='100%';T=setTimeout(go,30000);
+  orderGame(app.querySelector('#og'),GINMI[q],m=>{clearTimeout(T);bar.style.transition='none';gm+=m;q++;if(q<3)setTimeout(go,800);else unlock()})};go()},
+ ()=>{frame(shoSc,`<p class="big">${R(gm===0?'評{ひょう}:甲{こう}':gm<4?'評{ひょう}:乙{おつ}':'評{ひょう}:丙{へい}')}</p><p>${A('まちがえた数{かず}で評{ひょう}を決{き}めています。')}</p>`+finish('昌','素読吟味{そどくぎんみ} 及第{きゅうだい}','この学問所{がくもんじょ}は、明治{めいじ}になってからの東京{とうきょう}の大学{だいがく}のみなもとのひとつになりました。','『大学{だいがく}』、『論語{ろんご}』学而{がくじ}・衛霊公{えいれいこう}'),3,false);bindHome()}
+];
+
+/* ---------- 福沢塾 ---------- */
+const fukuSc='<div class="roof"></div><div class="where">江戸・海べの塾</div>';
+const FUKU=[
+ intro(fukuSc,'きみは福沢諭吉{ふくざわゆきち}の塾{じゅく}の塾生{じゅくせい}。先生{せんせい}は適塾{てきじゅく}でオランダ語{ご}をきわめた人{ひと}。ところが横浜{よこはま}へ行{い}ってみると、店{みせ}の看板{かんばん}がひとつも読{よ}めなかった。そこにあったのは英語{えいご}だった。',
+  F('福沢{ふくざわ}は一八五八年{ねん}、江戸{えど}の築地鉄砲洲{つきじてっぽうず}で蘭学{らんがく}の塾{じゅく}をはじめました。次{つぎ}の年{とし}に横浜{よこはま}でオランダ語{ご}が通{つう}じないと知{し}り、英語{えいご}を一{いち}から学{まな}びなおしました。'),4),
+ quizStep(fukuSc,'ことばをつくる',[
+  {head:'<p class="eng">speech</p>',q:'人{ひと}の前{まえ}で自分{じぶん}の考{かんが}えを話{はな}すこと。日本語{にほんご}にするなら?',o:['演説{えんぜつ}','手紙{てがみ}','算術{さんじゅつ}'],a:0,x:'「演説{えんぜつ}」という訳{やく}は、福沢{ふくざわ}たちが広{ひろ}めました。'},
+  {head:'<p class="eng">liberty</p>',q:'ほかの人{ひと}にしばられず、自分{じぶん}で決{き}められること。',o:['親切{しんせつ}','自由{じゆう}','勇気{ゆうき}'],a:1,x:'福沢{ふくざわ}は「自由{じゆう}」と訳{やく}しながら、ぴったりのことばがないとなやみました。'},
+  {head:'<p class="eng">economy</p>',q:'物{もの}を作{つく}り、売{う}り買{か}いし、くらしをささえるしくみ。',o:['天文{てんもん}','剣術{けんじゅつ}','経済{けいざい}'],a:2,x:'塾{じゅく}ではアメリカのウェーランドが書{か}いた経済{けいざい}の本{ほん}を読{よ}みました。'}],
+  F('英語{えいご}には、日本語{にほんご}にまだない考{かんが}えがたくさんありました。訳{やく}すことは、新{あたら}しいことばを作{つく}ることでした。')+'<br>'+A('三{みっ}つからえらぶ形{かたち}。'),4),
+ choiceStep(fukuSc,'大砲{たいほう}の音{おと}','一八六八年{ねん}五月{ごがつ}十五日{じゅうごにち}。上野{うえの}で戦{たたか}いがはじまり、大砲{たいほう}の音{おと}が塾{じゅく}までひびく。町{まち}は大{おお}さわぎ。きみは?',['講義{こうぎ}をつづけてほしい','ようすを見{み}に行{い}きたい','家{いえ}が心配{しんぱい}だから帰{かえ}りたい'],
+  '福沢{ふくざわ}は、いつもどおり経済{けいざい}の本{ほん}の講義{こうぎ}をつづけました。世{よ}の中{なか}がどうなっても学問{がくもん}は休{やす}まない、という考{かんが}えでした。',F('上野戦争{うえのせんそう}の日{ひ}のできごとです。')+'<br>'+A('きみの気{き}もちは、どれをえらんでもかまいません。'),4,true),
+ fin(fukuSc,'慶','福沢塾{ふくざわじゅく} 修了{しゅうりょう}','この年{とし}、塾{じゅく}はそのときの年号{ねんごう}から「慶應義塾{けいおうぎじゅく}」と名{な}づけられ、今{いま}もつづいています。','福沢諭吉{ふくざわゆきち}『福翁自伝{ふくおうじでん}』',4)
+];
+
+/* ---------- 閑谷学校 ---------- */
+const shizuSc='<div class="roof"></div><div class="where">備前・山あいの谷</div>';
+const SHIZU=[
+ intro(shizuSc,'備前{びぜん}の山{やま}にかこまれた谷{たに}に、赤{あか}い瓦{かわら}の大{おお}きな講堂{こうどう}がある。武士{ぶし}の子{こ}でなくても、ここでは学{まな}べる。',
+  F('一六七〇年{ねん}、岡山藩主{おかやまはんしゅ}の池田光政{いけだみつまさ}が、ふつうの人{ひと}びとの子{こ}のためにつくらせた学校{がっこう}。屋根{やね}は備前焼{びぜんやき}の瓦{かわら}で、講堂{こうどう}は今{いま}も国宝{こくほう}としてのこっています。'),4),
+ ()=>{frame(shizuSc,`${H('床{ゆか}をみがく')}<p>${R('学{まな}ぶ前{まえ}に、講堂{こうどう}の床{ゆか}をふこう。')}</p><div class="yuka"><i id="sh"></i></div><button class="btn" id="mg">${R('みがく')}</button>
+  <p class="note">${F('講堂{こうどう}の床{ゆか}はうるしぬりで、窓{まど}のあかりがうつるほど光{ひか}っています。')}<br>${A('床{ゆか}みがきのあそび。')}</p>`,4,false);
+  let c=0;app.querySelector('#mg').onclick=e=>{c++;tok(240+c*30,.06);app.querySelector('#sh').style.opacity=c/8;if(c>=8){e.target.disabled=true;unlock()}}},
+ sodoku(shizuSc,'素読{そどく}','光{ひか}る床{ゆか}に正座{せいざ}して、声{こえ}をそろえる。読{よ}む順{じゅん}におそう。',['己{おのれ}の','欲{ほっ}せざる所{ところ}は','人{ひと}に施{ほどこ}すこと','勿{な}かれ'],'意味{いみ}:自分{じぶん}がされたくないことは、人{ひと}にもしてはいけない。',F('『論語{ろんご}』のことば。'),4),
+ fin(shizuSc,'閑','閑谷学校{しずたにがっこう} 修了{しゅうりょう}','幕末{ばくまつ}にここで学{まな}んだ大鳥圭介{おおとりけいすけ}は、そのあと大坂{おおさか}の適塾{てきじゅく}へ進{すす}みました。','『論語{ろんご}』衛霊公{えいれいこう}',4)
+];
+
+/* ---------- 咸宜園 ---------- */
+const kangiSc='<div class="roof"></div><div class="where">豊後日田・霜の朝</div>';
+const KYU=['無級{むきゅう}','一級下{いっきゅうげ}','一級上{いっきゅうじょう}'];
+const kyu=n=>`<p class="kyu">${R('月旦評{げったんひょう}')}:${KYU.map((k,i)=>i===n?`<b>${R(k)}</b>`:R(k)).join(' → ')} …</p>`;
+const KANGI=[
+ intro(kangiSc,'豊後{ぶんご}の日田{ひた}。全国{ぜんこく}から若者{わかもの}が歩{ある}いてやって来{く}る塾{じゅく}がある。門{もん}をくぐる前{まえ}に、きみは三{みっ}つのものを手{て}ばなす。',
+  F('広瀬淡窓{ひろせたんそう}の塾{じゅく}。「咸宜{かんぎ}」は「みんなよろしい」という意味{いみ}で、四千人{よんせんにん}をこえる人{ひと}が入門{にゅうもん}したといわれます。'),5),
+ ()=>{frame(kangiSc,`${H('三奪法{さんだつほう}')}<p>${R('ひとつずつおして、手{て}ばなそう。')}</p><div class="datsu"><button>${R('年{とし}:きみのほうが年上{としうえ}だ')}</button><button>${R('学歴{がくれき}:前{まえ}の塾{じゅく}では一番{いちばん}だった')}</button><button>${R('身分{みぶん}:家{いえ}がらがりっぱだ')}</button></div><div id="kq"></div>
+  <p class="note">${F('入門{にゅうもん}するとき、年{とし}・それまでの学歴{がくれき}・身分{みぶん}の三{みっ}つをうばい、全員{ぜんいん}を同{おな}じところから始{はじ}めさせました。成績{せいせき}は毎月{まいつき}「月旦評{げったんひょう}」にはり出{だ}され、無級{むきゅう}から九級{きゅうきゅう}まで上{あ}がっていきます。')}</p>`,5,false);
+  let c=0;app.querySelectorAll('.datsu button').forEach(b=>b.onclick=()=>{b.disabled=true;tok(200,.2);if(++c===3){app.querySelector('#kq').innerHTML=kyu(0);unlock()}})},
+ sodoku(kangiSc,'詩{し}を読{よ}む','淡窓{たんそう}先生{せんせい}が塾生{じゅくせい}のために作{つく}った詩{し}。読{よ}む順{じゅん}におそう。',['道{い}うことを休{や}めよ 他郷{たきょう}苦辛{くしん}多{おお}しと','同袍{どうほう}友{とも}有{あ}り 自{おのずか}ら相{あい}親{した}しむ','柴扉{さいひ}暁{あかつき}に出{い}づれば 霜{しも}雪{ゆき}の如{ごと}し','君{きみ}は川流{せんりゅう}を汲{く}め 我{われ}は薪{たきぎ}を拾{ひろ}わん'],
+  '意味{いみ}:ふるさとをはなれてつらい、なんて言{い}うな。ここには仲間{なかま}がいる。朝{あさ}、戸{と}をあければ霜{しも}が雪{ゆき}のようだ。きみは川{かわ}で水{みず}をくんでくれ、ぼくはたきぎをひろうから。',F('広瀬淡窓{ひろせたんそう}「桂林荘雑詠{けいりんそうざつえい}」。塾生{じゅくせい}は寮{りょう}でいっしょにくらしました。'),5),
+ choiceStep(kangiSc,'係{かかり}をもつ',`詩{し}が読{よ}めて、きみは一級下{いっきゅうげ}に上{あ}がった。塾{じゅく}では全員{ぜんいん}がなにかの係{かかり}をもつ。どれを引{ひ}きうける?`,['ごはんをたく係{かかり}','そうじの係{かかり}','本{ほん}の出{だ}し入{い}れの係{かかり}','新入{しんい}りの世話{せわ}をする係{かかり}'],
+  '係{かかり}をやりとげて、一級上{いっきゅうじょう}に上{あ}がった。',F('全員{ぜんいん}に役目{やくめ}をわりあてる「職任制{しょくにんせい}」。学問{がくもん}だけでなく、くらしを自分{じぶん}たちで回{まわ}すことも学{まな}びでした。')+'<br>'+A('係{かかり}の名前{なまえ}は言{い}いかえています。'),5),
+ fin(kangiSc,'咸','咸宜園{かんぎえん} 修了{しゅうりょう}','高野長英{たかのちょうえい}や大村益次郎{おおむらますじろう}も、ここで学{まな}びました。','広瀬淡窓{ひろせたんそう}「桂林荘雑詠{けいりんそうざつえい} 諸生{しょせい}に示{しめ}す」',5,kyu(2))
+];
+
+/* ---------- 長崎海軍伝習所 ---------- */
+const kaiSc='<div class="ship"></div><div class="where">長崎・港の朝</div>';
+const KAIGUN=[
+ intro(kaiSc,'長崎{ながさき}の港{みなと}。伝習生{でんしゅうせい}は幕府{ばくふ}や藩{はん}からえらばれた若者{わかもの}たち。先生{せんせい}はオランダの海軍{かいぐん}の人{ひと}で、ことばは通詞{つうじ}(通訳{つうやく})が日本語{にほんご}になおす。教室{きょうしつ}は、海{うみ}の上{うえ}だ。',
+  F('一八五五年{ねん}に幕府{ばくふ}がひらいた学校{がっこう}。オランダからおくられた蒸気船{じょうきせん}「観光丸{かんこうまる}」を使{つか}い、船{ふね}の動{うご}かし方{かた}・測量{そくりょう}・算術{さんじゅつ}・大砲{たいほう}などを学{まな}びました。'),3),
+ quizStep(kaiSc,'算術{さんじゅつ}で船{ふね}を動{うご}かす',[
+  {q:'船{ふね}は一時間{いちじかん}に六海里{ろくかいり}すすむ。三時間{さんじかん}では?',o:['十二海里{じゅうにかいり}','十八海里{じゅうはちかいり}','二十四海里{にじゅうよんかいり}'],a:1,x:'6×3=18。速{はや}さと時間{じかん}から、今{いま}いる場所{ばしょ}がわかる。'},
+  {q:'羅針盤{らしんばん}は北{きた}が0度{ど}、東{ひがし}が90度{ど}、南{みなみ}が180度{ど}。南東{なんとう}へ向{む}かうには?',o:['45度{ど}','135度{ど}','225度{ど}'],a:1,x:'東{ひがし}と南{みなみ}のまん中{なか}だから、90と180の間{あいだ}の135度{ど}。'},
+  {q:'正午{しょうご}、太陽{たいよう}がいちばん高{たか}くなった。日本{にほん}の近{ちか}くの海{うみ}で、太陽{たいよう}はどの方角{ほうがく}にある?',o:['北{きた}','東{ひがし}','南{みなみ}'],a:2,x:'南{みなみ}。このときの太陽{たいよう}の高{たか}さをはかると、船{ふね}が南北{なんぼく}のどのあたりにいるかがわかる。'}],
+  F('海{うみ}の上{うえ}には道{みち}しるべがありません。伝習生{でんしゅうせい}は西洋{せいよう}の算術{さんじゅつ}を一{いち}から学{まな}びました。')+'<br>'+A('問題{もんだい}は小学生{しょうがくせい}むけに作{つく}ったものです。'),3),
+ fin(kaiSc,'海','海軍伝習所{かいぐんでんしゅうじょ} 修了{しゅうりょう}','ここで学{まな}んだ勝海舟{かつかいしゅう}は、一八六〇年{ねん}に咸臨丸{かんりんまる}で太平洋{たいへいよう}をわたり、アメリカへ行{い}きました。','カッテンディーケ『長崎海軍伝習所{ながさきかいぐんでんしゅうじょ}の日々{ひび}』',3)
+];
+
+/* ---------- 郷中教育 ---------- */
+const gojuSc='<div class="kemuri"></div><div class="yama"></div><div class="where">薩摩・桜島の見える町</div>';
+const GOJU=[
+ intro(gojuSc,'薩摩{さつま}の城下{じょうか}。この町{まち}の学{まな}びには、先生{せんせい}がいない。年上{としうえ}の「二才{にせ}」が、年下{としした}の「稚児{ちご}」に教{おし}える。きみは今日{きょう}、稚児{ちご}として仲間{なかま}に入{はい}る。',
+  F('「郷中{ごじゅう}」は町{まち}ごとの集{あつ}まり。武士{ぶし}の男{おとこ}の子{こ}は六{ろく}、七歳{ななさい}ごろから入{はい}り、毎日{まいにち}いっしょに読{よ}み、相撲{すもう}や剣{けん}のけいこをしました。'),5),
+ sodoku(gojuSc,'いろは歌{うた}','みんなでおぼえる最初{さいしょ}の歌{うた}。読{よ}む順{じゅん}におそう。',['いにしへの','道{みち}を聞{き}きても','唱{とな}へても','わが行{おこな}ひに','せずばかひなし'],'意味{いみ}:昔{むかし}のりっぱな教{おし}えを聞{き}いても口{くち}にしても、自分{じぶん}でやらなければ意味{いみ}がない。',
+  F('島津忠良{しまづただよし}(日新公{じっしんこう})が作{つく}った四十七首{よんじゅうななしゅ}の「いろは歌{うた}」の、はじめの一首{いっしゅ}です。'),5),
+ choiceStep(gojuSc,'詮議{せんぎ}','二才{にせ}がたずねる。「友{とも}だちと会{あ}う約束{やくそく}の日{ひ}。大雨{おおあめ}で橋{はし}が流{なが}された。どうする?」',['遠回{とおまわ}りしてでも行{い}く','川{かわ}がおさまるまで待{ま}つ','行{い}けないと知{し}らせる方法{ほうほう}をさがす'],
+  '二才{にせ}はすぐに重{かさ}ねてたずねる。「では、そうしているうちに日{ひ}がくれたら?」 声{こえ}に出{だ}して、すぐ答{こた}えてみよう。',F('「詮議{せんぎ}」は、もし〜ならどうするか、を次々{つぎつぎ}に問{と}われてその場{ば}で答{こた}えるけいこ。正{ただ}しい答{こた}えはひとつではなく、考{かんが}えぬく力{ちから}をきたえました。')+'<br>'+A('問{と}いは作{つく}ったものです。'),5),
+ choiceStep(gojuSc,'二才{にせ}になる','年月{としつき}がたち、きみは二才{にせ}になった。稚児{ちご}がけんかに負{ま}けて泣{な}いている。なんと声{こえ}をかける?',['いっしょにけいこしよう','なぜ負{ま}けたか、考{かんが}えてみよう','泣{な}いてもいい。つぎは負{ま}けるな'],
+  '教{おし}えられた子{こ}が、こんどは教{おし}える。郷中{ごじゅう}の学{まな}びは、こうして受{う}けつがれた。',F('郷中{ごじゅう}の教{おし}えは「負{ま}けるな、うそを言{い}うな、弱{よわ}い者{もの}をいじめるな」。')+'<br>'+A('声{こえ}かけは、どれをえらんでもかまいません。'),5),
+ fin(gojuSc,'薩','郷中教育{ごじゅうきょういく} 修了{しゅうりょう}','西郷隆盛{さいごうたかもり}と大久保利通{おおくぼとしみち}は、同{おな}じ町{まち}の郷中{ごじゅう}で育{そだ}ちました。','島津忠良{しまづただよし}「日新公{じっしんこう}いろは歌{うた}」',5)
+];
+const SCHOOLS={nisshin:NISSHIN,teki:TEKI,shoka:SHOKA,kodo:KODO,shohei:SHOHEI,fuku:FUKU,shizu:SHIZU,kangi:KANGI,kaigun:KAIGUN,goju:GOJU};
+
+function render(){
+  const tabs=document.getElementById('tabs'),tabbed=!!S.me&&S.view!=='title'&&S.view!=='make';tabs.hidden=!tabbed;document.body.classList.toggle('tabbed',tabbed);
+  tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='pass')===(S.view==='pass')));
+  setMood(S.view==='walk'?'walk':S.view==='school'?(S.school==='teki'?'night':'school'):'map');
+  if(S.view==='title')return viewTitle();
+  if(!S.me||S.view==='make')return viewMake();
+  if(S.view==='school'){document.body.dataset.s=S.school;SCHOOLS[S.school][S.step]()}
+  else if(S.view==='walk')viewWalk();
+  else if(S.view==='pass')viewPass(); else viewMap();
+}
+document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b||S.view===b.dataset.v)return;clearTimeout(T);WK++;try{speechSynthesis.cancel()}catch(x){}
+  S.resume=S.view==='school'&&b.dataset.v==='pass'?{school:S.school,step:S.step}:b.dataset.v==='map'?null:S.resume;S.view=b.dataset.v;render();scrollTo(0,0)};
+const start=d=>{if(d&&d.done){S.done=d.done;S.shi=d.shi||'';S.me=d.me||S.me;S.at=d.at||S.at}render()};
+window.claude?.hot?.snapshot?.(()=>({done:S.done,shi:S.shi,me:S.me,at:S.at}));
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+</script>
+</body>
+</html>
