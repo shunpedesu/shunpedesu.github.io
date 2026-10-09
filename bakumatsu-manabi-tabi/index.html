@@ -280,20 +280,36 @@ function sfx(k){if(!AU.on)return;try{const c=ac(),t=c.currentTime,o=AU.sfx;
   else if(k==='arrive'){[294,392,440,587,784].forEach((f,i)=>pluck(f,t+i*.1,.9,.35,o));drum(t+.5,.6,o)}
   else if(k==='boom'){drum(t,1,o,70);hiss(t,.6,.5,o,200)}
   else if(k==='step'){hiss(t,.06,.22,o,900)}}catch(e){}}
-/* 音階: 都節(しっとり)と陽音階(あかるい)。数字は音階の何番目か、-1は休み */
-const SC={in:[0,1,5,7,8,12,13,17,19,20],yo:[0,2,5,7,9,12,14,17,19,21]},_=-1;
+/* 音楽: 和楽器風の音色 × ビート。都節(in)と民謡調のペンタ(yo)。数字は音階の何番目か、_ は休み */
+const SC={in:[0,1,5,7,8],yo:[0,3,5,7,10]},_=-1;
+function fxInit(){if(AU.bus)return;const c=AU.ctx;AU.bus=c.createGain();const lp=c.createBiquadFilter();lp.type='lowpass';lp.frequency.value=6000;const cp=c.createDynamicsCompressor();cp.threshold.value=-18;cp.ratio.value=4;
+  AU.bus.connect(lp).connect(cp).connect(AU.bgm);AU.send=c.createGain();AU.send.gain.value=.3;const dl=c.createDelay(1);dl.delayTime.value=.33;const fb=c.createGain();fb.gain.value=.38;const dlp=c.createBiquadFilter();dlp.type='lowpass';dlp.frequency.value=2200;
+  AU.send.connect(dl);dl.connect(dlp).connect(fb).connect(dl);dlp.connect(AU.bus);AU.dl=dl;AU.bgm.gain.value=.22}
+function sham(f,t,v,out){const c=AU.ctx,o=c.createOscillator(),bp=c.createBiquadFilter(),g=c.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f*1.03,t);o.frequency.exponentialRampToValueAtTime(f,t+.03);bp.type='bandpass';bp.frequency.value=Math.min(4200,f*3.2);bp.Q.value=1.6;env(g,t,v,.26,.003);o.connect(bp).connect(g).connect(out);o.start(t);o.stop(t+.3);hiss(t,.02,v*.5,out,3200)}
+function bassN(f,t,d,v,out){const c=AU.ctx,o=c.createOscillator(),o2=c.createOscillator(),lp=c.createBiquadFilter(),g=c.createGain();o.type='triangle';o2.type='sine';o.frequency.value=f;o2.frequency.value=f/2;lp.type='lowpass';lp.frequency.value=420;env(g,t,v,d,.008);o.connect(lp);o2.connect(lp);lp.connect(g).connect(out);o.start(t);o2.start(t);o.stop(t+d+.05);o2.stop(t+d+.05)}
+function pad(fs,t,d,v,out){const c=AU.ctx,lp=c.createBiquadFilter(),g=c.createGain();lp.type='lowpass';lp.frequency.value=780;g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+d*.35);g.gain.linearRampToValueAtTime(.0001,t+d);lp.connect(g).connect(out);
+  fs.forEach(f=>[-7,7].forEach(ct=>{const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=ct;o.connect(lp);o.start(t);o.stop(t+d+.05)}))}
+const snare=(t,v,o)=>{hiss(t,.15,v,o,1900);drum(t,v*.5,o,210)},hat=(t,v,o)=>hiss(t,.03,v,o,8200);
 const MOOD={
- map:{bpm:80,sc:'in',base:293.66,fl:[4,_,_,_,5,_,4,_,2,_,_,_,1,_,2,_,4,_,_,_,5,_,7,_,5,_,_,_,4,_,_,_, 7,_,_,_,5,_,4,_,5,_,_,_,2,_,1,_,2,_,_,_,4,_,2,_,0,_,_,_,_,_,_,_],ko:[0,_,3,_,5,_,3,_,0,_,2,_,4,_,2,_],dr:[]},
- walk:{bpm:118,sc:'yo',base:293.66,fl:[],ko:[5,_,5,7,8,_,7,5,3,_,5,_,3,2,0,_, 2,_,3,5,3,_,2,0,2,_,3,_,5,_,_,_, 5,_,7,8,9,_,8,7,5,_,7,_,5,3,2,_, 3,_,5,3,2,_,0,_,2,3,2,0,0,_,_,_],dr:[1,_,_,2,1,_,2,_]},
- school:{bpm:58,sc:'yo',base:220,fl:[],ko:[0,_,_,3,_,_,5,_,_,_,4,_,_,2,_,_, 3,_,_,5,_,_,7,_,_,_,5,_,_,3,_,_],dr:[]},
- night:{bpm:50,sc:'in',base:196,fl:[5,_,_,_,_,_,4,_,2,_,_,_,_,_,_,_,1,_,_,_,2,_,_,_,0,_,_,_,_,_,_,_],ko:[0,_,_,_,_,_,2,_,_,_,_,_,3,_,_,_],dr:[]}};
-const nf=(m,i)=>m.base*Math.pow(2,SC[m.sc][i]/12);
-function bgmTick(){const c=AU.ctx,m=MOOD[AU.mood];if(!m)return;const st=30/m.bpm;
-  while(AU.next<c.currentTime+.25){const i=AU.step,t=Math.max(AU.next,c.currentTime+.02);
-    const k=m.ko.length?m.ko[i%m.ko.length]:_;if(k>=0)pluck(nf(m,k),t,1.4,.5,AU.bgm);
-    const f=m.fl.length?m.fl[i%m.fl.length]:_;if(f>=0){let n=1;while(m.fl[(i+n)%m.fl.length]<0&&n<8)n++;flute(nf(m,f)*2,t,st*n*.95,.32,AU.bgm)}
-    const d=m.dr.length?m.dr[i%m.dr.length]:_;if(d===1)drum(t,.8,AU.bgm);else if(d===2)hiss(t,.05,.35,AU.bgm,2400);
-    AU.step++;AU.next=t+st}}
+ map:{bpm:82,sc:'in',base:146.83,sw:.16,k:'x.....x...x.....',s:'....x.......x...',h:'x.x.x.x.x.x.x.xx',br:'x..x..x...x.....',bb:[0,3,2,4],pad:1,ins:'koto',
+  ld:[[5,_,_,7,_,_,8,_,7,_,5,_,_,_,_,_, 4,_,_,5,_,_,7,_,5,_,4,_,2,_,_,_, 5,_,_,7,_,_,9,_,8,_,7,_,_,_,5,_, 4,_,5,_,2,_,_,_,0,_,_,_,_,_,_,_],
+      [9,_,_,8,_,_,7,_,_,_,5,_,7,_,_,_, 8,_,_,7,_,_,5,_,4,_,_,_,2,_,_,_, 4,_,5,_,7,_,_,_,5,_,4,_,2,_,_,_, 0,_,_,2,_,_,4,_,5,_,_,_,_,_,_,_]]},
+ walk:{bpm:138,sc:'yo',base:146.83,sw:0,k:'x...x...x...x.x.',s:'....x.......x..x',h:'x.xxx.xxx.xxx.xx',br:'x.x.x.x.x.x.x.x.',bb:[0,0,3,4],pad:0,ins:'sham',
+  ld:[[5,_,5,7,8,_,7,5,7,_,5,4,5,_,_,_, 5,_,5,7,8,_,10,8,7,_,8,7,5,_,_,_],[5,_,5,7,8,_,7,5,7,_,5,4,5,_,_,_, 8,_,8,10,12,_,10,8,7,_,5,7,8,_,_,_],
+      [9,_,8,7,8,_,7,5,7,_,5,4,2,_,4,_, 5,_,7,_,8,_,7,5,4,_,2,_,0,_,_,_],[5,_,5,7,8,_,7,5,7,_,5,4,5,_,_,_, 5,7,8,10,12,_,10,_,8,_,7,_,5,_,_,_]]},
+ school:{bpm:72,sc:'yo',base:146.83,sw:0,k:'x...............',s:'................',h:'....x.......x...',br:'x.........x.....',bb:[0,2,3,0],pad:1,ins:'koto',
+  ld:[[5,_,_,_,_,_,7,_,_,_,8,_,_,_,_,_, _,_,7,_,_,_,5,_,_,_,_,_,4,_,_,_, 5,_,_,_,_,_,9,_,_,_,8,_,_,_,7,_, _,_,5,_,_,_,_,_,4,_,_,_,5,_,_,_]]},
+ night:{bpm:68,sc:'in',base:130.81,sw:.14,k:'x.......x.x.....',s:'....x.......x...',h:'..x...x...x...x.',br:'x.....x...x.....',bb:[0,0,1,4],pad:1,ins:'flute',
+  ld:[[7,_,_,_,_,_,_,_,6,_,_,_,5,_,_,_, _,_,_,_,4,_,_,_,5,_,_,_,_,_,_,_, 9,_,_,_,_,_,_,_,8,_,_,_,7,_,_,_, 5,_,_,_,_,_,6,_,5,_,_,_,_,_,_,_]]}};
+const nf=(m,d)=>{const sc=SC[m.sc],o=Math.floor(d/5);return m.base*Math.pow(2,(sc[((d%5)+5)%5]+12*o)/12)};
+function bgmTick(){const c=AU.ctx,m=MOOD[AU.mood];if(!m)return;fxInit();const st=15/m.bpm,B=AU.bus;AU.dl.delayTime.value=st*3;
+  while(AU.next<c.currentTime+.25){const i=AU.step,pos=i%16,bar=Math.floor(i/16),t=Math.max(AU.next,c.currentTime+.02)+(pos%2?st*m.sw:0);
+    if(m.k[pos]==='x')drum(t,.95,B,150);if(m.s[pos]==='x')snare(t,.5,B);if(m.h[pos]==='x')hat(t,pos%4===2?.22:.13,B);
+    const root=m.bb[bar%m.bb.length];if(m.br[pos]==='x')bassN(nf(m,root)/2,t,st*2.6,.75,B);
+    if(m.pad&&pos===0)pad([nf(m,root),nf(m,root+2),nf(m,root+4)],t,st*16,.11,B);
+    const L=m.ld[0].length,pat=m.ld[Math.floor(i/L)%m.ld.length],n=pat[i%L];
+    if(n>=0){const f=nf(m,n)*2;if(m.ins==='sham'){sham(f,t,.5,B);sham(f,t,.12,AU.send)}else if(m.ins==='flute'){let k=1;while(pat[(i+k)%L]<0&&k<12)k++;flute(f,t,st*k*.95,.3,B);flute(f,t,st*k*.9,.1,AU.send)}else{pluck(f,t,1.5,.5,B);pluck(f,t,1.2,.2,AU.send)}}
+    AU.step++;AU.next+=st}}
 function bgm(){clearInterval(AU.timer);AU.timer=null;if(!AU.on||!AU.mood||!AU.ctx)return;AU.step=0;AU.next=AU.ctx.currentTime+.1;AU.timer=setInterval(()=>{try{bgmTick()}catch(e){}},90)}
 function setMood(m){if(AU.mood===m&&AU.timer)return;AU.mood=m;bgm()}
 const sndBtn=document.getElementById('snd'),sndLabel=()=>{sndBtn.textContent=AU.on?'♪ 音あり':'♪ 音なし';sndBtn.setAttribute('aria-pressed',AU.on)};sndLabel();
@@ -367,6 +383,62 @@ function bindDaily(){const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{co
   const pool=DAILY(),d=new Date(),q=pool[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%pool.length];
   box.innerHTML=`<p style="font-size:14px">${R(q.s)}${R('より。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="dg"></div>`;
   orderGame(box.querySelector('#dg'),q.p,()=>{S.dailyDone=k;logDay();sfx('stamp');setTimeout(()=>{if(S.view==='pass')render()},900)})}
+/* ---------- 通うたびに変わる文と問い ---------- */
+const kanaOf=p=>p.join('、').replace(/[一-鿿々ヶ]+\{([^}]+)\}/g,'$1');
+const SP=[
+ {p:['故{ふる}きを温{たず}ねて','新{あたら}しきを知{し}る','以{もっ}て師{し}と為{な}るべし'],m:'昔{むかし}のことをよく学{まな}び、そこから新{あたら}しいことを見{み}つける。そういう人{ひと}が先生{せんせい}になれる。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['之{これ}を知{し}る者{もの}は','之{これ}を好{この}む者{もの}に如{し}かず','之{これ}を好{この}む者{もの}は','之{これ}を楽{たの}しむ者{もの}に如{し}かず'],m:'知{し}っているだけの人{ひと}は、好{す}きな人{ひと}にかなわない。好{す}きな人{ひと}は、楽{たの}しんでいる人{ひと}にかなわない。',s:'『論語{ろんご}』雍也{ようや}'},
+ {p:['義{ぎ}を見{み}て','為{せ}ざるは','勇{ゆう}無{な}きなり'],m:'正{ただ}しいとわかっているのにやらないのは、勇気{ゆうき}がないからだ。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['過{す}ぎたるは','猶{な}お','及{およ}ばざるがごとし'],m:'やりすぎは、足{た}りないのと同{おな}じくらいよくない。',s:'『論語{ろんご}』先進{せんしん}'},
+ {p:['徳{とく}は','孤{こ}ならず','必{かなら}ず隣{となり}有{あ}り'],m:'りっぱな行{おこな}いをする人{ひと}は、ひとりぼっちにならない。かならず仲間{なかま}があらわれる。',s:'『論語{ろんご}』里仁{りじん}'},
+ {p:['吾{われ}十有五{じゅうゆうご}にして','学{がく}に志{こころざ}す','三十{さんじゅう}にして立{た}つ','四十{しじゅう}にして惑{まど}わず'],m:'わたしは十五歳{じゅうごさい}で学問{がくもん}をこころざし、三十{さんじゅう}でひとり立{だ}ちし、四十{よんじゅう}でまよわなくなった。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['三人{さんにん}行{おこな}えば','必{かなら}ず','我{わ}が師{し}有{あ}り'],m:'三人{さんにん}でいっしょに歩{ある}けば、その中{なか}にかならず自分{じぶん}の手本{てほん}になる人{ひと}がいる。',s:'『論語{ろんご}』述而{じゅつじ}'},
+ {p:['君子{くんし}は','和{わ}して同{どう}ぜず','小人{しょうじん}は','同{どう}じて和{わ}せず'],m:'りっぱな人{ひと}は、仲{なか}よくするが、何{なん}でも合{あ}わせたりはしない。つまらない人{ひと}は、合{あ}わせるだけで、ほんとうには仲{なか}よくない。',s:'『論語{ろんご}』子路{しろ}'},
+ {p:['学{まな}びて思{おも}わざれば','則{すなわ}ち罔{くら}し','思{おも}いて学{まな}ばざれば','則{すなわ}ち殆{あやう}し'],m:'学{まな}ぶだけで考{かんが}えなければ、身{み}につかない。考{かんが}えるだけで学{まな}ばなければ、あぶなっかしい。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['性{せい}','相{あい}近{ちか}し','習{なら}い','相{あい}遠{とお}し'],m:'人{ひと}は生{う}まれたときは似{に}ている。そのあとの学{まな}びと習慣{しゅうかん}で、大{おお}きな差{さ}がつく。',s:'『論語{ろんご}』陽貨{ようか}'},
+ {p:['剛毅木訥{ごうきぼくとつ}','仁{じん}に','近{ちか}し'],m:'心{こころ}が強{つよ}く、かざりけがなく、口{くち}べたな人{ひと}は、思{おも}いやりのある人{ひと}に近{ちか}い。',s:'『論語{ろんご}』子路{しろ}'},
+ {p:['知{し}らざるを','知{し}らずと為{な}す','是{こ}れ知{し}るなり'],m:'知{し}らないことを「知{し}らない」とみとめる。それが、ほんとうに知{し}るということだ。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['天{てん}の時{とき}は','地{ち}の利{り}に如{し}かず','地{ち}の利{り}は','人{ひと}の和{わ}に如{し}かず'],m:'よい時{とき}にめぐまれるより、よい場所{ばしょ}にいるほうが強{つよ}い。よい場所{ばしょ}より、人{ひと}びとが力{ちから}を合{あ}わせるほうが強{つよ}い。',s:'『孟子{もうし}』公孫丑{こうそんちゅう}下{げ}'},
+ {p:['巧言令色{こうげんれいしょく}','鮮{すく}なし','仁{じん}'],m:'口{くち}がうまく、顔{かお}つきだけよい人{ひと}に、ほんとうの思{おも}いやりは少{すく}ない。',s:'『論語{ろんご}』学而{がくじ}'},
+ {p:['過{あやま}ちて','改{あらた}めざる','是{これ}を過{あやま}ちと謂{い}う'],m:'まちがえたのに直{なお}さない。それこそが、ほんとうのまちがいだ。',s:'『論語{ろんご}』衛霊公{えいれいこう}'},
+ {p:['歳{とし}寒{さむ}くして','然{しか}る後{のち}に','松柏{しょうはく}の','彫{しぼ}むに後{おく}るるを知{し}る'],m:'寒{さむ}い冬{ふゆ}になってはじめて、松{まつ}が最後{さいご}まで緑{みどり}でいることがわかる。苦{くる}しいときに、人{ひと}のほんとうの強{つよ}さがわかる。',s:'『論語{ろんご}』子罕{しかん}'},
+ {p:['知者{ちしゃ}は惑{まど}わず','仁者{じんしゃ}は憂{うれ}えず','勇者{ゆうしゃ}は懼{おそ}れず'],m:'よく知{し}る人{ひと}はまよわない。思{おも}いやりのある人{ひと}はくよくよしない。勇気{ゆうき}のある人{ひと}はおそれない。',s:'『論語{ろんご}』子罕{しかん}'},
+ {p:['己{おのれ}の','欲{ほっ}せざる所{ところ}は','人{ひと}に施{ほどこ}すこと','勿{な}かれ'],m:'自分{じぶん}がされたくないことは、人{ひと}にもしてはいけない。',s:'『論語{ろんご}』衛霊公{えいれいこう}'}];
+const IROHA=[{p:['楼{ろう}の上{うえ}も','はにふの小屋{こや}も','住{す}む人{ひと}の','心{こころ}にこそは','たかきいやしき'],m:'りっぱな建物{たてもの}に住{す}んでも、そまつな小屋{こや}に住{す}んでも、人{ひと}のねうちは心{こころ}で決{き}まる。',s:'いろは歌{うた}「ろ」'},
+ {p:['はかなくも','明日{あす}の命{いのち}を','頼{たの}むかな','今日{きょう}も今日{きょう}もと','学{まな}びをばせで'],m:'明日{あした}があると思{おも}って、今日{きょう}も学{まな}ばずにすごしてしまう。それではいけない。',s:'いろは歌{うた}「は」'}];
+const SIDX={nisshin:0,kodo:1,shohei:2,shizu:3,kangi:4,goju:5};
+function draw(school,k){const v=S.vis[school]||0,list=school==='goju'?IROHA.concat(SP):SP,st=(Math.max(0,v-1)*3+(school==='goju'?0:(SIDX[school]||0)*4)+(v===0?(SIDX[school]||0)*4+1:0))%list.length;return Array.from({length:k},(_,j)=>list[(st+j)%list.length])}
+const MOSHIS=[{p:['至誠{しせい}にして','動{うご}かざる者{もの}は','未{いま}だ','之{こ}れ有{あ}らざるなり'],m:'まごころをつくして、心{こころ}を動{うご}かされない人{ひと}は、今{いま}までひとりもいない。'},
+ {p:['天{てん}の時{とき}は','地{ち}の利{り}に如{し}かず','地{ち}の利{り}は','人{ひと}の和{わ}に如{し}かず'],m:'よい時{とき}より、よい場所{ばしょ}。よい場所{ばしょ}より、人{ひと}びとが力{ちから}を合{あ}わせること。'},
+ {p:['我{われ}','善{よ}く','吾{わ}が浩然{こうぜん}の気{き}を','養{やしな}う'],m:'わたしは、のびのびとした大{おお}きな気{き}もちを、たいせつに育{そだ}てている。'}];
+const TOPICS=[{q:'松陰{しょういん}がたずねる。「学問{がくもん}は、何{なん}のためにするのか?」',o:['世{よ}の中{なか}の役{やく}に立{た}つため','自分{じぶん}をみがくため','知{し}るのが楽{たの}しいから']},
+ {q:'松陰{しょういん}がたずねる。「身分{みぶん}のちがう人{ひと}どうしが、いっしょに学{まな}ぶのはよいことか?」',o:['よい。いろいろな考{かんが}えにふれられる','むずかしい。くらしがちがいすぎる','何{なに}を学{まな}ぶかによる']},
+ {q:'松陰{しょういん}がたずねる。「遠{とお}い国{くに}のできごとを、なぜ知{し}らねばならないのか?」',o:['いざというときに備{そな}えるため','よいところをまねて学{まな}ぶため','知{し}らなくてもくらせると思{おも}う']},
+ {q:'松陰{しょういん}がたずねる。「正{ただ}しいと思{おも}うことに、まわりが反対{はんたい}したら、どうするか?」',o:['それでもやる','まず、わかってもらえるまで話{はな}す','もう一度{いちど}考{かんが}えなおす']}];
+const ALTQ={'goju:詮議':[
+ {q:'二才{にせ}がたずねる。「道{みち}で、けがをした旅人{たびびと}を見{み}つけた。だが、けいこの時刻{じこく}がせまっている。どうする?」',o:['旅人{たびびと}を助{たす}ける','けいこへ急{いそ}ぐ','近{ちか}くの大人{おとな}をよぶ'],a:'二才{にせ}はすぐに重{かさ}ねてたずねる。「では、助{たす}けているあいだに、けいこをぬけたと仲間{なかま}にせめられたら?」 声{こえ}に出{だ}して、すぐ答{こた}えてみよう。'},
+ {q:'二才{にせ}がたずねる。「仲間{なかま}がうそをついているのを知{し}った。どうする?」',o:['本人{ほんにん}にじかに言{い}う','年上{としうえ}に相談{そうだん}する','しばらくようすを見{み}る'],a:'二才{にせ}はすぐに重{かさ}ねてたずねる。「では、その仲間{なかま}が、いちばんの友{とも}だったら?」 声{こえ}に出{だ}して、すぐ答{こた}えてみよう。'},
+ {q:'二才{にせ}がたずねる。「年下{としした}の子{こ}が、川{かわ}に物{もの}を落{お}として泣{な}いている。流{なが}れは速{はや}い。どうする?」',o:['自分{じぶん}が川{かわ}に入{はい}って取{と}る','長{なが}い棒{ぼう}をさがす','あきらめるよう言{い}う'],a:'二才{にせ}はすぐに重{かさ}ねてたずねる。「では、それが父上{ちちうえ}の形見{かたみ}の品{しな}だったら?」 声{こえ}に出{だ}して、すぐ答{こた}えてみよう。'}]};
+const NLX=[{w:['De','hond','drinkt','water'],j:['犬{いぬ}は','水{みず}を','飲{の}む']},{w:['Ik','heb','een','boek'],j:['わたしは','本{ほん}を','持{も}っている']},{w:['De','arts','helpt','de','zieke'],j:['医者{いしゃ}は','病人{びょうにん}を','助{たす}ける']},
+ {w:['Wij','leren','Nederlands'],j:['わたしたちは','オランダ語{ご}を','学{まな}ぶ']},{w:['De','zon','geeft','licht'],j:['太陽{たいよう}は','光{ひかり}を','与{あた}える']},{w:['Het','kind','leest','een','boek'],j:['子{こ}どもは','本{ほん}を','読{よ}む']},
+ {w:['De','arts','ziet','het','bloed'],j:['医者{いしゃ}は','血{ち}を','見{み}る']},{w:['Het','bloed','is','rood'],j:['血{ち}は','赤{あか}い','のである']},{w:['De','aarde','is','rond'],j:['地球{ちきゅう}は','丸{まる}い','のである']}];
+const tekiSet=()=>{const v=S.vis.teki||0;return v===0?NL:[0,1,2].map(j=>NLX[((v-1)*3+j)%NLX.length])};
+const FW=[{head:'<p class="eng">competition</p>',q:'店{みせ}どうしが、よい品{しな}を安{やす}く売{う}ろうときそいあうこと。',o:['競争{きょうそう}','相談{そうだん}','休息{きゅうそく}'],a:0,x:'福沢{ふくざわ}が「競争{きょうそう}」と訳{やく}すと、幕府{ばくふ}の役人{やくにん}が「争{あらそ}い」の字{じ}をいやがった、という話{はなし}がのこっています。'},
+ {head:'<p class="eng">copyright</p>',q:'本{ほん}を書{か}いた人{ひと}が、勝手{かって}に写{うつ}されないようにする権利{けんり}。',o:['関所{せきしょ}','版権{はんけん}','年貢{ねんぐ}'],a:1,x:'福沢{ふくざわ}は「版権{はんけん}」ということばを使{つか}い、にせものの本{ほん}とたたかいました。'},
+ {head:'<p class="eng">debate</p>',q:'賛成{さんせい}と反対{はんたい}に分{わ}かれて、意見{いけん}をたたかわせること。',o:['素読{そどく}','写本{しゃほん}','討論{とうろん}'],a:2,x:'「討論{とうろん}」も、福沢{ふくざわ}たちが広{ひろ}めた訳語{やくご}といわれます。'},
+ {head:'<p class="eng">physics</p>',q:'物{もの}が落{お}ちるわけや、光{ひかり}や熱{ねつ}のしくみを調{しら}べる学問{がくもん}。',o:['窮理{きゅうり}','礼法{れいほう}','和歌{わか}'],a:0,x:'当時{とうじ}は物理学{ぶつりがく}を「窮理{きゅうり}」とよびました。福沢{ふくざわ}は子{こ}どもむけに『訓蒙窮理図解{きんもうきゅうりずかい}』を書{か}いています。'},
+ {head:'<p class="eng">steam</p>',q:'湯{ゆ}をわかすと出{で}る、船{ふね}や車{くるま}を動{うご}かす力{ちから}のもと。',o:['墨{すみ}','蒸気{じょうき}','稲{いね}'],a:1,x:'福沢{ふくざわ}は『西洋事情{せいようじじょう}』で、蒸気{じょうき}で動{うご}く船{ふね}や車{くるま}を紹介{しょうかい}しました。'},
+ {head:'<p class="eng">independence</p>',q:'人{ひと}にたよらず、自分{じぶん}の力{ちから}で立{た}つこと。',o:['服従{ふくじゅう}','見物{けんぶつ}','独立{どくりつ}'],a:2,x:'福沢{ふくざわ}は「独立自尊{どくりつじそん}」ということばをたいせつにしました。'}];
+const fukuSet=()=>{const v=S.vis.fuku||0;return [0,1,2].map(j=>FW[((v-1)*3+j)%FW.length])};
+/* 海軍伝習所: 算術の問題をその場でつくる */
+function kaiGen(){const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),mk=(q,ok,ng,x,u)=>{const o=[ok,...ng].sort(()=>Math.random()-.5);return {q,o:o.map(n=>n+u),a:o.indexOf(ok),x}};
+  const DIR=[['北東{ほくとう}',45],['東{ひがし}',90],['南東{なんとう}',135],['南{みなみ}',180],['南西{なんせい}',225],['西{にし}',270],['北西{ほくせい}',315]];
+  const a=rnd(4,9),t=rnd(2,6),a2=rnd(4,8),t2=rnd(3,7),d=DIR[rnd(0,6)],h=rnd(1,8)*30,tn=rnd(1,5)*15,kn=rnd(5,9),mi=rnd(2,4)*30;
+  return [mk(`船{ふね}は一時間{いちじかん}に${a}海里{かいり}すすむ。${t}時間{じかん}では?`,a*t,[a*t+a,a*t-a],`${a}×${t}=${a*t}。速{はや}さ×時間{じかん}で、進{すす}んだ道{みち}のりがわかる。`,'海里{かいり}'),
+   mk(`${a2*t2}海里{かいり}先{さき}の港{みなと}へ、一時間{いちじかん}に${a2}海里{かいり}で向{む}かう。何時間{なんじかん}かかる?`,t2,[t2+1,t2-1],`${a2*t2}÷${a2}=${t2}。道{みち}のり÷速{はや}さで、かかる時間{じかん}がわかる。`,'時間{じかん}'),
+   mk(`羅針盤{らしんばん}は北{きた}が0度{ど}、東{ひがし}が90度{ど}、南{みなみ}が180度{ど}、西{にし}が270度{ど}。${d[0]}へ向{む}かうには?`,d[1],[(d[1]+90)%360,(d[1]+180)%360],`${d[0]}は${d[1]}度{ど}。`,'度{ど}'),
+   mk(`いま船{ふね}は${h}度{ど}へ向{む}いている。右{みぎ}へ${tn}度{ど}まわすと?`,(h+tn)%360,[(h+tn+30)%360,(h-tn+360)%360],`${h}+${tn}=${(h+tn)%360}。右{みぎ}へまわすと数{かず}がふえる。`,'度{ど}'),
+   mk(`一時間{いちじかん}に${kn}海里{かいり}の速{はや}さで、${mi}分{ぷん}すすんだ。道{みち}のりは? (${mi}分{ぷん}は${mi/60}時間{じかん})`,kn*mi/60,[kn*mi/60+kn/2,kn*mi/60+kn],`${kn}×${mi/60}=${kn*mi/60}。`,'海里{かいり}')]}
 const plain=t=>t.replace(/\{[^}]+\}/g,'');
 /* 顔のつくり: 肖像画や写真でつたわる特徴(輪郭・眉・目・年ごろ)を数値にしたもの
    rx,ry=顔の幅と長さ cw=あごの幅 br=[眉の太さ,つり上がり] e=目(n細い s切れ長 g穏やか b大きい) ns=鼻の長さ ho=こけた頬 old=しわ fh=広いひたい mu=ひげ nk=首の太さ */
@@ -582,22 +654,22 @@ const NISSHIN=[
   <p class="note" id="okn" hidden>${F('「什{じゅう}」の子{こ}どもたちが毎日{まいにち}たしかめあった決{き}まりです。六{ろく}と七{なな}のように、今{いま}のくらしには合{あ}わないものもあります。決{き}まりは時代{じだい}でかわります。きみの組{くみ}なら、どんな掟{おきて}にする?')}</p>`,4,false);
   let i=0;const ul=app.querySelector('#ok'),b=app.querySelector('#say');
   b.onclick=()=>{tok(300,.2);if(i<7){ul.innerHTML=`<li>${R(OKITE[i])}</li>`;i++}else{ul.innerHTML=`<li class="last">${R('ならぬことは<br>ならぬものです')}</li>`;b.hidden=true;app.querySelector('#okn').hidden=false;unlock()}}},
- ()=>{let q=0;const go=()=>{const r=RONGO[q];
+ ()=>{let q=0;const RS=S.rs=(S.vis.nisshin||0)===0?RONGO:draw('nisshin',3);const go=()=>{const r=RS[q];
   frame(win,`<h2>${R('素読{そどく}')} ${q+1}/3</h2><p>${R('意味{いみ}はまだ考{かんが}えなくていい。先生{せんせい}のあとについて、大{おお}きな声{こえ}で。')}</p>
   <div class="tate" id="tt">${r.p.map(x=>`<span>${R(x)}、</span>`).join('')}</div>
   <div class="row"><button class="btn" id="tch">${R('先生{せんせい}の読{よ}みをきく')}</button></div><div id="og"></div>
   <p class="note">${F('素読{そどく}は、意味{いみ}の説明{せつめい}より先{さき}に、声{こえ}に出{だ}してくり返{かえ}し読{よ}む学{まな}び方{かた}。先生{せんせい}は「字突{じつ}き棒{ぼう}」で一字{いちじ}ずつ指{さ}しました。読{よ}んでいるのは『論語{ろんご}』のはじめの文{ぶん}です。')}<br>${A('読{よ}む順{じゅん}にならべるあそびと、機械{きかい}の声{こえ}。')}</p>`,4,false);
   const sp=[...app.querySelectorAll('#tt span')];
-  app.querySelector('#tch').onclick=e=>{e.target.disabled=true;speak(r.k);let j=0;const t=setInterval(()=>{sp.forEach(s=>s.classList.remove('now'));if(j<sp.length){sp[j].classList.add('on','now');tok(700,.05);j++}else{clearInterval(t);
+  app.querySelector('#tch').onclick=e=>{e.target.disabled=true;speak(kanaOf(r.p));let j=0;const t=setInterval(()=>{sp.forEach(s=>s.classList.remove('now'));if(j<sp.length){sp[j].classList.add('on','now');tok(700,.05);j++}else{clearInterval(t);
     app.querySelector('#og').innerHTML=`<p>${R('きみの番{ばん}。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="og2"></div>`;
     orderGame(app.querySelector('#og2'),r.p,()=>{q++;if(q<3)setTimeout(go,700);else unlock()})}},1100)}};go()},
- ()=>{frame(win,`<h2>${R('意味{いみ}は、あとからわかる')}</h2><div class="tate all" style="height:13em;font-size:19px">${RONGO.map(r=>`<span>${R(r.p.join('、'))}。</span>`).join('')}</div>
-  ${RONGO.map(r=>`<p>${R(r.m)}</p>`).join('')}
+ ()=>{frame(win,`<h2>${R('意味{いみ}は、あとからわかる')}</h2><div class="tate all" style="height:13em;font-size:19px">${(S.rs||RONGO).map(r=>`<span>${R(r.p.join('、'))}。</span>`).join('')}</div>
+  ${(S.rs||RONGO).map(r=>`<p>${R(r.m)}</p>`).join('')}
   ${finish('会','日新館{にっしんかん} 修了{しゅうりょう}','ここで学{まな}んだ山川健次郎{やまかわけんじろう}は、のちにアメリカで物理学{ぶつりがく}を学{まな}び、東京帝国大学{とうきょうていこくだいがく}の総長{そうちょう}になりました。','『論語{ろんご}』学而{がくじ}第一{だいいち}、会津藩{あいづはん}「什{じゅう}の掟{おきて}」')}`,4,false);bindHome()}
 ];
 
 /* ---------- 適塾 ---------- */
-const DICT={De:'「その」のしるし',zon:'太陽{たいよう}',is:'〜である',een:'ひとつの',grote:'大{おお}きな',ster:'星{ほし}',Het:'「その」のしるし',hart:'心臓{しんぞう}',spier:'筋肉{きんにく}',Ik:'わたし',lees:'読{よ}む',boek:'本{ほん}'};
+const DICT={hond:'犬{いぬ}',drinkt:'飲{の}む',water:'水{みず}',heb:'持{も}っている',arts:'医者{いしゃ}',helpt:'助{たす}ける',de:'「その」のしるし',het:'「その」のしるし',zieke:'病人{びょうにん}',Wij:'わたしたち',leren:'学{まな}ぶ',Nederlands:'オランダ語{ご}',geeft:'与{あた}える',licht:'光{ひかり}',bloed:'血{ち}',rood:'赤{あか}い',aarde:'地球{ちきゅう}',rond:'丸{まる}い',kind:'子{こ}ども',leest:'読{よ}む',ziet:'見{み}る',De:'「その」のしるし',zon:'太陽{たいよう}',is:'〜である',een:'ひとつの',grote:'大{おお}きな',ster:'星{ほし}',Het:'「その」のしるし',hart:'心臓{しんぞう}',spier:'筋肉{きんにく}',Ik:'わたし',lees:'読{よ}む',boek:'本{ほん}'};
 const NL=[{w:['De','zon','is','een','grote','ster'],j:['太陽{たいよう}は','大{おお}きな','星{ほし}','である']},
  {w:['Het','hart','is','een','spier'],j:['心臓{しんぞう}は','筋肉{きんにく}','である']},
  {w:['Ik','lees','een','boek'],j:['わたしは','本{ほん}を','読{よ}む']}];
@@ -606,7 +678,7 @@ const TEKI=[
  ()=>{S.notes={};S.marks=[];frame(lamp,`<h2>${R('入門{にゅうもん}')}</h2>
   <p>${R('夜{よる}の大坂{おおさか}。行灯{あんどん}のあかりの下{した}で、塾生{じゅくせい}たちがオランダ語{ご}の本{ほん}とにらめっこしている。きみの場所{ばしょ}は、畳{たたみ}一枚{いちまい}ぶん。そこで読{よ}み、そこで寝{ね}る。')}</p>
   <p class="note">${F('適塾{てきじゅく}は医者{いしゃ}の緒方洪庵{おがたこうあん}が一八三八年{ねん}にひらいた蘭学{らんがく}の塾{じゅく}。先生{せんせい}が教{おし}える時間{じかん}は少{すく}なく、自分{じぶん}の力{ちから}で読{よ}みとくのが決{き}まりでした。辞書{じしょ}『ヅーフ・ハルマ』は塾{じゅく}に一{ひと}そろいだけ。置{お}いてある「ヅーフ部屋{べや}」は夜{よる}どおし人{ひと}がいたそうです。')}</p>`,5,true)},
- ...NL.map((s,n)=>()=>{let looks=0;
+ ...[0,1,2].map(n=>()=>{const s=tekiSet()[n];let looks=0;
   frame(lamp,`<h2>${R('解読{かいどく}')} ${n+1}/3</h2><p>${R('知{し}らないことばをおして、辞書{じしょ}を引{ひ}こう。一度{いちど}引{ひ}いたことばは、きみの帳面{ちょうめん}にのこる。')}</p>
   <div class="nl">${s.w.map(w=>`<button data-w="${w}">${w}<small>${S.notes[w]?R(DICT[w]):''}</small></button>`).join('')}</div>
   <p id="msg" style="min-height:1.9em;font-size:15px"></p><div class="wait"><b id="bar"></b></div><div id="og"></div>
@@ -636,10 +708,10 @@ const SHOKA=[
  ()=>{frame(sho,`<h2>${R('入門{にゅうもん}')}</h2>
   <div class="row" style="flex-wrap:nowrap;align-items:flex-start">${plan}<p style="min-width:0">${R('教室{きょうしつ}はこの八畳{はちじょう}だけ。時間割{じかんわり}はなく、来{き}たい人{ひと}が来{き}たいときに来{く}る。先生{せんせい}の吉田松陰{よしだしょういん}は、きみを「友{とも}」とよぶ。')}</p></div>
   <p class="note">${F('松陰{しょういん}が教{おし}えたのは一八五七年{ねん}ごろからの短{みじか}い間{あいだ}。はじめは八畳{はちじょう}ひと間{ま}で、人{ひと}がふえると塾生{じゅくせい}といっしょに建{た}て増{ま}しました。武士{ぶし}でない家{いえ}の子{こ}も通{かよ}いました。松陰{しょういん}は塾生{じゅくせい}を「諸友{しょゆう}」とよびました。')}</p>`,5,true)},
- ()=>{frame(sho,`<h2>${R('米{こめ}をつきながら読{よ}む')}</h2><p>${R('杵{きね}をふむたびに、ことばがひとつずつ出{で}てくる。声{こえ}に出{だ}して読{よ}もう。')}</p>
+ ()=>{const mo=MOSHIS[(S.vis.shoka||0)%MOSHIS.length];frame(sho,`<h2>${R('米{こめ}をつきながら読{よ}む')}</h2><p>${R('杵{きね}をふむたびに、ことばがひとつずつ出{で}てくる。声{こえ}に出{だ}して読{よ}もう。')}</p>
   <div class="row" style="justify-content:space-around"><div class="usu"><div class="kine" id="kn"></div><div class="mortar"></div><button class="btn" id="tk">${R('つく')}</button></div>
-  <div class="tate" id="ms" style="height:11em;margin:0">${MOSHI.map(x=>`<span>${R(x)}</span>`).join('')}</div></div>
-  <p id="im" hidden>${R('意味{いみ}:まごころをつくして、心{こころ}を動{うご}かされない人{ひと}は、今{いま}までひとりもいない。')}</p>
+  <div class="tate" id="ms" style="height:11em;margin:0">${mo.p.map(x=>`<span>${R(x)}</span>`).join('')}</div></div>
+  <p id="im" hidden>${R('意味{いみ}:'+mo.m)}</p>
   <p class="note">${F('松陰{しょういん}がたいせつにした『孟子{もうし}』のことば。塾{じゅく}では畑{はたけ}しごとや米{こめ}つきをしながら本{ほん}を読{よ}んだ、とつたわります。')}</p>`,5,false);
   let c=0;const sp=[...app.querySelectorAll('#ms span')],kn=app.querySelector('#kn');
   app.querySelector('#tk').onclick=e=>{c++;tok(140,.18);kn.classList.add('hit');setTimeout(()=>kn.classList.remove('hit'),130);
@@ -648,13 +720,13 @@ const SHOKA=[
   <div class="choice">${NEWS.map((n,i)=>`<button data-i="${i}">${R(n)}</button>`).join('')}</div>
   <p class="note">${F('「飛耳長目{ひじちょうもく}」は、遠{とお}くのことをよく聞{き}き、よく見{み}るという意味{いみ}。塾{じゅく}には旅{たび}の人{ひと}や手紙{てがみ}から集{あつ}めた知{し}らせの帳面{ちょうめん}がありました。三{みっ}つの知{し}らせはどれもほんとうのできごとです。')}<br>${A('どれをえらんでも正解{せいかい}です。')}</p>`,5,false);
   app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.choice button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');pick=+b.dataset.i;tok();unlock()})},
- ()=>{stance=null;frame(sho,`<h2>${R('話{はな}しあい')}</h2><p>${R('松陰{しょういん}がたずねる。「外国{がいこく}の大{おお}きな船{ふね}が、つぎつぎにやって来{く}る。きみなら、どうする?」')}</p>
-  <div class="choice"><button>${R('もっと知{し}るために、外国{がいこく}のことを学{まな}ぶ')}</button><button>${R('まず、自分{じぶん}の国{くに}の守{まも}りをかためる')}</button><button>${R('会{あ}って、話{はな}しあってみる')}</button></div>
+ ()=>{stance=null;const tv=S.vis.shoka||0,tp=tv?TOPICS[(tv-1)%TOPICS.length]:null;frame(sho,`<h2>${R('話{はな}しあい')}</h2><p>${R(tp?tp.q:'松陰{しょういん}がたずねる。「外国{がいこく}の大{おお}きな船{ふね}が、つぎつぎにやって来{く}る。きみなら、どうする?」')}</p>
+  <div class="choice">${tp?tp.o.map(o=>`<button>${R(o)}</button>`).join(''):`<button>${R('もっと知{し}るために、外国{がいこく}のことを学{まな}ぶ')}</button><button>${R('まず、自分{じぶん}の国{くに}の守{まも}りをかためる')}</button><button>${R('会{あ}って、話{はな}しあってみる')}</button>`}</div>
   <label for="why">${R('そう考{かんが}えたわけを、きみのことばで')}</label><textarea id="why"></textarea>
   <button class="btn" id="say" disabled>${R('意見{いけん}を言{い}う')}</button><div id="vo"></div>`,5,false);
   const say=app.querySelector('#say');
   app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.choice button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');say.disabled=false});
-  say.onclick=()=>{say.hidden=true;tok();app.querySelector('#vo').innerHTML=`<div class="voices"><p>${R('「知{し}らない相手{あいて}とは、たたかうことも話{はな}すこともできない。まず学{まな}ぶべきだ」')}</p><p>${R('「学{まな}んでいるあいだに攻{せ}められたら? 守{まも}りが先{さき}だ」')}</p><p>${R('「どちらも要{い}る。では、今日{きょう}から何{なに}をする?」')}</p></div>
+  say.onclick=()=>{say.hidden=true;tok();app.querySelector('#vo').innerHTML=tp?`<div class="voices"><p>${R('「なぜそう思{おも}うのか、もう少{すこ}し聞{き}かせてくれ」')}</p><p>${R('「わたしはちがう考{かんが}えだ。きみなら、どう言{い}い返{かえ}す?」')}</p><p>${R('「では、明日{あした}から何{なに}をする?」')}</p></div><p class="note">${A('問{と}いと三{みっ}つの声{こえ}は、塾{じゅく}の話{はな}しあいのようすを思{おも}いえがいて作{つく}ったものです。正{ただ}しい答{こた}えはありません。')}</p>`:`<div class="voices"><p>${R('「知{し}らない相手{あいて}とは、たたかうことも話{はな}すこともできない。まず学{まな}ぶべきだ」')}</p><p>${R('「学{まな}んでいるあいだに攻{せ}められたら? 守{まも}りが先{さき}だ」')}</p><p>${R('「どちらも要{い}る。では、今日{きょう}から何{なに}をする?」')}</p></div>
    <p class="note">${A('三{みっ}つの声{こえ}は、塾{じゅく}の話{はな}しあいのようすを思{おも}いえがいて作{つく}ったものです。')}<br>${F('松陰{しょういん}自身{じしん}は一八五四年{ねん}、世界{せかい}を自分{じぶん}の目{め}で見{み}ようと、下田{しもだ}でアメリカの船{ふね}に乗{の}りこもうとしました。正{ただ}しい答{こた}えはひとつではなく、塾{じゅく}ではみんなが意見{いけん}を出{だ}しあいました。')}</p>`;unlock()}},
  ()=>{frame(sho,`<h2>${R('きみの志{こころざし}は?')}</h2><p>${R('松陰{しょういん}は塾生{じゅくせい}ひとりひとりにたずねた。大{おお}きくなくていい。きみがやってみたいことを書{か}こう。')}</p>
   <label for="shi">${R('わたしの志{こころざし}')}</label><textarea id="shi" maxlength="80">${esc(S.shi)}</textarea><button class="btn" id="wr">${R('手形{てがた}に書{か}きこむ')}</button>
@@ -665,16 +737,17 @@ const SHOKA=[
 /* ---------- 追加七校の共通部品 ---------- */
 const H=t=>`<h2>${R(t)}</h2>`;
 const intro=(sc,t,n,tot)=>()=>frame(sc,`${H('入門{にゅうもん}')}<p>${R(t)}</p><p class="note">${n}</p>`,tot,true);
-const sodoku=(sc,title,lead,parts,after,note,tot)=>()=>{frame(sc,`${H(title)}<p>${R(lead)}</p><div id="og"></div><p id="im" hidden>${R(after)}</p><p class="note">${note}</p>`,tot,false);
-  orderGame(app.querySelector('#og'),parts,()=>{app.querySelector('#im').hidden=false;unlock()})};
+const sodoku=(sc,title,lead,parts,after,note,tot)=>()=>{const v=S.vis[S.school]||0,items=(v===0?[{p:parts,m:after.replace('意味{いみ}:','')}]:[]).concat(draw(S.school,v===0?2:3));let i=0;
+  const go=()=>{const it=items[i];frame(sc,`${H(title)} ${i+1}/${items.length}<p>${R(lead)}</p>${it.s?`<p style="font-size:14px">${R(it.s)}</p>`:''}<div id="og"></div><p id="im" hidden>${R('意味{いみ}:'+it.m)}</p><button class="btn" id="nq" hidden>${R('つぎの文{ぶん}')}</button><p class="note">${note}<br>${A('通{かよ}うたびに、読{よ}む文{ぶん}がかわります。')}</p>`,tot,false);
+    orderGame(app.querySelector('#og'),it.p,()=>{app.querySelector('#im').hidden=false;if(++i<items.length){const n=app.querySelector('#nq');n.hidden=false;n.onclick=()=>{go();scrollTo(0,0)}}else unlock()})};go()};
 const fin=(sc,seal,title,who,src,tot,pre='')=>()=>{frame(sc,pre+finish(seal,title,who,src),tot,false);bindHome()};
 /* 正解のある問いを順に出す */
-const quizStep=(sc,title,qs,note,tot)=>()=>{let i=0;const go=()=>{const q=qs[i];
+const quizStep=(sc,title,qs,note,tot)=>()=>{const QS=typeof qs==='function'?qs():qs;let i=0;const go=()=>{const q=QS[i];
   frame(sc,`${H(title)} ${q.head||''}<p>${R(q.q)}</p><div class="choice">${q.o.map((o,k)=>`<button data-k="${k}">${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(q.x)}</p><button class="btn" id="nq" hidden>${R('つぎの問{と}い')}</button><p class="note">${note}</p>`,tot,false);
   app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{if(+b.dataset.k===q.a){tok(620);b.classList.add('sel');app.querySelectorAll('.choice button').forEach(x=>x.disabled=true);app.querySelector('#ex').hidden=false;
-    if(++i<qs.length){const n=app.querySelector('#nq');n.hidden=false;n.onclick=go}else unlock()}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}})};go()};
+    if(++i<QS.length){const n=app.querySelector('#nq');n.hidden=false;n.onclick=go}else unlock()}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}})};go()};
 /* 正解のない問い */
-const choiceStep=(sc,title,q,opts,after,note,tot,snd)=>()=>{frame(sc,`${H(title)}<p>${R(q)}</p><div class="choice">${opts.map(o=>`<button>${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(after)}</p><p class="note">${note}</p>`,tot,false);
+const choiceStep=(sc,title,q,opts,after,note,tot,snd)=>()=>{const al=ALTQ[S.school+':'+plain(title)],v=S.vis[S.school]||0,X=al&&v?al[(v-1)%al.length]:{q,o:opts,a:after};frame(sc,`${H(title)}<p>${R(X.q)}</p><div class="choice">${X.o.map(o=>`<button>${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(X.a)}</p><p class="note">${note}</p>`,tot,false);
   if(snd)setTimeout(()=>sfx('boom'),400);
   app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{app.querySelectorAll('.choice button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');tok();app.querySelector('#ex').hidden=false;unlock()})};
 
@@ -700,10 +773,10 @@ let T,gm=0;
 const SHOHEI=[
  intro(shoSc,'江戸{えど}・湯島{ゆしま}の坂{さか}の上{うえ}。黒{くろ}い建物{たてもの}がならぶ、幕府{ばくふ}の学問所{がくもんじょ}。今日{きょう}は「素読吟味{そどくぎんみ}」の日{ひ}。役人{やくにん}の前{まえ}にひとりで進{すす}み出{で}て、指{さ}されたところを読{よ}む。',
   F('昌平坂学問所{しょうへいざかがくもんじょ}は一七九七年{ねん}に幕府{ばくふ}がじかに運営{うんえい}する学校{がっこう}になりました。「素読吟味{そどくぎんみ}」は幕府{ばくふ}の家来{けらい}の子{こ}どもが受{う}けた試験{しけん}で、よくできるとほうびが出{で}ました。全国{ぜんこく}の藩{はん}からも秀才{しゅうさい}が集{あつ}まり、寮{りょう}でくらしました。'),3),
- ()=>{gm=0;let q=0;const go=()=>{frame(shoSc,`${H('素読吟味{そどくぎんみ}')} ${q+1}/3<p>${R('線{せん}がのびきる前{まえ}に、つっかえずに読{よ}みきろう。')}</p><div class="wait"><b id="bar"></b></div><div id="og"></div>
+ ()=>{gm=0;let q=0;const GS=(S.vis.shohei||0)===0?GINMI.map(p=>({p})):draw('shohei',3);const go=()=>{frame(shoSc,`${H('素読吟味{そどくぎんみ}')} ${q+1}/3<p>${R('線{せん}がのびきる前{まえ}に、つっかえずに読{よ}みきろう。')}</p><div class="wait"><b id="bar"></b></div><div id="og"></div>
   <p class="note">${F('読{よ}んでいるのは『大学{だいがく}』と『論語{ろんご}』。四書{ししょ}とよばれる本{ほん}です。')}<br>${A('時間{じかん}のきまりと、順{じゅん}にならべるあそび。')}</p>`,3,false);
   const bar=app.querySelector('#bar');void bar.offsetWidth;bar.style.transition='width 30s linear';bar.style.width='100%';T=setTimeout(go,30000);
-  orderGame(app.querySelector('#og'),GINMI[q],m=>{clearTimeout(T);bar.style.transition='none';gm+=m;q++;if(q<3)setTimeout(go,800);else unlock()})};go()},
+  orderGame(app.querySelector('#og'),GS[q].p,m=>{clearTimeout(T);bar.style.transition='none';gm+=m;q++;if(q<3)setTimeout(go,800);else unlock()})};go()},
  ()=>{frame(shoSc,`<p class="big">${R(gm===0?'評{ひょう}:甲{こう}':gm<4?'評{ひょう}:乙{おつ}':'評{ひょう}:丙{へい}')}</p><p>${A('まちがえた数{かず}で評{ひょう}を決{き}めています。')}</p>`+finish('昌','素読吟味{そどくぎんみ} 及第{きゅうだい}','この学問所{がくもんじょ}は、明治{めいじ}になってからの東京{とうきょう}の大学{だいがく}のみなもとのひとつになりました。','『大学{だいがく}』、『論語{ろんご}』学而{がくじ}・衛霊公{えいれいこう}'),3,false);bindHome()}
 ];
 
@@ -712,7 +785,7 @@ const fukuSc='<div class="roof"></div><div class="where">江戸・海べの塾</
 const FUKU=[
  intro(fukuSc,'きみは福沢諭吉{ふくざわゆきち}の塾{じゅく}の塾生{じゅくせい}。先生{せんせい}は適塾{てきじゅく}でオランダ語{ご}をきわめた人{ひと}。ところが横浜{よこはま}へ行{い}ってみると、店{みせ}の看板{かんばん}がひとつも読{よ}めなかった。そこにあったのは英語{えいご}だった。',
   F('福沢{ふくざわ}は一八五八年{ねん}、江戸{えど}の築地鉄砲洲{つきじてっぽうず}で蘭学{らんがく}の塾{じゅく}をはじめました。次{つぎ}の年{とし}に横浜{よこはま}でオランダ語{ご}が通{つう}じないと知{し}り、英語{えいご}を一{いち}から学{まな}びなおしました。'),4),
- quizStep(fukuSc,'ことばをつくる',[
+ quizStep(fukuSc,'ことばをつくる',()=>(S.vis.fuku||0)?fukuSet():[
   {head:'<p class="eng">speech</p>',q:'人{ひと}の前{まえ}で自分{じぶん}の考{かんが}えを話{はな}すこと。日本語{にほんご}にするなら?',o:['演説{えんぜつ}','手紙{てがみ}','算術{さんじゅつ}'],a:0,x:'「演説{えんぜつ}」という訳{やく}は、福沢{ふくざわ}たちが広{ひろ}めました。'},
   {head:'<p class="eng">liberty</p>',q:'ほかの人{ひと}にしばられず、自分{じぶん}で決{き}められること。',o:['親切{しんせつ}','自由{じゆう}','勇気{ゆうき}'],a:1,x:'福沢{ふくざわ}は「自由{じゆう}」と訳{やく}しながら、ぴったりのことばがないとなやみました。'},
   {head:'<p class="eng">economy</p>',q:'物{もの}を作{つく}り、売{う}り買{か}いし、くらしをささえるしくみ。',o:['天文{てんもん}','剣術{けんじゅつ}','経済{けいざい}'],a:2,x:'塾{じゅく}ではアメリカのウェーランドが書{か}いた経済{けいざい}の本{ほん}を読{よ}みました。'}],
@@ -756,7 +829,7 @@ const kaiSc='<div class="ship"></div><div class="where">長崎・港の朝</div>
 const KAIGUN=[
  intro(kaiSc,'長崎{ながさき}の港{みなと}。伝習生{でんしゅうせい}は幕府{ばくふ}や藩{はん}からえらばれた若者{わかもの}たち。先生{せんせい}はオランダの海軍{かいぐん}の人{ひと}で、ことばは通詞{つうじ}(通訳{つうやく})が日本語{にほんご}になおす。教室{きょうしつ}は、海{うみ}の上{うえ}だ。',
   F('一八五五年{ねん}に幕府{ばくふ}がひらいた学校{がっこう}。オランダからおくられた蒸気船{じょうきせん}「観光丸{かんこうまる}」を使{つか}い、船{ふね}の動{うご}かし方{かた}・測量{そくりょう}・算術{さんじゅつ}・大砲{たいほう}などを学{まな}びました。'),3),
- quizStep(kaiSc,'算術{さんじゅつ}で船{ふね}を動{うご}かす',[
+ quizStep(kaiSc,'算術{さんじゅつ}で船{ふね}を動{うご}かす',()=>(S.vis.kaigun||0)?kaiGen():[
   {q:'船{ふね}は一時間{いちじかん}に六海里{ろくかいり}すすむ。三時間{さんじかん}では?',o:['十二海里{じゅうにかいり}','十八海里{じゅうはちかいり}','二十四海里{にじゅうよんかいり}'],a:1,x:'6×3=18。速{はや}さと時間{じかん}から、今{いま}いる場所{ばしょ}がわかる。'},
   {q:'羅針盤{らしんばん}は北{きた}が0度{ど}、東{ひがし}が90度{ど}、南{みなみ}が180度{ど}。南東{なんとう}へ向{む}かうには?',o:['45度{ど}','135度{ど}','225度{ど}'],a:1,x:'東{ひがし}と南{みなみ}のまん中{なか}だから、90と180の間{あいだ}の135度{ど}。'},
   {q:'正午{しょうご}、太陽{たいよう}がいちばん高{たか}くなった。日本{にほん}の近{ちか}くの海{うみ}で、太陽{たいよう}はどの方角{ほうがく}にある?',o:['北{きた}','東{ひがし}','南{みなみ}'],a:2,x:'南{みなみ}。このときの太陽{たいよう}の高{たか}さをはかると、船{ふね}が南北{なんぼく}のどのあたりにいるかがわかる。'}],
