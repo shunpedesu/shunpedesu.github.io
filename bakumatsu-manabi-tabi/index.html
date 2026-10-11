@@ -246,6 +246,13 @@ h1,h2,.fuda .nm,.fuda .no,.big,.kyu,.seal,.shi,.okite .last{letter-spacing:.02em
 .goalist li.ok b{color:var(--shu)}
 .op .goalist li.ok b{color:#ff8a70}
 .goal{border-top:5px solid var(--shu)}
+.dy{border-top:1px dashed var(--line);padding-top:8px;margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.dy>b{font-family:var(--f-brush);font-weight:400;font-size:16px}
+.dok{font-size:14px;line-height:1.8;opacity:.85}
+.shoko p{font-family:var(--f-book);font-weight:400;font-size:16px;line-height:2;border-bottom:1px dashed var(--line);padding:6px 0}
+.shoko span{font-family:var(--f-body);font-weight:600;font-size:13px}
+.shoko small{font-family:var(--f-body);font-size:12px;opacity:.8}
+.shoko b{font-family:var(--f-brush);font-weight:400;color:var(--shu);margin-right:4px}
 details.more>summary{display:inline-block;list-style:none;cursor:pointer;font-size:13px;font-weight:600;line-height:1.6;padding:4px 12px;border:1.5px solid currentColor;border-radius:14px;opacity:.8}
 details.more>summary::-webkit-details-marker{display:none}
 details.more[open]>summary{margin-bottom:8px}
@@ -287,6 +294,7 @@ body.tabbed .nav{bottom:calc(54px + env(safe-area-inset-bottom,0px))}
 </head>
 <body>
 
+
 <button id="snd" type="button" aria-pressed="true">♪ 音あり</button>
 <div id="app"></div>
 <nav id="tabs" hidden aria-label="画面の切りかえ"><button type="button" data-v="map">道中図</button><button type="button" data-v="pass">マイページ</button></nav>
@@ -297,15 +305,16 @@ const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
 /* バージョン情報: 更新のたびに先頭へ足す */
-const HIST=[['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
+const HIST=[['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
+ ['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
  ['1.2.0','2026-10-10','レベル、門の解放、時代の仕事、品あつめを追加。シェア用の画像を設定。'],
  ['1.1.0','2026-10-10','史実を原典と照らし合わせ、裏づけのない説明を削除。出典ページ、オープニング、旅の目あて、旅のむすびを追加。音楽を自作曲に。'],
  ['1.0.0','2026-10-09','公開。十の学び舎、歩く旅、主人公づくり、マイページ、出会う人。']];
 const VER=HIST[0][0],VERDATE=HIST[0][1];
 let S={view:'title',school:null,step:0,done:{},shi:'',notes:{},marks:[]};
 S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];
-try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.diff=d.df||'n';S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
-const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox,df:S.diff}))}catch(e){}};
+try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.diff=d.df||'n';S.read=d.rd||0;S.revDone=d.rv||'';S.calcDone=d.cq||'';S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
+const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox,df:S.diff,rd:S.read,rv:S.revDone,cq:S.calcDone}))}catch(e){}};
 const UM={b:'武士{ぶし}の子{こ}',c:'商人{しょうにん}の子{こ}',n:'農家{のうか}の子{こ}',i:'医者{いしゃ}の子{こ}'};
 const UMD={b:'藩{はん}の学校{がっこう}に通{かよ}える家{いえ}。父{ちち}は刀{かたな}を二本{にほん}さしている。',c:'町{まち}の寺子屋{てらこや}で、読{よ}み書{か}きとそろばんを習{なら}った。',n:'村{むら}の寺子屋{てらこや}で学{まな}び、家{いえ}の田畑{たはた}も手{て}つだっている。',i:'家{いえ}には薬{くすり}と本{ほん}がある。蘭学{らんがく}にあこがれている。'};
 const AGE={10:'十歳{じっさい}',11:'十一歳{じゅういっさい}',12:'十二歳{じゅうにさい}',13:'十三歳{じゅうさんさい}',14:'十四歳{じゅうよんさい}',15:'十五歳{じゅうごさい}'};
@@ -465,15 +474,27 @@ function myPage(){const tot=Object.values(S.days).reduce((a,b)=>a+b,0),rk=[...RA
   <div class="cal" aria-label="この14日間の記録">${cal}</div>
   <h3>${R('持{も}ちもの')} ${Object.keys(S.items).length}/${Object.keys(ITEMS).length}</h3><div class="items">${Object.keys(ITEMS).map(k=>S.items[k]?`<details><summary><b class="itm">${ITEMS[k].g}</b>${R(ITEMS[k].n)}</summary>${ITEMS[k].f?`<p>${F(ITEMS[k].f)}</p>`:''}</details>`:`<div class="q"><b class="itm">?</b></div>`).join('')}</div>
   <h3>${R('むずかしさ')}</h3>${dfButtons('dfm')}<p style="font-size:13px;line-height:1.7">${A(DFNOTE)}</p>
-  <h3>${R('今日{きょう}の素読{そどく}')}</h3><div id="daily"></div>
+  <h3>${R('今日{きょう}の学{まな}び')}</h3><div id="daily"></div>
   <h3>${R('学{まな}び舎{や}ごとの記録{きろく}')}</h3>
   <ul class="rec">${STATIONS.map(s=>{const v=S.vis[s.id]||0,ev=EV[s.id]||[];return `<li><b>${R(s.nm)}</b><span>${v?R(`${v}回{かい}`):R('まだ')}</span><small>${ev.map(e=>S.ev[s.id+e.at]?R(e.n):'?').join(' ・ ')}</small></li>`}).join('')}</ul>
   <p class="note">${F('当時{とうじ}の学{まな}びは、同{おな}じ文{ぶん}を毎日{まいにち}くり返{かえ}し声{こえ}に出{だ}すことが基本{きほん}でした。')}<br>${A('レベル、門{もん}がひらく順{じゅん}、品{しな}あつめ、通{かよ}うと起{お}こるできごと。品{しな}の説明{せつめい}は史実{しじつ}です。')}</p></section>`}
-function bindDaily(){app.querySelectorAll('#dfm button').forEach(b=>b.onclick=()=>{S.diff=b.dataset.k;save();tok();render()});const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{const r=S.resume;S.resume=null;S.view='school';S.school=r.school;S.step=r.step;render();scrollTo(0,0)};const box=app.querySelector('#daily');if(!box)return;const k=dkey();
-  if(S.dailyDone===k){box.innerHTML=`<p>${R('今日{きょう}の素読{そどく}はすませた。また明日{あした}。')}</p>`;return}
-  const pool=DAILY(),d=new Date(),q=pool[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%pool.length];
-  box.innerHTML=`<p style="font-size:14px">${R(q.s)}${R('より。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="dg"></div>`;
-  orderGame(box.querySelector('#dg'),q.p,()=>{S.dailyDone=k;logDay();sfx('stamp');setTimeout(()=>{if(S.view==='pass')render()},900)})}
+function bindDaily(){app.querySelectorAll('#dfm button').forEach(b=>b.onclick=()=>{S.diff=b.dataset.k;save();tok();render()});const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{const r=S.resume;S.resume=null;S.view='school';S.school=r.school;S.step=r.step;render();scrollTo(0,0)};const box=app.querySelector('#daily');if(!box)return;const k=dkey(),bk=BOOK(),n=Math.min(S.read||0,bk.length),dn=Math.floor(Date.now()/864e5);
+  const ok=t=>`<p class="dok">${R(t)}</p>`,again=()=>setTimeout(()=>{if(S.view==='pass')render()},900);
+  box.innerHTML=`<p style="font-size:14px">${R(`読本{とくほん}:${n}/${bk.length} まで読{よ}んだ。毎日{まいにち}ひとつ、新{あたら}しい文{ぶん}に進{すす}みます。`)}</p>
+   <div class="dy"><b>${R('一{いち}、新{あたら}しい文{ぶん}')}</b><div id="d1"></div></div><div class="dy"><b>${R('二{に}、おさらい')}</b><div id="d2"></div></div><div class="dy"><b>${R('三{さん}、算術{さんじゅつ}一問{いちもん}')}</b><div id="d3"></div></div>
+   <details class="more"><summary>${R(`読{よ}んだ文{ぶん}を見{み}かえす(${n})`)}</summary><div class="shoko">${bk.slice(0,n).map((q,i)=>`<p><b>${i+1}</b> ${R(q.p.join(' '))}<br><span>${R(q.m)}</span><br><small>${R(q.s)}</small></p>`).join('')||R('まだありません。')}</div></details>`;
+  const d1=box.querySelector('#d1'),d2=box.querySelector('#d2'),d3=box.querySelector('#d3');
+  if(S.dailyDone===k)d1.innerHTML=ok(n>0?'今日{きょう}の文{ぶん}:'+bk[n-1].p.join(' ')+'。意味{いみ}:'+bk[n-1].m:'今日{きょう}の分{ぶん}はすませた。');
+  else if(n>=bk.length)d1.innerHTML=ok('読本{とくほん}をすべて読{よ}みおえた。これからは、おさらいで力{ちから}をたもとう。');
+  else{const q=bk[n];d1.innerHTML=`<p style="font-size:14px">${R(q.s)}${R('より。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="dg"></div>`;
+    orderGame(d1.querySelector('#dg'),q.p,()=>{S.read=n+1;S.dailyDone=k;logDay();sfx('stamp');again()})}
+  if(n<2)d2.innerHTML=ok('文{ぶん}を二{ふた}つ読{よ}むと、おさらいが始{はじ}まります。');
+  else if(S.revDone===k)d2.innerHTML=ok('今日{きょう}のおさらいはすませた。');
+  else{const ri=(dn*7)%(S.dailyDone===k?Math.max(1,n-1):n),q=bk[ri];d2.innerHTML=`<p style="font-size:14px">${R(`${ri+1}番目{ばんめ}に読{よ}んだ文{ぶん}。おぼえているかな。`)}</p><div id="dr"></div><p id="drm" hidden style="font-size:14px">${R('意味{いみ}:'+q.m)}</p>`;
+    orderGame(d2.querySelector('#dr'),q.p,()=>{S.revDone=k;if(n>=bk.length&&S.dailyDone!==k){S.dailyDone=k;logDay()}else save();sfx('ok');again()})}
+  if(S.calcDone===k)d3.innerHTML=ok('今日{きょう}の一問{いちもん}はといた。');
+  else{const q=kaiGen()[dn%3];d3.innerHTML=`<p style="font-size:15px">${R(q.q)}</p><div class="choice">${q.o.map((o,i)=>`<button data-k="${i}">${R(o)}</button>`).join('')}</div>`;
+    d3.querySelectorAll('button').forEach(b=>b.onclick=()=>{if(+b.dataset.k===q.a){S.calcDone=k;save();sfx('ok');d3.innerHTML=ok('正解{せいかい}。'+q.x)}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}})}}
 /* ---------- 通うたびに変わる文と問い ---------- */
 const kanaOf=p=>p.join('、').replace(/[一-鿿々ヶ]+\{([^}]+)\}/g,'$1');
 const SP=[
@@ -497,8 +518,47 @@ const SP=[
  {p:['己{おのれ}の','欲{ほっ}せざる所{ところ}は','人{ひと}に施{ほどこ}すこと','勿{な}かれ'],m:'自分{じぶん}がされたくないことは、人{ひと}にもしてはいけない。',s:'『論語{ろんご}』衛霊公{えいれいこう}'}];
 const IROHA=[{p:['楼{ろう}の上{うえ}も','はにふの小屋{こや}も','住{す}む人{ひと}の','心{こころ}にこそは','たかきいやしき'],m:'りっぱな建物{たてもの}に住{す}んでも、そまつな小屋{こや}に住{す}んでも、人{ひと}のねうちは心{こころ}で決{き}まる。',s:'いろは歌{うた}「ろ」'},
  {p:['はかなくも','明日{あす}の命{いのち}を','頼{たの}むかな','今日{きょう}も今日{きょう}もと','学{まな}びをばせで'],m:'明日{あした}があると思{おも}って、今日{きょう}も学{まな}ばずにすごしてしまう。それではいけない。',s:'いろは歌{うた}「は」'}];
+const NEWP=[
+ {p:['吾{われ}','日{ひ}に三{み}たび','吾{わ}が身{み}を','省{かえり}みる'],m:'わたしは毎日{まいにち}、何度{なんど}も自分{じぶん}のしたことをふり返{かえ}る。',s:'『論語{ろんご}』学而{がくじ}'},
+ {p:['過{あやま}ちては','則{すなわ}ち','改{あらた}むるに','憚{はばか}ること勿{な}かれ'],m:'まちがえたら、ためらわずにすぐ直{なお}しなさい。',s:'『論語{ろんご}』学而{がくじ}'},
+ {p:['人{ひと}の己{おのれ}を知{し}らざるを','患{うれ}えず','人{ひと}を知{し}らざるを','患{うれ}うるなり'],m:'人{ひと}が自分{じぶん}をわかってくれないことを気{き}にするな。自分{じぶん}が人{ひと}をわかっていないことを気{き}にしなさい。',s:'『論語{ろんご}』学而{がくじ}'},
+ {p:['君子{くんし}は','器{うつわ}','ならず'],m:'りっぱな人{ひと}は、ひとつの使{つか}いみちしかない道具{どうぐ}のようではない。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['其{そ}の以{な}す所{ところ}を視{み}','其{そ}の由{よ}る所{ところ}を観{み}','其{そ}の安{やす}んずる所{ところ}を察{さっ}す'],m:'その人{ひと}が何{なに}をするか、なぜするか、何{なに}に落{お}ちつくかを見{み}れば、人{ひと}がらがわかる。',s:'『論語{ろんご}』為政{いせい}'},
+ {p:['君子{くんし}は','義{ぎ}に喩{さと}り','小人{しょうじん}は','利{り}に喩{さと}る'],m:'りっぱな人{ひと}は正{ただ}しいかどうかで考{かんが}え、つまらない人{ひと}はもうかるかどうかで考{かんが}える。',s:'『論語{ろんご}』里仁{りじん}'},
+ {p:['賢{けん}を見{み}ては','斉{ひと}しからんことを思{おも}い','不賢{ふけん}を見{み}ては','内{うち}に自{みずか}ら省{かえり}みる'],m:'すぐれた人{ひと}を見{み}たら、自分{じぶん}もそうなろうと思{おも}う。そうでない人{ひと}を見{み}たら、自分{じぶん}はどうかとふり返{かえ}る。',s:'『論語{ろんご}』里仁{りじん}'},
+ {p:['父母{ふぼ}在{いま}せば','遠{とお}く遊{あそ}ばず','遊{あそ}ぶこと','必{かなら}ず方{ほう}有{あ}り'],m:'父母{ふぼ}が元気{げんき}なうちは、遠{とお}くへ行{い}きっぱなしにしない。出{で}かけるなら、行{い}き先{さき}をはっきり伝{つた}える。',s:'『論語{ろんご}』里仁{りじん}'},
+ {p:['君子{くんし}は','言{げん}に訥{とつ}にして','行{おこな}いに敏{びん}ならんと','欲{ほっ}す'],m:'りっぱな人{ひと}は、口{くち}は重{おも}くても、行{おこな}いはすばやくありたいと願{ねが}う。',s:'『論語{ろんご}』里仁{りじん}'},
+ {p:['一{いち}を聞{き}いて','以{もっ}て','十{じゅう}を知{し}る'],m:'ひとつ聞{き}いただけで、十{じゅう}のことがわかる。',s:'『論語{ろんご}』公冶長{こうやちょう}'},
+ {p:['敏{びん}にして','学{がく}を好{この}み','下問{かもん}を','恥{は}じず'],m:'かしこいうえに学{まな}ぶことが好{す}きで、年下{としした}の人{ひと}に聞{き}くことをはずかしいと思{おも}わない。',s:'『論語{ろんご}』公冶長{こうやちょう}'},
+ {p:['力{ちから}足{た}らざる者{もの}は','中道{ちゅうどう}にして廃{はい}す','今{いま}女{なんじ}は','画{かぎ}れり'],m:'力{ちから}が足{た}りない人{ひと}は、とちゅうで力{ちから}つきる。だがおまえは、やる前{まえ}から自分{じぶん}で線{せん}を引{ひ}いている。',s:'『論語{ろんご}』雍也{ようや}'},
+ {p:['憤{ふん}せずんば','啓{けい}せず','悱{ひ}せずんば','発{はっ}せず'],m:'わかりたくてうずうずしていなければ、教{おし}えない。言{い}いたくて口{くち}をもごもごさせていなければ、助{たす}けない。',s:'『論語{ろんご}』述而{じゅつじ}'},
+ {p:['我{われ}は生{う}まれながらにして','之{これ}を知{し}る者{もの}に非{あら}ず','古{いにしえ}を好{この}み','敏{びん}にして以{もっ}て之{これ}を求{もと}めたる者{もの}なり'],m:'わたしは生{う}まれつき物知{ものし}りだったのではない。昔{むかし}のことが好{す}きで、いっしょうけんめい学{まな}んできただけだ。',s:'『論語{ろんご}』述而{じゅつじ}'},
+ {p:['仁{じん}遠{とお}からんや','我{われ}仁{じん}を欲{ほっ}すれば','斯{ここ}に仁{じん}至{いた}る'],m:'思{おも}いやりは遠{とお}くにあるものだろうか。わたしが求{もと}めれば、すぐここにやって来{く}る。',s:'『論語{ろんご}』述而{じゅつじ}'},
+ {p:['後生{こうせい}畏{おそ}るべし','焉{いずく}んぞ','来者{らいしゃ}の今{いま}に如{し}かざるを','知{し}らんや'],m:'若{わか}い人{ひと}をあなどってはいけない。これからの人{ひと}が今{いま}の人{ひと}におよばないと、どうして言{い}えるだろう。',s:'『論語{ろんご}』子罕{しかん}'},
+ {p:['三軍{さんぐん}も','帥{すい}を奪{うば}うべきなり','匹夫{ひっぷ}も','志{こころざし}を奪{うば}うべからざるなり'],m:'大{おお}きな軍隊{ぐんたい}からでも大将{たいしょう}をうばうことはできる。けれど、ひとりの人{ひと}の志{こころざし}は、だれにもうばえない。',s:'『論語{ろんご}』子罕{しかん}'},
+ {p:['逝{ゆ}く者{もの}は','斯{か}くの如{ごと}きか','昼夜{ちゅうや}を','舎{お}かず'],m:'すぎていくものは、この川{かわ}の流{なが}れのようだ。昼{ひる}も夜{よる}も休{やす}まない。',s:'『論語{ろんご}』子罕{しかん}'},
+ {p:['己{おのれ}に克{か}ちて','礼{れい}に復{かえ}るを','仁{じん}と為{な}す'],m:'自分{じぶん}のわがままにうち勝{か}って、礼儀{れいぎ}に立{た}ち返{かえ}ること。それが思{おも}いやりだ。',s:'『論語{ろんご}』顔淵{がんえん}'},
+ {p:['四海{しかい}の内{うち}','皆{みな}','兄弟{けいてい}なり'],m:'世界{せかい}じゅうの人{ひと}は、みな兄弟{きょうだい}だ。',s:'『論語{ろんご}』顔淵{がんえん}'},
+ {p:['君子{くんし}は','文{ぶん}を以{もっ}て友{とも}を会{かい}し','友{とも}を以{もっ}て','仁{じん}を輔{たす}く'],m:'りっぱな人{ひと}は、学問{がくもん}を通{つう}じて友{とも}だちと集{あつ}まり、友{とも}だちのおかげで自分{じぶん}をみがく。',s:'『論語{ろんご}』顔淵{がんえん}'},
+ {p:['速{すみ}やかならんと欲{ほっ}すれば','則{すなわ}ち達{たっ}せず','小利{しょうり}を見{み}れば','則{すなわ}ち大事{だいじ}成{な}らず'],m:'急{いそ}ぎすぎると、たどりつけない。小{ちい}さな得{とく}に目{め}をうばわれると、大{おお}きなことはなしとげられない。',s:'『論語{ろんご}』子路{しろ}'},
+ {p:['其{そ}の身{み}','正{ただ}しければ','令{れい}せずして','行{おこな}わる'],m:'上{うえ}に立{た}つ人{ひと}の行{おこな}いが正{ただ}しければ、命令{めいれい}しなくても、ものごとは行{おこな}われる。',s:'『論語{ろんご}』子路{しろ}'},
+ {p:['古{いにしえ}の学{まな}ぶ者{もの}は','己{おのれ}の為{ため}にし','今{いま}の学{まな}ぶ者{もの}は','人{ひと}の為{ため}にす'],m:'昔{むかし}の人{ひと}は自分{じぶん}をみがくために学{まな}んだ。今{いま}の人{ひと}は、人{ひと}に見{み}せるために学{まな}んでいる。',s:'『論語{ろんご}』憲問{けんもん}'},
+ {p:['人{ひと}','遠{とお}き慮{おもんぱか}り無{な}ければ','必{かなら}ず','近{ちか}き憂{うれ}い有{あ}り'],m:'先{さき}のことを考{かんが}えておかないと、かならず身近{みぢか}なところでこまったことが起{お}きる。',s:'『論語{ろんご}』衛霊公{えいれいこう}'},
+ {p:['君子{くんし}は','諸{これ}を己{おのれ}に求{もと}め','小人{しょうじん}は','諸{これ}を人{ひと}に求{もと}む'],m:'りっぱな人{ひと}は、うまくいかないわけを自分{じぶん}にさがす。つまらない人{ひと}は、人{ひと}のせいにする。',s:'『論語{ろんご}』衛霊公{えいれいこう}'},
+ {p:['教{おし}え','有{あ}りて','類{るい}','無{な}し'],m:'人{ひと}は教{おし}えによって変{か}わる。生{う}まれによる区別{くべつ}はない。',s:'『論語{ろんご}』衛霊公{えいれいこう}'},
+ {p:['辞{じ}は','達{たっ}する','のみ'],m:'ことばは、相手{あいて}に伝{つた}わればそれでよい。',s:'『論語{ろんご}』衛霊公{えいれいこう}'},
+ {p:['直{なお}きを友{とも}とし','諒{まこと}を友{とも}とし','多聞{たぶん}を友{とも}とするは','益{えき}なり'],m:'正直{しょうじき}な人{ひと}、誠実{せいじつ}な人{ひと}、物知{ものし}りな人{ひと}を友{とも}だちにするのは、ためになる。',s:'『論語{ろんご}』季氏{きし}'},
+ {p:['日{ひ}に其{そ}の亡{な}き所{ところ}を知{し}り','月{つき}に','其{そ}の能{よ}くする所{ところ}を','忘{わす}るること無{な}し'],m:'毎日{まいにち}、まだ知{し}らないことを知{し}る。毎月{まいつき}、できるようになったことを忘{わす}れないようにする。',s:'『論語{ろんご}』子張{しちょう}'},
+ {p:['博{ひろ}く学{まな}びて','篤{あつ}く志{こころざ}し','切{せつ}に問{と}いて','近{ちか}く思{おも}う'],m:'広{ひろ}く学{まな}び、しっかり志{こころざし}を立{た}て、熱心{ねっしん}に問{と}い、身近{みぢか}なことから考{かんが}える。',s:'『論語{ろんご}』子張{しちょう}'},
+ {p:['君子{くんし}の過{あやま}ちや','日月{じつげつ}の','食{しょく}の如{ごと}し'],m:'りっぱな人{ひと}のまちがいは、日食{にっしょく}や月食{げっしょく}のようなものだ。かくさないから、みんなに見{み}える。直{なお}せば、みんなが見上{みあ}げる。',s:'『論語{ろんご}』子張{しちょう}'},
+ {p:['天{てん}の将{まさ}に','大任{たいにん}を是{こ}の人{ひと}に降{くだ}さんとするや','必{かなら}ず先{ま}ず','其{そ}の心志{しんし}を苦{くる}しめ'],m:'天{てん}が人{ひと}に大{おお}きな役目{やくめ}をあたえようとするときは、かならずまずその人{ひと}の心{こころ}を苦{くる}しめて、きたえる。',s:'『孟子{もうし}』告子{こくし}下{げ}'},
+ {p:['万物{ばんぶつ}','皆{みな}','我{われ}に備{そな}わる'],m:'あらゆるものごとの道理{どうり}は、自分{じぶん}の中{なか}にそなわっている。',s:'『孟子{もうし}』尽心{じんしん}上{じょう}'},
+ {p:['大人{たいじん}とは','其{そ}の赤子{せきし}の心{こころ}を','失{うしな}わざる者{もの}なり'],m:'りっぱな大人{おとな}とは、赤{あか}んぼうのようなまっすぐな心{こころ}をなくさない人{ひと}のことだ。',s:'『孟子{もうし}』離婁{りろう}下{げ}'},
+ {p:['惻隠{そくいん}の心{こころ}は','仁{じん}の','端{たん}なり'],m:'かわいそうだと思{おも}う心{こころ}は、思{おも}いやりのはじまりだ。',s:'『孟子{もうし}』公孫丑{こうそんちゅう}上{じょう}'},
+ {p:['苟{まこと}に日{ひ}に新{あら}たに','日日{ひび}に新{あら}たに','又{また}日{ひ}に新{あら}たなり'],m:'今日{きょう}の自分{じぶん}を新{あたら}しくし、明日{あした}も新{あたら}しくし、そのまた次{つぎ}の日{ひ}も新{あたら}しくする。',s:'『大学{だいがく}』'}];
+const BOOK=()=>[...RONGO.map(r=>({p:r.p,m:r.m,s:'『論語{ろんご}』学而{がくじ}'})),...SP,...NEWP,{p:MOSHIS[0].p,m:MOSHIS[0].m,s:'『孟子{もうし}』離婁{りろう}上{じょう}'},{p:MOSHIS[2].p,m:MOSHIS[2].m,s:'『孟子{もうし}』公孫丑{こうそんちゅう}上{じょう}'},{p:['大学{だいがく}の道{みち}は','明徳{めいとく}を明{あき}らかにするに在{あ}り','民{たみ}に親{した}しむに在{あ}り','至善{しぜん}に止{とど}まるに在{あ}り'],m:'学問{がくもん}の道{みち}は、自分{じぶん}のよい心{こころ}をかがやかせ、人{ひと}びとと親{した}しみ、いちばんよいあり方{かた}にとどまることにある。',s:'『大学{だいがく}』'},{p:['いにしへの','道{みち}を聞{き}きても','唱{とな}へても','わが行{おこな}ひに','せずばかひなし'],m:'昔{むかし}のりっぱな教{おし}えを聞{き}いても口{くち}にしても、自分{じぶん}でやらなければ意味{いみ}がない。',s:'いろは歌{うた}「い」'},...IROHA];
 const SIDX={nisshin:0,kodo:1,shohei:2,shizu:3,kangi:4,goju:5};
-function draw(school,k){const v=S.vis[school]||0,list=school==='goju'?IROHA.concat(SP):SP,st=(Math.max(0,v-1)*3+(school==='goju'?0:(SIDX[school]||0)*4)+(v===0?(SIDX[school]||0)*4+1:0))%list.length;return Array.from({length:k},(_,j)=>list[(st+j)%list.length])}
+function draw(school,k){const v=S.vis[school]||0,list=school==='goju'?IROHA.concat(SP,NEWP):SP.concat(NEWP),st=(Math.max(0,v-1)*3+(school==='goju'?0:(SIDX[school]||0)*4)+(v===0?(SIDX[school]||0)*4+1:0))%list.length;return Array.from({length:k},(_,j)=>list[(st+j)%list.length])}
 const MOSHIS=[{p:['至誠{しせい}にして','動{うご}かざる者{もの}は','未{いま}だ','之{こ}れ有{あ}らざるなり'],m:'まごころをつくして、心{こころ}を動{うご}かされない人{ひと}は、今{いま}までひとりもいない。'},
  {p:['天{てん}の時{とき}は','地{ち}の利{り}に如{し}かず','地{ち}の利{り}は','人{ひと}の和{わ}に如{し}かず'],m:'よい時{とき}より、よい場所{ばしょ}。よい場所{ばしょ}より、人{ひと}びとが力{ちから}を合{あ}わせること。'},
  {p:['我{われ}','善{よ}く','吾{わ}が浩然{こうぜん}の気{き}を','養{やしな}う'],m:'わたしは、のびのびとした大{おお}きな気{き}もちを、たいせつに育{そだ}てている。'}];
@@ -632,7 +692,7 @@ const SRC=[
  ['咸宜園','一八一七年に咸宜園と命名/入門者は四千人をこえる/学力・年齢・地位を問わず無級から(三奪法)/月旦評は無級〜九級・十九段階/門下に高野長英、大村益次郎(一八四三年入門)/淡窓は商家の生まれで病気がち/「休道」の詩の本文','職任制(全員が係をもつ)。係をえらぶ場面ごと外しました',[['咸宜園',W+'咸宜園'],['広瀬淡窓',W+'広瀬淡窓'],['咸宜園(コトバンク)','https://kotobank.jp/word/%E5%92%B8%E5%AE%9C%E5%9C%92-48555']]],
  ['長崎海軍伝習所','一八五五〜五九年/観光丸はオランダからの寄贈/教官はオランダ軍人、第二次はカッテンディーケ/教科に航海術・砲術・測量術・算術・機関学/伝習生は幕臣と藩士/勝は教官との連絡役で数学が苦手、一八六〇年に咸臨丸で渡米/榎本は第二期で機関学、のちオランダ留学','通詞が通訳した、という説明',[['長崎海軍伝習所',W+'長崎海軍伝習所'],['勝海舟',W+'勝海舟'],['榎本武揚',W+'榎本武揚'],['カッテンディーケ',W+'ヴィレム・ホイセン・ファン・カッテンディーケ']]],
  ['郷中教育','六歳以上の男子が対象、稚児と二才/先輩が後輩を指導/「負けるな」「弱いものいじめをするな」、うそをつつしむ/いろは歌「い」「ろ」「は」の本文(加世田歴史館)、四十七首、郷中教育の基本/西郷は一八四七年に二才頭/大久保は同じ加治屋町の郷中','「詮議」という問答の名前としくみ(問いかけの場面は「アプリの工夫」にしました)/相撲のけいこ',[['郷中',W+'郷中'],['日新公いろは歌(加世田歴史館)','https://hantoubunka.site.kagoshima.jp/kasedainfo/irohauta2.html'],['西郷隆盛',W+'西郷隆盛'],['大久保利通',W+'大久保利通']]],
- ['古典の文','原文で確認:『論語』十八句すべての本文と篇(学而・為政・里仁・雍也・述而・子罕・先進・子路・衛霊公・陽貨)/『孟子』三句(離婁上・公孫丑上・公孫丑下)/『大学』冒頭(礼記)','(ふりがなと読み下しは、一般的な読み方によっています。オランダ語の文と算術の問題は、はじめから「アプリの工夫」です)',[['論語(Wikisource 原文)','https://zh.wikisource.org/wiki/論語'],['孟子(Wikisource 原文)','https://zh.wikisource.org/wiki/孟子']]],
+ ['古典の文','原文で確認:『論語』五十句の本文と篇(学而・為政・里仁・公冶長・雍也・述而・子罕・先進・顔淵・子路・憲問・衛霊公・季氏・陽貨・子張)/『孟子』七句(離婁上下・公孫丑上下・告子下・尽心上)/『大学』二句(礼記)','(ふりがなと読み下しは、一般的な読み方によっています。オランダ語の文と算術の問題は、はじめから「アプリの工夫」です)',[['論語(Wikisource 原文)','https://zh.wikisource.org/wiki/論語'],['孟子(Wikisource 原文)','https://zh.wikisource.org/wiki/孟子']]],
  ['旅と時代','一里塚は日本橋を起点に一里ごと/関所の通過に通行手形','旅人は一日に十里歩いた、という説明',[['一里塚',W+'一里塚'],['通行手形',W+'通行手形']]]];
 function viewSrc(){document.body.dataset.s='';
   app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button><section class="panel">${H('出典{しゅってん}と確認{かくにん}のようす')}
@@ -758,7 +818,7 @@ function viewPass(){
   ${S.endSeen?`<button class="btn sub" id="reed">${R('旅{たび}のむすびをもう一度{いちど}見{み}る')}</button>`:''}
   <button class="btn sub" id="rs">${R('はじめからやりなおす')}</button>`;
   bindDaily();const re=app.querySelector('#reed');if(re)re.onclick=()=>{S.view='end';render();scrollTo(0,0)};
-  const rs=app.querySelector('#rs');let arm=false;rs.onclick=()=>{if(!arm){arm=true;rs.innerHTML=R('ほんとうに消{け}す? もう一度{いちど}おす');return}S.done={};S.shi='';S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];S.endSeen=0;S.opSeen=0;save();S.view='title';render()};
+  const rs=app.querySelector('#rs');let arm=false;rs.onclick=()=>{if(!arm){arm=true;rs.innerHTML=R('ほんとうに消{け}す? もう一度{いちど}おす');return}S.done={};S.shi='';S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];S.read=0;S.revDone='';S.calcDone='';S.dailyDone='';S.endSeen=0;S.opSeen=0;save();S.view='title';render()};
   app.querySelector('#back').onclick=()=>{S.view='map';render()};
 }
 
