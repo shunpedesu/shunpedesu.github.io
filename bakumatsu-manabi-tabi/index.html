@@ -120,7 +120,7 @@ body[data-s="shizu"]{--bg:#d8d6bd} body[data-s="kangi"]{--bg:#cfd3c2} body[data-
 .sc-goju .yama{position:absolute;left:4%;bottom:38%;width:62%;max-width:340px;height:92px;background:#4b5563;clip-path:polygon(0 100%,24% 34%,36% 22%,44% 30%,56% 8%,66% 14%,100% 100%)}
 .sc-goju .kemuri{position:absolute;left:32%;top:8px;width:70px;height:44px;border-radius:50%;background:#9a9591;opacity:.75;filter:blur(5px)}
 .mato{position:relative;height:44px;background:var(--bg);border:1.5px solid var(--fg)}
-.mato::before{content:"";position:absolute;left:41%;width:18%;top:0;bottom:0;background:var(--shu);opacity:.8}
+.mato::before{content:"";position:absolute;left:calc(50% - var(--z,18%)/2);width:var(--z,18%);top:0;bottom:0;background:var(--shu);opacity:.8}
 .mato .ya{position:absolute;top:5px;width:6px;height:32px;background:var(--fg);animation:ya 1.2s linear infinite alternate!important}
 @keyframes ya{from{left:0}to{left:calc(100% - 6px)}}
 .yuka{height:96px;background:#3a1c13;position:relative;overflow:hidden;border:1.5px solid var(--line)}
@@ -246,6 +246,8 @@ h1,h2,.fuda .nm,.fuda .no,.big,.kyu,.seal,.shi,.okite .last{letter-spacing:.02em
 .goalist li.ok b{color:var(--shu)}
 .op .goalist li.ok b{color:#ff8a70}
 .goal{border-top:5px solid var(--shu)}
+.tile.hint{outline:4px solid var(--shu);outline-offset:2px}
+.mihon{font-family:var(--f-book);font-weight:400;font-size:15px;line-height:2.1;border:1.5px dashed var(--line);padding:6px 10px}
 .inbox{border:2px solid var(--shu)}.inbox p{font-size:15px;line-height:1.8}
 .itm{display:inline-grid;place-items:center;width:30px;height:30px;margin-right:8px;background:var(--sumi);color:var(--washi);font-family:var(--f-brush);font-weight:400;font-size:16px;border-radius:3px;vertical-align:middle}
 .items{display:grid;gap:6px;font-size:14px;line-height:1.7}
@@ -291,8 +293,8 @@ const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R
 const app=document.getElementById('app');
 let S={view:'title',school:null,step:0,done:{},shi:'',notes:{},marks:[]};
 S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];
-try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
-const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox}))}catch(e){}};
+try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.diff=d.df||'n';S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
+const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox,df:S.diff}))}catch(e){}};
 const UM={b:'武士{ぶし}の子{こ}',c:'商人{しょうにん}の子{こ}',n:'農家{のうか}の子{こ}',i:'医者{いしゃ}の子{こ}'};
 const UMD={b:'藩{はん}の学校{がっこう}に通{かよ}える家{いえ}。父{ちち}は刀{かたな}を二本{にほん}さしている。',c:'町{まち}の寺子屋{てらこや}で、読{よ}み書{か}きとそろばんを習{なら}った。',n:'村{むら}の寺子屋{てらこや}で学{まな}び、家{いえ}の田畑{たはた}も手{て}つだっている。',i:'家{いえ}には薬{くすり}と本{ほん}がある。蘭学{らんがく}にあこがれている。'};
 const AGE={10:'十歳{じっさい}',11:'十一歳{じゅういっさい}',12:'十二歳{じゅうにさい}',13:'十三歳{じゅうさんさい}',14:'十四歳{じゅうよんさい}',15:'十五歳{じゅうごさい}'};
@@ -451,11 +453,12 @@ function myPage(){const tot=Object.values(S.days).reduce((a,b)=>a+b,0),rk=[...RA
   <p>${R(`これまでの学{まな}び ${tot}回{かい} ・ つづけて ${st}日{にち}`)}${lvOf(tot)<10?`<br><span style="font-size:14px">${R(`あと${LV[lvOf(tot)]-tot}回{かい}でレベル${lvOf(tot)+1}`)}</span>`:''}</p>
   <div class="cal" aria-label="この14日間の記録">${cal}</div>
   <h3>${R('持{も}ちもの')} ${Object.keys(S.items).length}/${Object.keys(ITEMS).length}</h3><div class="items">${Object.keys(ITEMS).map(k=>S.items[k]?`<details><summary><b class="itm">${ITEMS[k].g}</b>${R(ITEMS[k].n)}</summary>${ITEMS[k].f?`<p>${F(ITEMS[k].f)}</p>`:''}</details>`:`<div class="q"><b class="itm">?</b></div>`).join('')}</div>
+  <h3>${R('むずかしさ')}</h3>${dfButtons('dfm')}<p style="font-size:13px;line-height:1.7">${A(DFNOTE)}</p>
   <h3>${R('今日{きょう}の素読{そどく}')}</h3><div id="daily"></div>
   <h3>${R('学{まな}び舎{や}ごとの記録{きろく}')}</h3>
   <ul class="rec">${STATIONS.map(s=>{const v=S.vis[s.id]||0,ev=EV[s.id]||[];return `<li><b>${R(s.nm)}</b><span>${v?R(`${v}回{かい}`):R('まだ')}</span><small>${ev.map(e=>S.ev[s.id+e.at]?R(e.n):'?').join(' ・ ')}</small></li>`}).join('')}</ul>
   <p class="note">${F('当時{とうじ}の学{まな}びは、同{おな}じ文{ぶん}を毎日{まいにち}くり返{かえ}し声{こえ}に出{だ}すことが基本{きほん}でした。')}<br>${A('レベル、門{もん}がひらく順{じゅん}、品{しな}あつめ、通{かよ}うと起{お}こるできごと。品{しな}の説明{せつめい}は史実{しじつ}です。')}</p></section>`}
-function bindDaily(){const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{const r=S.resume;S.resume=null;S.view='school';S.school=r.school;S.step=r.step;render();scrollTo(0,0)};const box=app.querySelector('#daily');if(!box)return;const k=dkey();
+function bindDaily(){app.querySelectorAll('#dfm button').forEach(b=>b.onclick=()=>{S.diff=b.dataset.k;save();tok();render()});const rb=app.querySelector('#res');if(rb)rb.onclick=()=>{const r=S.resume;S.resume=null;S.view='school';S.school=r.school;S.step=r.step;render();scrollTo(0,0)};const box=app.querySelector('#daily');if(!box)return;const k=dkey();
   if(S.dailyDone===k){box.innerHTML=`<p>${R('今日{きょう}の素読{そどく}はすませた。また明日{あした}。')}</p>`;return}
   const pool=DAILY(),d=new Date(),q=pool[(d.getFullYear()*372+d.getMonth()*31+d.getDate())%pool.length];
   box.innerHTML=`<p style="font-size:14px">${R(q.s)}${R('より。声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。')}</p><div id="dg"></div>`;
@@ -509,12 +512,12 @@ const fukuSet=()=>{const v=S.vis.fuku||0;return [0,1,2].map(j=>FW[(v*3+j)%FW.len
 /* 海軍伝習所: 算術の問題をその場でつくる */
 function kaiGen(){const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),mk=(q,ok,ng,x,u)=>{const o=[ok,...ng].sort(()=>Math.random()-.5);return {q,o:o.map(n=>n+u),a:o.indexOf(ok),x}};
   const DIR=[['北東{ほくとう}',45],['東{ひがし}',90],['南東{なんとう}',135],['南{みなみ}',180],['南西{なんせい}',225],['西{にし}',270],['北西{ほくせい}',315]];
-  const a=rnd(4,9),t=rnd(2,6),a2=rnd(4,8),t2=rnd(3,7),d=DIR[rnd(0,6)],h=rnd(1,8)*30,tn=rnd(1,5)*15,kn=rnd(5,9),mi=rnd(2,4)*30;
-  return [mk(`船{ふね}は一時間{いちじかん}に${a}海里{かいり}すすむ。${t}時間{じかん}では?`,a*t,[a*t+a,a*t-a],`${a}×${t}=${a*t}。速{はや}さ×時間{じかん}で、進{すす}んだ道{みち}のりがわかる。`,'海里{かいり}'),
+  const HX=DF()==='h'?3:1,a=rnd(4,9)*HX,t=rnd(2,6),a2=rnd(4,8)*HX,t2=rnd(3,7),d=DIR[rnd(0,6)],h=rnd(1,8)*30,tn=rnd(1,5)*15,kn=rnd(5,9),mi=rnd(2,4)*30;
+  const QQ=[mk(`船{ふね}は一時間{いちじかん}に${a}海里{かいり}すすむ。${t}時間{じかん}では?`,a*t,[a*t+a,a*t-a],`${a}×${t}=${a*t}。速{はや}さ×時間{じかん}で、進{すす}んだ道{みち}のりがわかる。`,'海里{かいり}'),
    mk(`${a2*t2}海里{かいり}先{さき}の港{みなと}へ、一時間{いちじかん}に${a2}海里{かいり}で向{む}かう。何時間{なんじかん}かかる?`,t2,[t2+1,t2-1],`${a2*t2}÷${a2}=${t2}。道{みち}のり÷速{はや}さで、かかる時間{じかん}がわかる。`,'時間{じかん}'),
    mk(`羅針盤{らしんばん}は北{きた}が0度{ど}、東{ひがし}が90度{ど}、南{みなみ}が180度{ど}、西{にし}が270度{ど}。${d[0]}へ向{む}かうには?`,d[1],[(d[1]+90)%360,(d[1]+180)%360],`${d[0]}は${d[1]}度{ど}。`,'度{ど}'),
    mk(`いま船{ふね}は${h}度{ど}へ向{む}いている。右{みぎ}へ${tn}度{ど}まわすと?`,(h+tn)%360,[(h+tn+30)%360,(h-tn+360)%360],`${h}+${tn}=${(h+tn)%360}。右{みぎ}へまわすと数{かず}がふえる。`,'度{ど}'),
-   mk(`一時間{いちじかん}に${kn}海里{かいり}の速{はや}さで、${mi}分{ぷん}すすんだ。道{みち}のりは? (${mi}分{ぷん}は${mi/60}時間{じかん})`,kn*mi/60,[kn*mi/60+kn/2,kn*mi/60+kn],`${kn}×${mi/60}=${kn*mi/60}。`,'海里{かいり}')]}
+   mk(`一時間{いちじかん}に${kn}海里{かいり}の速{はや}さで、${mi}分{ぷん}すすんだ。道{みち}のりは? (${mi}分{ぷん}は${mi/60}時間{じかん})`,kn*mi/60,[kn*mi/60+kn/2,kn*mi/60+kn],`${kn}×${mi/60}=${kn*mi/60}。`,'海里{かいり}')];return DF()==='e'?QQ.slice(0,3):QQ}
 const plain=t=>t.replace(/\{[^}]+\}/g,'');
 /* 顔のつくり: 肖像画や写真でつたわる特徴(輪郭・眉・目・年ごろ)を数値にしたもの
    rx,ry=顔の幅と長さ cw=あごの幅 br=[眉の太さ,つり上がり] e=目(n細い s切れ長 g穏やか b大きい) ns=鼻の長さ ho=こけた頬 old=しわ fh=広いひたい mu=ひげ nk=首の太さ */
@@ -669,10 +672,11 @@ function viewMake(){
   <label for="nm">${R('名前{なまえ}')}</label><input type="text" id="nm" maxlength="10" value="${esc(m.name)}" placeholder="なまえ">
   <p>${R('生{う}まれた家{いえ}')}</p><div class="choice" id="um">${Object.keys(UM).map(k=>`<button data-k="${k}" class="${k===m.um?'sel':''}">${R(UM[k])}<small>${R(UMD[k])}</small></button>`).join('')}</div>
   <p>${R('年{とし}')}</p><div class="ages" id="ag">${Object.keys(AGE).map(k=>`<button data-k="${k}" class="${+k===m.age?'sel':''}">${R(AGE[k])}</button>`).join('')}</div>
+  <p>${R('むずかしさ')}</p>${dfButtons('df')}<p style="font-size:13px;line-height:1.7">${A(DFNOTE)}${R(' あとからマイページで変{か}えられます。')}</p>
   <button class="btn" id="dep">${R('旅立{たびだ}つ')}</button>
   <p class="note">${F('江戸時代{えどじだい}は、生{う}まれた家{いえ}によって入{はい}れる学校{がっこう}がちがいました。学問{がくもん}のために遠{とお}くの塾{じゅく}へ旅{たび}することを「遊学{ゆうがく}」といいます。')}<br>${A('どの生{う}まれをえらんでも十校{じっこう}すべてを体験{たいけん}できます。ほんとうは入{はい}れたかどうかは、門{もん}の前{まえ}の入門札{にゅうもんふだ}でわかります。')}</p></section>`;
   const pickIn=(sel,key)=>app.querySelectorAll(sel+' button').forEach(b=>b.onclick=()=>{app.querySelectorAll(sel+' button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');m[key]=key==='age'?+b.dataset.k:b.dataset.k;tok()});
-  pickIn('#um','um');pickIn('#ag','age');
+  pickIn('#um','um');pickIn('#ag','age');app.querySelectorAll('#df button').forEach(b=>b.onclick=()=>{app.querySelectorAll('#df button').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');S.diff=b.dataset.k;tok()});
   app.querySelector('#dep').onclick=()=>{m.name=app.querySelector('#nm').value.trim()||'たびびと';S.me=m;save();S.view='map';render();scrollTo(0,0)};
 }
 
@@ -747,14 +751,20 @@ function viewPass(){
 }
 
 /* ---------- 部品 ---------- */
+/* むずかしさ: e=やさしい n=ふつう h=むずかしい */
+const DF=()=>S.diff||'n',DFN={e:'やさしい',n:'ふつう',h:'むずかしい'},WT={e:.5,n:1.5,h:2.6},TL={e:60,n:30,h:18},ZW=()=>({e:.16,n:.09,h:.05})[DF()];
+const dfButtons=id=>`<div class="ages" id="${id}">${Object.keys(DFN).map(k=>`<button data-k="${k}" class="${k===DF()?'sel':''}">${DFN[k]}</button>`).join('')}</div>`;
+const DFNOTE='やさしい:見本{みほん}が出{で}て、まちがえると正{ただ}しい札{ふだ}が光{ひか}ります。時間{じかん}もゆっくり。 むずかしい:まぎらわしい札{ふだ}がまざり、時間{じかん}が短{みじか}く、的{まと}が小{ちい}さくなります。';
 function orderGame(box,parts,done){
-  let next=0,miss=0;const idx=parts.map((_,i)=>i);
-  do{idx.sort(()=>Math.random()-.5)}while(parts.length>1&&idx.every((v,i)=>v===i));
-  box.innerHTML=`<div class="ans"></div><div class="tiles">${idx.map(i=>`<button class="tile" data-i="${i}">${R(parts[i])}</button>`).join('')}</div>`;
+  const D=DF();let next=0,miss=0,tiles=parts.map((p,i)=>({p,i}));
+  if(D==='h'){const src=(S.view==='school'&&S.school==='teki'?NL.concat(NLX).flatMap(x=>x.j):SP.concat(IROHA).flatMap(x=>x.p)).filter(x=>!parts.includes(x));
+    for(let k=0;k<2&&src.length;k++)tiles.push({p:src.splice(Math.floor(Math.random()*src.length),1)[0],i:-1})}
+  do{tiles.sort(()=>Math.random()-.5)}while(D!=='h'&&parts.length>1&&tiles.every((t,k)=>t.i===k));
+  box.innerHTML=`${D==='e'?`<p class="mihon">${R('見本{みほん}')}:${parts.map(R).join(' ')}</p>`:''}<div class="ans"></div><div class="tiles">${tiles.map(t=>`<button class="tile" data-i="${t.i}">${R(t.p)}</button>`).join('')}</div>`;
   const ans=box.querySelector('.ans');
   box.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{
-    if(+t.dataset.i===next){tok(440+next*60);ans.insertAdjacentHTML('beforeend',`<span>${R(parts[next])}</span>`);t.classList.add('used');next++;if(next===parts.length)done(miss)}
-    else{miss++;tok(160,.15);t.classList.remove('ng');void t.offsetWidth;t.classList.add('ng')}
+    if(+t.dataset.i===next){tok(440+next*60);ans.insertAdjacentHTML('beforeend',`<span>${R(parts[next])}</span>`);t.classList.add('used');t.classList.remove('hint');next++;if(next===parts.length)done(miss)}
+    else{miss++;tok(160,.15);t.classList.remove('ng');void t.offsetWidth;t.classList.add('ng');if(D==='e'){const c=box.querySelector(`.tile[data-i="${next}"]:not(.used)`);if(c)c.classList.add('hint')}}
   });
 }
 function frame(sc,body,total,canNext){
@@ -825,8 +835,8 @@ const TEKI=[
     orderGame(app.querySelector('#og'),s.j,miss=>{const m=miss===0?'△':miss<3?'○':'●';S.marks.push(m);msg.innerHTML=R(`会読{かいどく}のしるし: <b style="font-size:24px">${m}</b>`);unlock()})}};
   app.querySelectorAll('.nl button').forEach(b=>b.onclick=()=>{const w=b.dataset.w;if(busy||S.notes[w])return;busy=true;looks++;
     msg.innerHTML=R(looks%2?'ヅーフ部屋{べや}へ。先{さき}に来{き}た人{ひと}が辞書{じしょ}を使{つか}っている……':'ヅーフ部屋{べや}へ。辞書{じしょ}の頁{ぺーじ}をめくる……');
-    bar.style.transition='none';bar.style.width='0';void bar.offsetWidth;bar.style.transition='width 1.5s linear';bar.style.width='100%';
-    setTimeout(()=>{S.notes[w]=1;b.querySelector('small').innerHTML=R(DICT[w]);tok(620);busy=false;msg.textContent='';bar.style.transition='none';bar.style.width='0';check()},1550)});
+    bar.style.transition='none';bar.style.width='0';void bar.offsetWidth;bar.style.transition='width '+WT[DF()]+'s linear';bar.style.width='100%';
+    setTimeout(()=>{S.notes[w]=1;b.querySelector('small').innerHTML=R(DICT[w]);tok(620);busy=false;msg.textContent='';bar.style.transition='none';bar.style.width='0';check()},WT[DF()]*1000+50)});
   check()}),
  ()=>{const pt=S.marks.reduce((a,m)=>a+(m==='△'?3:m==='○'?1:0),0);
   frame(lamp,`<h2>${R('会読{かいどく}の結果{けっか}')}</h2><p class="marks">${S.marks.join(' ')}</p>
@@ -880,7 +890,7 @@ const sodoku=(sc,title,lead,parts,after,note,tot)=>()=>{const v=S.vis[S.school]|
 const fin=(sc,seal,title,who,src,tot,pre='')=>()=>{frame(sc,pre+finish(seal,title,who,src),tot,false);bindHome()};
 /* 正解のある問いを順に出す */
 const quizStep=(sc,title,qs,note,tot)=>()=>{const QS=typeof qs==='function'?qs():qs;let i=0;const go=()=>{const q=QS[i];
-  frame(sc,`${H(title)} ${q.head||''}<p>${R(q.q)}</p><div class="choice">${q.o.map((o,k)=>`<button data-k="${k}">${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(q.x)}</p><button class="btn" id="nq" hidden>${R('つぎの問{と}い')}</button><p class="note">${note}</p>`,tot,false);
+  frame(sc,`${H(title)} ${q.head||''}<p>${R(q.q)}</p><div class="choice">${q.o.map((o,k)=>(DF()==='e'&&q.o.length>2&&k===(q.a===0?1:0))?'':`<button data-k="${k}">${R(o)}</button>`).join('')}</div><p id="ex" hidden>${R(q.x)}</p><button class="btn" id="nq" hidden>${R('つぎの問{と}い')}</button><p class="note">${note}</p>`,tot,false);
   app.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{if(+b.dataset.k===q.a){tok(620);b.classList.add('sel');app.querySelectorAll('.choice button').forEach(x=>x.disabled=true);app.querySelector('#ex').hidden=false;
     if(++i<QS.length){const n=app.querySelector('#nq');n.hidden=false;n.onclick=go}else unlock()}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}})};go()};
 /* 正解のない問い */
@@ -895,10 +905,10 @@ const KODO=[
   F('一八四一年{ねん}に藩主{はんしゅ}の徳川斉昭{とくがわなりあき}がひらいた、藩校{はんこう}。学問{がくもん}と武芸{ぶげい}は分{わ}けられないという「文武不岐{ぶんぶふき}」が合{あ}いことばでした。卒業{そつぎょう}はなく、大人{おとな}になっても通{かよ}いました。'),4),
  sodoku(kodoSc,'文{ぶん}:素読{そどく}','声{こえ}に出{だ}しながら、読{よ}む順{じゅん}におそう。',['弘道{こうどう}とは何{なん}ぞ','人{ひと}能{よ}く','道{みち}を弘{ひろ}むるなり'],'意味{いみ}:弘道{こうどう}とは何{なに}か。人{ひと}が、正{ただ}しい道{みち}をひろめていくことだ。',
   F('学校{がっこう}の名前{なまえ}のわけを書{か}いた『弘道館記{こうどうかんき}』のはじめの文{ぶん}です。'),4),
- ()=>{frame(kodoSc,`${H('武{ぶ}:弓{ゆみ}')}<p>${R('矢{や}が赤{あか}い的{まと}にかさなったときに放{はな}とう。三本{さんぼん}。')}</p><div class="mato"><i class="ya" id="ya"></i></div><div class="row"><button class="btn" id="sh">${R('放{はな}つ')}</button><span id="hit" class="kyu"></span></div>
+ ()=>{frame(kodoSc,`${H('武{ぶ}:弓{ゆみ}')}<p>${R('矢{や}が赤{あか}い的{まと}にかさなったときに放{はな}とう。三本{さんぼん}。')}</p><div class="mato" style="--z:${ZW()*200}%"><i class="ya" id="ya"></i></div><div class="row"><button class="btn" id="sh">${R('放{はな}つ')}</button><span id="hit" class="kyu"></span></div>
   <p class="note">${F('武館{ぶかん}では、武芸{ぶげい}のけいこをしました。')}<br>${A('的{まと}あてのあそび。当{あ}たらなくても先{さき}へ進{すす}めます。')}</p>`,4,false);
   let n=0,h=0;app.querySelector('#sh').onclick=e=>{const m=app.querySelector('.mato').getBoundingClientRect(),y=app.querySelector('#ya').getBoundingClientRect(),p=(y.left+3-m.left)/m.width;n++;
-   if(p>.41&&p<.59){h++;tok(700,.2)}else tok(160,.15);app.querySelector('#hit').innerHTML=R(`${n}本{ほん}のうち ${h}本{ほん} 命中{めいちゅう}`);if(n>=3){e.target.disabled=true;unlock()}}},
+   if(Math.abs(p-.5)<ZW()){h++;tok(700,.2)}else tok(160,.15);app.querySelector('#hit').innerHTML=R(`${n}本{ほん}のうち ${h}本{ほん} 命中{めいちゅう}`);if(n>=3){e.target.disabled=true;unlock()}}},
  fin(kodoSc,'水','弘道館{こうどうかん} 修了{しゅうりょう}','最後{さいご}の将軍{しょうぐん}になる徳川慶喜{とくがわよしのぶ}も、子{こ}どものころここで学{まな}びました。','『弘道館記{こうどうかんき}』',4,
   `<p>${F('斉昭{なりあき}は、学{まな}ぶ場所{ばしょ}の弘道館{こうどうかん}と、休{やす}む場所{ばしょ}の偕楽園{かいらくえん}を、ふたつでひと組{くみ}として作{つく}りました。がんばったら、梅{うめ}を見{み}て休{やす}もう。')}</p>`)
 ];
@@ -912,7 +922,7 @@ const SHOHEI=[
   F('昌平坂学問所{しょうへいざかがくもんじょ}は一七九七年{ねん}に幕府{ばくふ}がじかに運営{うんえい}する学校{がっこう}になりました。「素読吟味{そどくぎんみ}」は幕府{ばくふ}の家来{けらい}の子{こ}どもが受{う}けた試験{しけん}で、よくできるとほうびが出{で}ました。講義{こうぎ}を聞{き}くことは、幕府{ばくふ}の家来{けらい}でない人{ひと}にもゆるされました。'),3),
  ()=>{gm=0;let q=0;const GS=(S.vis.shohei||0)===0?GINMI.map(p=>({p})):draw('shohei',3);const go=()=>{frame(shoSc,`${H('素読吟味{そどくぎんみ}')} ${q+1}/3<p>${R('線{せん}がのびきる前{まえ}に、つっかえずに読{よ}みきろう。')}</p><div class="wait"><b id="bar"></b></div><div id="og"></div>
   <p class="note">${F('読{よ}んでいるのは『大学{だいがく}』と『論語{ろんご}』。四書{ししょ}とよばれる本{ほん}です。')}<br>${A('時間{じかん}のきまりと、順{じゅん}にならべるあそび。')}</p>`,3,false);
-  const bar=app.querySelector('#bar');void bar.offsetWidth;bar.style.transition='width 30s linear';bar.style.width='100%';T=setTimeout(go,30000);
+  const bar=app.querySelector('#bar');void bar.offsetWidth;bar.style.transition='width '+TL[DF()]+'s linear';bar.style.width='100%';T=setTimeout(go,TL[DF()]*1000);
   orderGame(app.querySelector('#og'),GS[q].p,m=>{clearTimeout(T);bar.style.transition='none';gm+=m;q++;if(q<3)setTimeout(go,800);else unlock()})};go()},
  ()=>{frame(shoSc,`<p class="big">${R(gm===0?'評{ひょう}:甲{こう}':gm<4?'評{ひょう}:乙{おつ}':'評{ひょう}:丙{へい}')}</p><p>${A('まちがえた数{かず}で評{ひょう}を決{き}めています。')}</p>`+finish('昌','素読吟味{そどくぎんみ} 及第{きゅうだい}','この学問所{がくもんじょ}は、明治{めいじ}になってからの東京{とうきょう}の大学{だいがく}のみなもとのひとつになりました。','『大学{だいがく}』、『論語{ろんご}』学而{がくじ}・衛霊公{えいれいこう}'),3,false);bindHome()}
 ];
