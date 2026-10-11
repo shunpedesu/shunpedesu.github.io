@@ -296,6 +296,12 @@ const R=s=>s.replace(/([一-鿿々ヶ]+)\{([^}]+)\}/g,'<ruby>$1<rt>$2</rt></ruby
 const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
+/* バージョン情報: 更新のたびに先頭へ足す */
+const HIST=[['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
+ ['1.2.0','2026-10-10','レベル、門の解放、時代の仕事、品あつめを追加。シェア用の画像を設定。'],
+ ['1.1.0','2026-10-10','史実を原典と照らし合わせ、裏づけのない説明を削除。出典ページ、オープニング、旅の目あて、旅のむすびを追加。音楽を自作曲に。'],
+ ['1.0.0','2026-10-09','公開。十の学び舎、歩く旅、主人公づくり、マイページ、出会う人。']];
+const VER=HIST[0][0],VERDATE=HIST[0][1];
 let S={view:'title',school:null,step:0,done:{},shi:'',notes:{},marks:[]};
 S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];
 try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.diff=d.df||'n';S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
@@ -592,7 +598,8 @@ function viewMap(){
     <span><span class="nm">${R(s.nm)}</span><br><span class="sub">${R(s.pl)} ・ ${R(s.way)}${s.id===S.at?' <b class="ima">いまここ</b>':''}</span></span>
     ${s.id&&S.done[s.id]?`<span class="seal">${s.seal}</span>`:`<span class="go">${unlocked(s.id)?R('入門{にゅうもん}する'):R('レベル'+NEED[s.id]+'で開{ひら}く')}</span>`}
   </button></li>`).join('')}</ol>
-  <details><summary>${R('おうちの方{かた}・先生{せんせい}へ')}</summary><p>各校の学び方(素読・会読・討論・詮議など)と読んでいる文章は、当時の記録や広く知られた資料をもとにしています。画面の「史実」は記録にもとづく内容、「アプリの工夫」は遊びやすくするために加えた演出です。当時の学校の多くは武士の男子に限られていました。このアプリでは主人公の生まれを選び、各校の「入門札」で「だれが学べたか」を示しています。専門家の監修は受けていません。確認できた内容と出典は下のボタンから見られます。素読は、意味の説明より先に声に出すのが当時のやり方です。ぜひ一緒に声に出してお読みください。</p><button class="btn sub" id="srcb">出典と確認のようす</button></details>`;
+  <details><summary>${R('おうちの方{かた}・先生{せんせい}へ')}</summary><p>各校の学び方(素読・会読・討論・詮議など)と読んでいる文章は、当時の記録や広く知られた資料をもとにしています。画面の「史実」は記録にもとづく内容、「アプリの工夫」は遊びやすくするために加えた演出です。当時の学校の多くは武士の男子に限られていました。このアプリでは主人公の生まれを選び、各校の「入門札」で「だれが学べたか」を示しています。専門家の監修は受けていません。確認できた内容と出典は下のボタンから見られます。素読は、意味の説明より先に声に出すのが当時のやり方です。ぜひ一緒に声に出してお読みください。</p><button class="btn sub" id="srcb">出典と確認のようす</button></details>
+  <details><summary>バージョン ${VER}(${VERDATE})・更新のきろく</summary>${HIST.map(h=>`<p><b>ver ${h[0]}</b> ${h[1]}<br>${h[2]}</p>`).join('')}</details>`;
   app.querySelector('#srcb').onclick=()=>{S.view='src';render();scrollTo(0,0)};
   app.querySelector('#me').onclick=()=>{S.view='make';render()};
   const ib=app.querySelector('#ibok');if(ib)ib.onclick=()=>{S.inbox=[];save();render()};
@@ -607,7 +614,7 @@ function viewTitle(){
   <div class="tbox"><p>${R('黒船{くろふね}が来{き}たころの日本{にほん}へ。旅{たび}をして、当時{とうじ}の子{こ}どもと同{おな}じやり方{かた}で学{まな}ぼう。')}</p>
   <div class="tseals">${STATIONS.map(s=>`<span class="seal ${S.done[s.id]?'got':''}">${s.seal}</span>`).join('')}</div>
   ${S.me?`<button class="btn" id="go1">${R('旅{たび}のつづき')}(${n}/10)</button><button class="btn sub" id="go3">${R('オープニングを見{み}る')}</button><button class="btn sub" id="go2">${R('主人公{しゅじんこう}をえらびなおす')}</button>`:`<button class="btn" id="go1">${R('旅{たび}をはじめる')}</button>`}
-  <p style="font-size:12px;text-align:center">${R('音楽{おんがく}と音{おと}が出{で}ます。左上{ひだりうえ}のボタンで消{け}せます。')}</p></div></section>`;
+  <p style="font-size:12px;text-align:center">${R('音楽{おんがく}と音{おと}が出{で}ます。左上{ひだりうえ}のボタンで消{け}せます。')}<br>ver ${VER}(${VERDATE})</p></div></section>`;
   app.querySelector('#go1').onclick=()=>{S.view=S.me?'map':'op';render();scrollTo(0,0)};
   const g3=app.querySelector('#go3');if(g3)g3.onclick=()=>{S.view='op';render();scrollTo(0,0)};
   const g2=app.querySelector('#go2');if(g2)g2.onclick=()=>{S.view='make';render();scrollTo(0,0)};
