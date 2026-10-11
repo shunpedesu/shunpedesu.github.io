@@ -246,6 +246,11 @@ h1,h2,.fuda .nm,.fuda .no,.big,.kyu,.seal,.shi,.okite .last{letter-spacing:.02em
 .goalist li.ok b{color:var(--shu)}
 .op .goalist li.ok b{color:#ff8a70}
 .goal{border-top:5px solid var(--shu)}
+details.more>summary{display:inline-block;list-style:none;cursor:pointer;font-size:13px;font-weight:600;line-height:1.6;padding:4px 12px;border:1.5px solid currentColor;border-radius:14px;opacity:.8}
+details.more>summary::-webkit-details-marker{display:none}
+details.more[open]>summary{margin-bottom:8px}
+details.more .note{border-top:0;padding-top:0}
+.nfuda details.more{margin-top:6px}.nfuda details.more p{font-size:14px;line-height:1.8}
 .tile.hint{outline:4px solid var(--shu);outline-offset:2px}
 .mihon{font-family:var(--f-book);font-weight:400;font-size:15px;line-height:2.1;border:1.5px dashed var(--line);padding:6px 10px}
 .inbox{border:2px solid var(--shu)}.inbox p{font-size:15px;line-height:1.8}
@@ -304,7 +309,7 @@ const ADM={nisshin:{w:'会津藩{あいづはん}の上級{じょうきゅう}�
 const ERA={nisshin:'一八六〇年{ねん}ごろ',kodo:'一八四〇年代{ねんだい}',shohei:'一八五〇年代{ねんだい}',fuku:'一八六〇年代{ねんだい}',teki:'一八五〇年代{ねんだい}',shizu:'一八四〇年代{ねんだい}',shoka:'一八五七年{ねん}ごろ',kangi:'一八四〇年代{ねんだい}',kaigun:'一八五〇年代{ねんだい}のおわり',goju:'一八四〇年代{ねんだい}'};
 function nyumon(){const a=ADM[S.school],b=S.me.um==='b';
   const v=a.o==='open'?F('全国{ぜんこく}から入門者{にゅうもんしゃ}が集{あつ}まりました。')+A('きみも塾生{じゅくせい}としてむかえます。'):a.o==='all'?F('きみの生{う}まれでも、ほんとうに入門{にゅうもん}できました。'):a.o==='most'?F('塾生{じゅくせい}の多{おお}くは武士{ぶし}の若者{わかもの}でした。')+A('きみも塾生{じゅくせい}としてむかえます。'):b?A('きみを、ここの武士{ぶし}の子{こ}としてむかえます。'):F('きみの生{う}まれでは、ほんとうは入門{にゅうもん}できませんでした。')+A('今日{きょう}は特別{とくべつ}に門{もん}をあけてもらいます。');
-  return `<div class="nfuda"><b class="t">${R('入門札{にゅうもんふだ}')}</b>${meLine()}<br>${A('たずねる時代{じだい}:'+ERA[S.school]+'。学{まな}び舎{や}ごとに、出会{であ}う人{ひと}がいた時代{じだい}へ旅{たび}します。')}<br>${F('ここで学{まな}べた人{ひと}:'+a.w)}<br>${v}</div>`}
+  return `<div class="nfuda"><b class="t">${R('入門札{にゅうもんふだ}')}</b>${meLine()}<br>${R(ERA[S.school])}<details class="more"><summary>${R('この門{もん}に入{はい}れた人{ひと}')}</summary><p>${A('学{まな}び舎{や}ごとに、出会{であ}う人{ひと}がいた時代{じだい}へ旅{たび}します。')}<br>${F('ここで学{まな}べた人{ひと}:'+a.w)}<br>${v}</p></details></div>`}
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------- 音: 音楽と効果音(すべてその場で合成) ---------- */
@@ -1013,6 +1018,8 @@ function render(){
 }
 document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');if(!b||S.view===b.dataset.v)return;clearTimeout(T);WK++;try{speechSynthesis.cancel()}catch(x){}
   S.resume=S.view==='school'&&b.dataset.v==='pass'?{school:S.school,step:S.step}:b.dataset.v==='map'?null:S.resume;S.view=b.dataset.v;render();scrollTo(0,0)};
+/* 文章を減らす: 史実と工夫の説明は「くわしく知る」にたたむ */
+new MutationObserver(()=>{app.querySelectorAll('p.note').forEach(n=>{if(n.closest('details')||n.hidden)return;const d=document.createElement('details'),m=document.createElement('summary');d.className='more';m.innerHTML=R('くわしく知{し}る');n.replaceWith(d);d.append(m,n)})}).observe(app,{childList:true});
 const start=d=>{if(d&&d.done){S.done=d.done;S.shi=d.shi||'';S.me=d.me||S.me;S.at=d.at||S.at}render()};
 window.claude?.hot?.snapshot?.(()=>({done:S.done,shi:S.shi,me:S.me,at:S.at}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
