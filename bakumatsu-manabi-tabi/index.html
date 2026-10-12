@@ -99,7 +99,11 @@ button.fuda:not([disabled]):hover{transform:translate(-1px,-1px);box-shadow:5px 
 /* 追加七校の舞台 */
 body[data-s="kodo"]{--bg:#eadfd6} body[data-s="shohei"]{--bg:#c6ccc4} body[data-s="fuku"]{--bg:#d3d6d2}
 body[data-s="shizu"]{--bg:#d8d6bd} body[data-s="kangi"]{--bg:#cfd3c2} body[data-s="kaigun"]{--bg:#c2d5db} body[data-s="goju"]{--bg:#dcd2c0}
-.scene .name{max-height:176px}
+.scene .name{white-space:nowrap;right:14px;top:14px;padding:9px 5px 7px;background:#f3ecd9;color:#1b1712;border:1.5px solid #1b1712;box-shadow:3px 3px 0 #1b171255;letter-spacing:.08em;line-height:1.25}
+.scene .where{left:12px;bottom:10px;padding:1px 9px;background:#f3ecd9;color:#1b1712;border:1.5px solid #1b1712}
+.scn{position:absolute;inset:0;width:100%;height:100%;display:block}.scene.pic::before,.scene.pic::after{display:none}
+.scn .fune{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){.scn .fune,.sc-nisshin .win::before,.sc-teki::before{animation:none}}
 .roof{position:absolute;left:6%;bottom:28%;width:54%;max-width:300px;height:100px;clip-path:polygon(8% 0,92% 0,100% 40%,95% 40%,95% 100%,5% 100%,5% 40%,0 40%)}
 .sc-kodo{background:linear-gradient(#f6e9e6 0 72%,#cdc3a8 72%)}
 .sc-kodo .roof{background:linear-gradient(#2c2c2c 0 40%,#f5f2e9 40%)}
@@ -308,7 +312,7 @@ const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
 /* バージョン情報: 更新のたびに先頭へ足す */
-const HIST=[['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
+const HIST=[['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
  ['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
  ['1.2.0','2026-10-10','レベル、門の解放、時代の仕事、品あつめを追加。シェア用の画像を設定。'],
  ['1.1.0','2026-10-10','史実を原典と照らし合わせ、裏づけのない説明を削除。出典ページ、オープニング、旅の目あて、旅のむすびを追加。音楽を自作曲に。'],
@@ -697,6 +701,7 @@ const SRC=[
  ['郷中教育','六歳以上の男子が対象、稚児と二才/先輩が後輩を指導/「負けるな」「弱いものいじめをするな」、うそをつつしむ/いろは歌「い」「ろ」「は」の本文(加世田歴史館)、四十七首、郷中教育の基本/西郷は一八四七年に二才頭/大久保は同じ加治屋町の郷中','「詮議」という問答の名前としくみ(問いかけの場面は「アプリの工夫」にしました)/相撲のけいこ',[['郷中',W+'郷中'],['日新公いろは歌(加世田歴史館)','https://hantoubunka.site.kagoshima.jp/kasedainfo/irohauta2.html'],['西郷隆盛',W+'西郷隆盛'],['大久保利通',W+'大久保利通']]],
  ['古典の文','原文で確認:『論語』五十句の本文と篇(学而・為政・里仁・公冶長・雍也・述而・子罕・先進・顔淵・子路・憲問・衛霊公・季氏・陽貨・子張)/『孟子』七句(離婁上下・公孫丑上下・告子下・尽心上)/『大学』二句(礼記)','(ふりがなと読み下しは、一般的な読み方によっています。オランダ語の文と算術の問題は、はじめから「アプリの工夫」です)',[['論語(Wikisource 原文)','https://zh.wikisource.org/wiki/論語'],['孟子(Wikisource 原文)','https://zh.wikisource.org/wiki/孟子']]],
  ['学び舎の読本','日新館:什の掟(公式サイトの表記)/弘道館:『弘道館記』の本文(拓本)と読み方(茨城県教育会『愛誦集衍義』一九三九年)/昌平坂:佐藤一斎『言志四録』は後半生の四十余年にわたる語録。十四のことばは西郷隆盛が書きぬいた『南洲手抄言志録』の本文と読み下し、「少くして学べば」は『言志四録』の項による/福沢塾:『学問のすすめ』の本文(一八七二〜七六年)/閑谷学校:毎月ついたちに「朱文公学規」の講釈があり農民も聴講できた(公式サイト)。朱子の学規の原文は「白鹿洞書院学規(掲示)」として確認/松下村塾:「士規七則」の原文と読み下し、一八五五年に玉木彦助の元服の祝いに書いたこと/咸宜園:「桂林荘雑詠」四首の原文と読み下し、淡窓のはじめの塾が桂林荘であること/郷中教育:いろは歌三十六首の本文(加世田歴史館のページ。『加世田市史』による)/適塾・海軍伝習所:オランダ語から日本語に入ったことば四十語とつづり','『学問のすすめ』は明治の本で、幕末の塾で読まれたものではありません(画面にもそう書いています)/閑谷学校で読まれた「朱文公学規」の本文そのものは未確認。朱子の学規として伝わる文を使いました。読み下しは一般的な読み方です/オランダ語の四十語を、適塾や伝習所で実際に教えたかどうかは未確認。「アプリの工夫」として表示しています/いろは歌は四十七首のうち三十六首。残りは小学生むけに説明しきれないため入れていません/すべての「やさしい意味」はこのアプリで書いたもので、専門家の校閲は受けていません',[['弘道館記(Wikisource)','https://ja.wikisource.org/wiki/弘道館記'],['弘道館記 愛誦集衍義(Wikisource)','https://ja.wikisource.org/wiki/弘道館記_(愛誦集衍義)'],['南洲手抄言志録(Wikisource)','https://ja.wikisource.org/wiki/南洲手抄言志録'],['言志四録',W+'言志四録'],['学問のすゝめ(Wikisource)','https://ja.wikisource.org/wiki/学問のすゝめ'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['白鹿洞書院學規(Wikisource 原文)','https://zh.wikisource.org/wiki/白鹿洞書院學規'],['士規七則',W+'士規七則'],['広瀬淡窓',W+'広瀬淡窓'],['日新公いろは歌(加世田歴史館)','https://hantoubunka.site.kagoshima.jp/kasedainfo/irohauta2.html'],['オランダ語由来の日本語(英語版Wikipedia)','https://en.wikipedia.org/wiki/List_of_Japanese_words_of_Dutch_origin']]],
+ ['学び舎の絵','弘道館:正門は本瓦葺きの四脚門。梅は設立当初から植えられた/昌平坂学問所:一七九九年の改築で、黒塗りの大きな建物に改められた/福沢塾:中津藩中屋敷の二階建ての長屋(一階は六畳一室と台所、二階は十五畳ほど)/閑谷学校:講堂は入母屋造り、しころ葺きの大屋根、火灯窓。石塀がめぐる/咸宜園:秋風庵は大きな寄棟造で茅葺き。遠思楼は二階建ての寄棟造(一八四九年)/長崎海軍伝習所:観光丸は木造の外輪船で、三本マストのスクーナー型','こまかい色、寸法、窓や柱の数、塀のつくりは想像で描いています/昌平坂と遠思楼の屋根の材料、観光丸の煙突の位置、福沢塾から海が見えたかどうかは未確認/日新館、適塾、松下村塾、郷中教育の絵は前のままで、建物の資料との照合はしていません',[['弘道館',W+'弘道館'],['湯島聖堂',W+'湯島聖堂'],['慶應義塾',W+'慶應義塾'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['咸宜園跡(教育遺産の資料・水戸市)','https://www.city.mito.lg.jp/uploaded/attachment/1199.pdf'],['観光丸',W+'観光丸']]],
  ['旅と時代','一里塚は日本橋を起点に一里ごと/関所の通過に通行手形','旅人は一日に十里歩いた、という説明',[['一里塚',W+'一里塚'],['通行手形',W+'通行手形']]]];
 function viewSrc(){document.body.dataset.s='';
   app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button><section class="panel">${H('出典{しゅってん}と確認{かくにん}のようす')}
@@ -843,10 +848,66 @@ function orderGame(box,parts,done){
     else{miss++;tok(160,.15);t.classList.remove('ng');void t.offsetWidth;t.classList.add('ng');if(D==='e'){const c=box.querySelector(`.tile[data-i="${next}"]:not(.used)`);if(c)c.classList.add('hint')}}
   });
 }
+/* ---------- 学び舎の絵(資料で確かめた建物のかたち) ---------- */
+const SV=b=>`<svg class="scn" viewBox="0 0 390 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${b}</svg>`;
+const SCN={
+ kodo:SV(`<rect width="390" height="200" fill="#f4e6e2"/><circle cx="60" cy="40" r="20" fill="#fff" opacity=".55"/>
+  <rect y="150" width="390" height="50" fill="#cfc5a9"/>
+  <rect y="112" width="310" height="38" fill="#f7f3ea"/><rect y="103" width="310" height="10" fill="#37383b"/><rect y="142" width="310" height="8" fill="#8d8674"/>
+  <rect x="98" y="88" width="104" height="62" fill="#e9dcc8"/><path d="M98 150 L128 118 L172 118 L202 150Z" fill="#d8ccb2"/>
+  <rect x="98" y="88" width="10" height="62" fill="#4a3423"/><rect x="192" y="88" width="10" height="62" fill="#4a3423"/><rect x="108" y="96" width="9" height="54" fill="#33241a"/><rect x="183" y="96" width="9" height="54" fill="#33241a"/>
+  <rect x="92" y="86" width="116" height="9" fill="#33241a"/>
+  <path d="M74 88 Q150 50 226 88 L236 94 L64 94Z" fill="#2f3033"/><rect x="112" y="58" width="76" height="7" rx="2" fill="#1f2022"/>
+  <path d="M74 88 Q150 50 226 88" fill="none" stroke="#55575b" stroke-width="1.5"/>
+  <g fill="none" stroke="#3a2a22" stroke-linecap="round"><path d="M330 0 C300 34 262 30 232 58" stroke-width="5"/><path d="M290 26 C286 48 270 60 262 84" stroke-width="3"/><path d="M262 34 C240 30 226 34 210 26" stroke-width="2.5"/></g>
+  <g fill="#cf3f6b"><circle cx="300" cy="18" r="4"/><circle cx="268" cy="36" r="4"/><circle cx="240" cy="52" r="4"/><circle cx="283" cy="52" r="3.5"/><circle cx="266" cy="76" r="3.5"/><circle cx="222" cy="30" r="3.5"/></g>
+  <g fill="#fff"><circle cx="314" cy="10" r="3.5"/><circle cx="254" cy="44" r="3.5"/><circle cx="276" cy="66" r="3"/><circle cx="238" cy="32" r="3"/><circle cx="228" cy="62" r="3"/></g>`),
+ shohei:SV(`<rect width="390" height="200" fill="#b9c5ca"/>
+  <ellipse cx="40" cy="96" rx="60" ry="42" fill="#4d6a55"/><ellipse cx="300" cy="100" rx="70" ry="40" fill="#44604d"/>
+  <rect y="150" width="390" height="50" fill="#8b8878"/>
+  <path d="M36 150 L60 122 L270 122 L294 150Z" fill="#a5a394"/><g stroke="#7d7b6d" stroke-width="1.5"><path d="M130 150 L142 122 M200 150 L188 122 M126 141 H204 M132 132 H198"/></g>
+  <rect x="70" y="80" width="190" height="42" fill="#17181a"/><g stroke="#2e3034" stroke-width="2"><path d="M96 82V122M122 82V122M148 82V122M182 82V122M208 82V122M234 82V122"/></g><rect x="150" y="92" width="30" height="30" fill="#0b0b0c"/>
+  <path d="M48 82 L88 44 L242 44 L282 82Z" fill="#26282c"/><rect x="98" y="38" width="134" height="8" rx="2" fill="#131416"/><rect x="42" y="80" width="246" height="5" fill="#0f1011"/>
+  <path d="M88 44 L48 82 M242 44 L282 82" stroke="#3b3e44" stroke-width="2"/>`),
+ fuku:SV(`<rect width="390" height="200" fill="#d6dfe2"/><rect y="88" width="390" height="62" fill="#5f8496"/><rect y="150" width="390" height="50" fill="#b5a787"/>
+  <g fill="#f3efe4"><path d="M318 60h14v26h-14z"/><path d="M346 70h10v18h-10z"/></g><g fill="#2c2a26"><path d="M308 86h34l-5 7h-24z"/><path d="M340 88h22l-4 5h-14z"/></g>
+  <rect x="20" y="70" width="260" height="42" fill="#ece5d3"/><rect x="20" y="112" width="260" height="38" fill="#6b5a45"/><g stroke="#5a4a38" stroke-width="1"><path d="M20 122H280M20 132H280M20 142H280"/></g>
+  <path d="M8 72 L30 50 L270 50 L292 72Z" fill="#3b3b3d"/><rect x="34" y="46" width="232" height="6" fill="#2a2a2c"/><rect x="12" y="108" width="276" height="7" fill="#3b3b3d"/>
+  <g fill="#3a3027"><rect x="40" y="80" width="30" height="20"/><rect x="88" y="80" width="30" height="20"/><rect x="184" y="80" width="30" height="20"/><rect x="232" y="80" width="30" height="20"/></g>
+  <rect x="136" y="80" width="30" height="20" fill="#f6d89a"/><g stroke="#3a3027" stroke-width="1.5"><path d="M136 80h30v20h-30zM146 80v20M156 80v20"/></g>
+  <g fill="#2e2620"><rect x="52" y="120" width="22" height="30"/><rect x="140" y="120" width="22" height="30"/><rect x="226" y="120" width="22" height="30"/></g>`),
+ shizu:SV(`<rect width="390" height="200" fill="#e4ead9"/><path d="M0 92 Q70 30 150 62 T300 44 T390 70V152H0Z" fill="#6b8a5c"/><path d="M0 120 Q90 76 190 100 T390 96V152H0Z" fill="#56744a"/>
+  <rect y="150" width="390" height="50" fill="#b9ae8c"/>
+  <rect x="74" y="100" width="192" height="42" fill="#efe6d2"/><rect x="74" y="134" width="192" height="8" fill="#7a6a55"/>
+  <g fill="#3f3226">${[92,128,164,200,236].map(x=>`<path d="M${x} 134v-16q0-11 8-14q8 3 8 14v16z"/>`).join('')}</g>
+  <path d="M106 58 L234 58 L250 80 L90 80Z" fill="#a8522c"/><rect x="112" y="52" width="116" height="8" rx="2" fill="#7f3c1f"/>
+  <path d="M90 80 L250 80 L288 102 L52 102Z" fill="#b9633a"/><path d="M90 80H250" stroke="#7f3c1f" stroke-width="2"/><rect x="56" y="101" width="228" height="4" fill="#5a3a26"/>
+  <g stroke="#964a28" stroke-width="1"><path d="M120 60L108 80M150 60L146 80M190 60L194 80M220 60L232 80M100 82L76 101M140 82L132 101M200 82L208 101M240 82L264 101M170 60V101"/></g>
+  <rect x="-10" y="136" width="410" height="22" rx="11" fill="#a9a79b"/><g fill="none" stroke="#86847a" stroke-width="1"><path d="M30 137l8 10 16-9 12 12M100 138l10 12 18-10 10 9M190 137l-8 11 18 6M240 138l12 10 16-9 12 10M320 138l10 12 16-8"/></g>`),
+ kangi:SV(`<rect width="390" height="200" fill="#eaede4"/><path d="M0 96 Q80 60 170 84 T390 70V152H0Z" fill="#b3c0ae"/>
+  <rect y="140" width="390" height="14" fill="#e3e7de"/><rect y="150" width="390" height="50" fill="#b9b299"/>
+  <rect x="24" y="112" width="196" height="38" fill="#e7ddc3"/><rect x="24" y="112" width="74" height="38" fill="#cdbf9f"/><rect x="40" y="120" width="30" height="30" fill="#3a2f24"/>
+  <g fill="#f6f2e6" stroke="#5c4a36" stroke-width="1.5"><rect x="112" y="120" width="26" height="30"/><rect x="138" y="120" width="26" height="30"/><rect x="176" y="120" width="30" height="30"/></g><path d="M98 112V150M170 112V150" stroke="#5c4a36" stroke-width="3"/>
+  <path d="M8 110 L62 56 L182 56 L236 110Z" fill="#8b7a48"/><g stroke="#786839" stroke-width="1.5"><path d="M70 62L34 104M100 60L82 106M122 58V108M144 60L162 106M174 62L210 104"/></g>
+  <rect x="62" y="48" width="120" height="11" rx="4" fill="#5d5030"/><rect x="4" y="106" width="236" height="9" rx="4" fill="#6f6037"/>
+  <rect x="262" y="92" width="52" height="58" fill="#e7ddc3"/><rect x="256" y="118" width="64" height="5" fill="#4d4a44"/><path d="M252 94 L270 74 L306 74 L324 94Z" fill="#55524a"/>
+  <g fill="#f6f2e6" stroke="#5c4a36" stroke-width="1.5"><rect x="272" y="100" width="32" height="14"/><rect x="276" y="128" width="24" height="22"/></g>
+  <g fill="#fff" opacity=".9"><circle cx="20" cy="146" r="1.5"/><circle cx="64" cy="143" r="1.2"/><circle cx="118" cy="147" r="1.5"/><circle cx="232" cy="144" r="1.3"/><circle cx="246" cy="148" r="1.5"/><circle cx="330" cy="145" r="1.3"/><circle cx="360" cy="148" r="1.5"/></g>`),
+ kaigun:SV(`<rect width="390" height="200" fill="#d6e4e8"/><path d="M0 104 Q50 72 110 92 T230 80 T390 96V120H0Z" fill="#8fa6a0"/><rect y="112" width="390" height="88" fill="#2e5f7b"/>
+  <g class="fune"><g fill="#b9b6b0" opacity=".7"><circle cx="150" cy="70" r="9"/><circle cx="136" cy="56" r="11"/><circle cx="116" cy="46" r="12"/></g>
+  <g stroke="#1c1a17" stroke-width="3"><path d="M84 34V130M196 28V130M246 40V130"/></g><path d="M278 126L312 110" stroke="#1c1a17" stroke-width="2.5"/>
+  <g fill="#efe8d6"><path d="M87 58L124 50L130 112L87 116Z"/><path d="M199 52L234 44L238 110L199 114Z"/><path d="M249 62L270 56L274 112L249 116Z"/><path d="M84 40L60 112L81 114Z"/></g>
+  <g stroke="#1c1a17" stroke-width="1"><path d="M84 34L40 128M246 40L290 122M196 28L246 40M84 34L196 28"/></g>
+  <rect x="150" y="78" width="11" height="50" fill="#1c1a17"/>
+  <path d="M36 126 H284 L270 150 H54Z" fill="#1c1a17"/><path d="M42 132H280" stroke="#e8e2d2" stroke-width="2"/>
+  <path d="M132 134 A24 24 0 0 1 180 134Z" fill="#2c2823" stroke="#cfc8b6" stroke-width="1.5"/><g stroke="#cfc8b6" stroke-width="1"><path d="M156 134V112M156 134L140 118M156 134L172 118"/></g></g>
+  <path d="M0 152q10-4 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0" fill="none" stroke="#5d8aa3" stroke-width="1.5"/>`)
+};
 function frame(sc,body,total,canNext){
   const st=STATIONS.find(s=>s.id===S.school);
   clearTimeout(T);const nm=st.nm.replace(/\{[^}]+\}/g,'');
-  app.innerHTML=`<div class="scene sc-${S.school}">${sc}<div class="name" ${nm.length>5?'style="font-size:24px"':''}>${nm}</div></div>
+  const fs=Math.min(28,Math.floor(150/nm.length)),pic=SCN[S.school];if(pic)sc=pic+sc.replace(/<div class="(roof|ume|ship)"><\/div>/g,'');
+  app.innerHTML=`<div class="scene sc-${S.school}${pic?' pic':''}">${sc}<div class="name" style="font-size:${fs}px;height:${Math.ceil(nm.length*fs*1.08+19)}px">${nm}</div></div>
   <section class="panel">${S.step===0?nyumon()+meet()+event():''}${body}</section>
   <div class="nav"><button class="btn sub" id="quit">← ${R('道中図{どうちゅうず}')}</button><span class="dots">${Array.from({length:total},(_,i)=>`<i class="${i<=S.step?'on':''}"></i>`).join('')}</span><button class="btn" id="next" ${canNext?'':'disabled'}>${R('つぎへ')} →</button></div>`;
   app.querySelector('#quit').onclick=()=>{try{speechSynthesis.cancel()}catch(e){};S.view='map';render()};
