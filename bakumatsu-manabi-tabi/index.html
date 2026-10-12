@@ -101,7 +101,7 @@ body[data-s="kodo"]{--bg:#eadfd6} body[data-s="shohei"]{--bg:#c6ccc4} body[data-
 body[data-s="shizu"]{--bg:#d8d6bd} body[data-s="kangi"]{--bg:#cfd3c2} body[data-s="kaigun"]{--bg:#c2d5db} body[data-s="goju"]{--bg:#dcd2c0}
 .scene .name{white-space:nowrap;right:14px;top:14px;padding:9px 5px 7px;background:#f3ecd9;color:#1b1712;border:1.5px solid #1b1712;box-shadow:3px 3px 0 #1b171255;letter-spacing:.08em;line-height:1.25}
 .scene .where{left:12px;bottom:10px;padding:1px 9px;background:#f3ecd9;color:#1b1712;border:1.5px solid #1b1712}
-.scn{position:absolute;inset:0;width:100%;height:100%;display:block}.scene.pic::before,.scene.pic::after{display:none}
+.scn{position:absolute;inset:0;width:100%;height:100%;display:block}.scene.pic::before,.scene.pic::after{display:none}.scene.pic{height:auto;aspect-ratio:390/200}
 .scn .fune{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @media (prefers-reduced-motion:reduce){.scn .fune,.sc-nisshin .win::before,.sc-teki::before{animation:none}}
 .roof{position:absolute;left:6%;bottom:28%;width:54%;max-width:300px;height:100px;clip-path:polygon(8% 0,92% 0,100% 40%,95% 40%,95% 100%,5% 100%,5% 40%,0 40%)}
@@ -312,7 +312,7 @@ const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
 /* バージョン情報: 更新のたびに先頭へ足す */
-const HIST=[['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
+const HIST=[['1.6.1','2026-10-12','広い画面で学び舎の絵の上が切れるのを直した。'],['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
  ['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
  ['1.2.0','2026-10-10','レベル、門の解放、時代の仕事、品あつめを追加。シェア用の画像を設定。'],
  ['1.1.0','2026-10-10','史実を原典と照らし合わせ、裏づけのない説明を削除。出典ページ、オープニング、旅の目あて、旅のむすびを追加。音楽を自作曲に。'],
