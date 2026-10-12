@@ -102,8 +102,10 @@ body[data-s="shizu"]{--bg:#d8d6bd} body[data-s="kangi"]{--bg:#cfd3c2} body[data-
 .scene .name{white-space:nowrap;right:14px;top:14px;padding:9px 5px 7px;background:#f3ecd9;color:#1b1712;border:1.5px solid #1b1712;box-shadow:3px 3px 0 #1b171255;letter-spacing:.08em;line-height:1.25}
 .scene .where{left:12px;bottom:10px;padding:1px 9px;background:#f3ecd9;color:#1b1712;border:1.5px solid #1b1712}
 .scn{position:absolute;inset:0;width:100%;height:100%;display:block}.scene.pic::before,.scene.pic::after{display:none}.scene.pic{height:auto;aspect-ratio:390/200}
+.scn .yuki{animation:snow2 6s linear infinite}@keyframes snow2{to{transform:translateY(60px)}}.scn .akari{animation:flick 2.6s ease-in-out infinite}
+.sc-goju.pic .where{}
 .scn .fune{animation:bob 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-@media (prefers-reduced-motion:reduce){.scn .fune,.sc-nisshin .win::before,.sc-teki::before{animation:none}}
+@media (prefers-reduced-motion:reduce){.scn .fune,.scn .yuki,.scn .akari,.sc-nisshin .win::before,.sc-teki::before{animation:none}}
 .roof{position:absolute;left:6%;bottom:28%;width:54%;max-width:300px;height:100px;clip-path:polygon(8% 0,92% 0,100% 40%,95% 40%,95% 100%,5% 100%,5% 40%,0 40%)}
 .sc-kodo{background:linear-gradient(#f6e9e6 0 72%,#cdc3a8 72%)}
 .sc-kodo .roof{background:linear-gradient(#2c2c2c 0 40%,#f5f2e9 40%)}
@@ -312,7 +314,7 @@ const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
 /* バージョン情報: 更新のたびに先頭へ足す */
-const HIST=[['1.6.1','2026-10-12','広い画面で学び舎の絵の上が切れるのを直した。'],['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
+const HIST=[['1.7.0','2026-10-12','のこり四つの学び舎(日新館、適塾、松下村塾、郷中教育)の絵も、資料にあわせて描きなおした。'],['1.6.1','2026-10-12','広い画面で学び舎の絵の上が切れるのを直した。'],['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
  ['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
  ['1.2.0','2026-10-10','レベル、門の解放、時代の仕事、品あつめを追加。シェア用の画像を設定。'],
  ['1.1.0','2026-10-10','史実を原典と照らし合わせ、裏づけのない説明を削除。出典ページ、オープニング、旅の目あて、旅のむすびを追加。音楽を自作曲に。'],
@@ -701,7 +703,7 @@ const SRC=[
  ['郷中教育','六歳以上の男子が対象、稚児と二才/先輩が後輩を指導/「負けるな」「弱いものいじめをするな」、うそをつつしむ/いろは歌「い」「ろ」「は」の本文(加世田歴史館)、四十七首、郷中教育の基本/西郷は一八四七年に二才頭/大久保は同じ加治屋町の郷中','「詮議」という問答の名前としくみ(問いかけの場面は「アプリの工夫」にしました)/相撲のけいこ',[['郷中',W+'郷中'],['日新公いろは歌(加世田歴史館)','https://hantoubunka.site.kagoshima.jp/kasedainfo/irohauta2.html'],['西郷隆盛',W+'西郷隆盛'],['大久保利通',W+'大久保利通']]],
  ['古典の文','原文で確認:『論語』五十句の本文と篇(学而・為政・里仁・公冶長・雍也・述而・子罕・先進・顔淵・子路・憲問・衛霊公・季氏・陽貨・子張)/『孟子』七句(離婁上下・公孫丑上下・告子下・尽心上)/『大学』二句(礼記)','(ふりがなと読み下しは、一般的な読み方によっています。オランダ語の文と算術の問題は、はじめから「アプリの工夫」です)',[['論語(Wikisource 原文)','https://zh.wikisource.org/wiki/論語'],['孟子(Wikisource 原文)','https://zh.wikisource.org/wiki/孟子']]],
  ['学び舎の読本','日新館:什の掟(公式サイトの表記)/弘道館:『弘道館記』の本文(拓本)と読み方(茨城県教育会『愛誦集衍義』一九三九年)/昌平坂:佐藤一斎『言志四録』は後半生の四十余年にわたる語録。十四のことばは西郷隆盛が書きぬいた『南洲手抄言志録』の本文と読み下し、「少くして学べば」は『言志四録』の項による/福沢塾:『学問のすすめ』の本文(一八七二〜七六年)/閑谷学校:毎月ついたちに「朱文公学規」の講釈があり農民も聴講できた(公式サイト)。朱子の学規の原文は「白鹿洞書院学規(掲示)」として確認/松下村塾:「士規七則」の原文と読み下し、一八五五年に玉木彦助の元服の祝いに書いたこと/咸宜園:「桂林荘雑詠」四首の原文と読み下し、淡窓のはじめの塾が桂林荘であること/郷中教育:いろは歌三十六首の本文(加世田歴史館のページ。『加世田市史』による)/適塾・海軍伝習所:オランダ語から日本語に入ったことば四十語とつづり','『学問のすすめ』は明治の本で、幕末の塾で読まれたものではありません(画面にもそう書いています)/閑谷学校で読まれた「朱文公学規」の本文そのものは未確認。朱子の学規として伝わる文を使いました。読み下しは一般的な読み方です/オランダ語の四十語を、適塾や伝習所で実際に教えたかどうかは未確認。「アプリの工夫」として表示しています/いろは歌は四十七首のうち三十六首。残りは小学生むけに説明しきれないため入れていません/すべての「やさしい意味」はこのアプリで書いたもので、専門家の校閲は受けていません',[['弘道館記(Wikisource)','https://ja.wikisource.org/wiki/弘道館記'],['弘道館記 愛誦集衍義(Wikisource)','https://ja.wikisource.org/wiki/弘道館記_(愛誦集衍義)'],['南洲手抄言志録(Wikisource)','https://ja.wikisource.org/wiki/南洲手抄言志録'],['言志四録',W+'言志四録'],['学問のすゝめ(Wikisource)','https://ja.wikisource.org/wiki/学問のすゝめ'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['白鹿洞書院學規(Wikisource 原文)','https://zh.wikisource.org/wiki/白鹿洞書院學規'],['士規七則',W+'士規七則'],['広瀬淡窓',W+'広瀬淡窓'],['日新公いろは歌(加世田歴史館)','https://hantoubunka.site.kagoshima.jp/kasedainfo/irohauta2.html'],['オランダ語由来の日本語(英語版Wikipedia)','https://en.wikipedia.org/wiki/List_of_Japanese_words_of_Dutch_origin']]],
- ['学び舎の絵','弘道館:正門は本瓦葺きの四脚門。梅は設立当初から植えられた/昌平坂学問所:一七九九年の改築で、黒塗りの大きな建物に改められた/福沢塾:中津藩中屋敷の二階建ての長屋(一階は六畳一室と台所、二階は十五畳ほど)/閑谷学校:講堂は入母屋造り、しころ葺きの大屋根、火灯窓。石塀がめぐる/咸宜園:秋風庵は大きな寄棟造で茅葺き。遠思楼は二階建ての寄棟造(一八四九年)/長崎海軍伝習所:観光丸は木造の外輪船で、三本マストのスクーナー型','こまかい色、寸法、窓や柱の数、塀のつくりは想像で描いています/昌平坂と遠思楼の屋根の材料、観光丸の煙突の位置、福沢塾から海が見えたかどうかは未確認/日新館、適塾、松下村塾、郷中教育の絵は前のままで、建物の資料との照合はしていません',[['弘道館',W+'弘道館'],['湯島聖堂',W+'湯島聖堂'],['慶應義塾',W+'慶應義塾'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['咸宜園跡(教育遺産の資料・水戸市)','https://www.city.mito.lg.jp/uploaded/attachment/1199.pdf'],['観光丸',W+'観光丸']]],
+ ['学び舎の絵','弘道館:正門は本瓦葺きの四脚門。梅は設立当初から植えられた/昌平坂学問所:一七九九年の改築で、黒塗りの大きな建物に改められた/福沢塾:中津藩中屋敷の二階建ての長屋(一階は六畳一室と台所、二階は十五畳ほど)/閑谷学校:講堂は入母屋造り、しころ葺きの大屋根、火灯窓。石塀がめぐる/咸宜園:秋風庵は大きな寄棟造で茅葺き。遠思楼は二階建ての寄棟造(一八四九年)/長崎海軍伝習所:観光丸は木造の外輪船で、三本マストのスクーナー型/日新館:会津若松城の西隣にあり、水練場と天文台をそなえた/適塾:北浜の町家(もとは商家)。辞書のある部屋はあかりが消えることがなかった/松下村塾:木造かわらぶきの平屋。八畳に十畳半を増築/郷中教育:加治屋町は甲突川の下流にあり、下級武士が住んだ','こまかい色、寸法、窓や柱の数、塀のつくりは想像で描いています/昌平坂と遠思楼の屋根の材料、観光丸の煙突の位置、福沢塾から海が見えたかどうかは未確認/日新館の校舎と門のかたち、城の見え方、適塾の格子や二階の窓、松下村塾の松の木と間取りの見え方、加治屋町の家と生垣は想像です(加治屋町の当時の建物は残っていません)',[['弘道館',W+'弘道館'],['湯島聖堂',W+'湯島聖堂'],['慶應義塾',W+'慶應義塾'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['咸宜園跡(教育遺産の資料・水戸市)','https://www.city.mito.lg.jp/uploaded/attachment/1199.pdf'],['観光丸',W+'観光丸'],['日新館',W+'日新館'],['適塾(OSAKA-INFO)','https://osaka-info.jp/spot/tekijuku/'],['松下村塾',W+'松下村塾'],['加治屋町',W+'加治屋町_(鹿児島市)']]],
  ['旅と時代','一里塚は日本橋を起点に一里ごと/関所の通過に通行手形','旅人は一日に十里歩いた、という説明',[['一里塚',W+'一里塚'],['通行手形',W+'通行手形']]]];
 function viewSrc(){document.body.dataset.s='';
   app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button><section class="panel">${H('出典{しゅってん}と確認{かくにん}のようす')}
@@ -851,6 +853,42 @@ function orderGame(box,parts,done){
 /* ---------- 学び舎の絵(資料で確かめた建物のかたち) ---------- */
 const SV=b=>`<svg class="scn" viewBox="0 0 390 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${b}</svg>`;
 const SCN={
+ nisshin:SV(`<rect width="390" height="200" fill="#dfe3e2"/>
+  <g fill="#b9c0c2"><path d="M236 96h70l-8-14h-54z"/><path d="M228 84h86l-10-8h-66z"/><path d="M246 76h50l-7-12h-36z"/><path d="M240 64h62l-8-7h-46z"/><path d="M254 57h34l-17-13z"/><rect x="226" y="96" width="90" height="24"/></g>
+  <path d="M0 112 Q120 96 240 110 T390 104V152H0Z" fill="#eef0ee"/><rect y="150" width="390" height="50" fill="#cfd3d1"/>
+  <rect x="18" y="110" width="232" height="34" fill="#efe9dc"/><g stroke="#5a4634" stroke-width="2"><path d="M40 112V144M80 112V144M120 112V144M160 112V144M200 112V144M232 112V144"/></g><rect x="18" y="136" width="232" height="8" fill="#6f5a45"/>
+  <path d="M6 112 L30 86 L238 86 L262 112Z" fill="#4a4c50"/><path d="M10 108 L32 88 L236 88 L258 108Z" fill="#f7f8f7"/><rect x="34" y="82" width="200" height="6" rx="2" fill="#f7f8f7"/>
+  <rect x="118" y="112" width="34" height="32" fill="#3a2c20"/>
+  <path d="M270 150 l10-22 h36 l10 22z" fill="#9a968c"/><rect x="284" y="122" width="28" height="6" fill="#f7f8f7"/>
+  <ellipse cx="262" cy="172" rx="92" ry="12" fill="#b4c4cc"/><ellipse cx="262" cy="172" rx="92" ry="12" fill="none" stroke="#f7f8f7" stroke-width="3"/>
+  <g class="yuki" fill="#fff"><circle cx="20" cy="10" r="1.8"/><circle cx="70" cy="40" r="1.5"/><circle cx="110" cy="18" r="2"/><circle cx="160" cy="56" r="1.5"/><circle cx="200" cy="24" r="1.8"/><circle cx="250" cy="8" r="1.5"/><circle cx="300" cy="44" r="2"/><circle cx="340" cy="20" r="1.5"/><circle cx="46" cy="72" r="1.6"/><circle cx="140" cy="84" r="1.4"/><circle cx="226" cy="66" r="1.8"/><circle cx="286" cy="78" r="1.5"/><circle cx="366" cy="60" r="1.7"/><circle cx="90" cy="-30" r="1.8"/><circle cx="180" cy="-14" r="1.5"/><circle cx="270" cy="-36" r="2"/><circle cx="350" cy="-20" r="1.5"/><circle cx="30" cy="-44" r="1.6"/></g>`),
+ teki:SV(`<rect width="390" height="200" fill="#0d1018"/><circle cx="300" cy="34" r="13" fill="#e9dfc6" opacity=".85"/>
+  <g fill="#161a24"><rect x="0" y="92" width="40" height="60"/><rect x="262" y="84" width="128" height="68"/><path d="M256 86l10-14h124v14z"/></g>
+  <rect y="150" width="390" height="50" fill="#22201c"/>
+  <rect x="40" y="62" width="222" height="90" fill="#2a2119"/>
+  <path d="M28 64 L48 42 L254 42 L274 64Z" fill="#1b1e26"/><rect x="52" y="38" width="198" height="6" fill="#12141a"/><g stroke="#2b2f3a" stroke-width="1"><path d="M70 44L58 63M100 44L94 63M130 44V63M160 44V63M190 44L196 63M220 44L232 63"/></g>
+  <rect x="32" y="102" width="238" height="8" fill="#1b1e26"/>
+  <g class="akari"><rect x="150" y="72" width="64" height="24" fill="#f2b85e"/><rect x="140" y="62" width="84" height="44" fill="#f2b85e" opacity=".18"/></g><g stroke="#2a2119" stroke-width="3"><path d="M160 72V96M170 72V96M180 72V96M190 72V96M200 72V96M150 84H214"/></g>
+  <g fill="#17120d"><rect x="58" y="72" width="60" height="24"/></g><g stroke="#3a2e22" stroke-width="2"><path d="M66 72V96M74 72V96M82 72V96M90 72V96M98 72V96M106 72V96"/></g>
+  <rect x="56" y="114" width="92" height="38" fill="#17120d"/><g stroke="#3a2e22" stroke-width="2"><path d="M62 114V152M70 114V152M78 114V152M86 114V152M94 114V152M102 114V152M110 114V152M118 114V152M126 114V152M134 114V152M142 114V152"/></g>
+  <rect x="172" y="114" width="46" height="38" fill="#0d0a07"/><rect x="176" y="108" width="38" height="20" fill="#39507a"/><rect x="226" y="114" width="26" height="38" fill="#17120d"/>`),
+ shoka:SV(`<rect width="390" height="200" fill="#efe6c4"/><path d="M0 96 Q90 60 200 84 T390 72V152H0Z" fill="#b6bf8a"/>
+  <rect y="150" width="390" height="50" fill="#b9ac6a"/>
+  <rect x="52" y="96" width="206" height="54" fill="#e9dfc2"/><rect x="52" y="96" width="206" height="54" fill="none" stroke="#6b4a2a" stroke-width="2"/>
+  <rect x="64" y="104" width="112" height="46" fill="#cdbb86"/><rect x="64" y="136" width="112" height="14" fill="#a9a05a"/><path d="M92 136V150M120 136V150M148 136V150" stroke="#807a40" stroke-width="1.5"/>
+  <g fill="#fbf6e2" stroke="#6b4a2a" stroke-width="1.5"><rect x="64" y="104" width="24" height="32"/><rect x="152" y="104" width="24" height="32"/></g><path d="M64 120H88M76 104V136M152 120H176M164 104V136" stroke="#6b4a2a" stroke-width="1"/>
+  <g fill="#fbf6e2" stroke="#6b4a2a" stroke-width="1.5"><rect x="190" y="108" width="26" height="42"/><rect x="216" y="108" width="26" height="42"/></g><path d="M190 122H242M190 136H242M203 108V150M229 108V150" stroke="#6b4a2a" stroke-width="1"/>
+  <rect x="48" y="146" width="214" height="6" fill="#6b4a2a"/>
+  <path d="M34 98 L64 66 L246 66 L276 98Z" fill="#5a5b5e"/><rect x="68" y="61" width="174" height="7" rx="2" fill="#3f4043"/><g stroke="#6f7074" stroke-width="1"><path d="M90 68L72 97M122 68L112 97M155 68V97M188 68L198 97M220 68L238 97"/></g><rect x="30" y="96" width="250" height="4" fill="#3f4043"/>
+  <path d="M300 152 C296 120 306 96 300 70" stroke="#4a3622" stroke-width="7" fill="none"/><g fill="#4d6a44"><ellipse cx="290" cy="64" rx="34" ry="12"/><ellipse cx="316" cy="84" rx="26" ry="9"/><ellipse cx="282" cy="92" rx="22" ry="8"/></g>
+  <path d="M0 0L150 0L60 200L0 200Z" fill="#fff8cf" opacity=".28"/>`),
+ goju:SV(`<rect width="390" height="200" fill="#efe3d2"/>
+  <g class="kemu" fill="#a39d98"><ellipse cx="190" cy="26" rx="26" ry="12" opacity=".6"/><ellipse cx="206" cy="14" rx="20" ry="9" opacity=".45"/></g>
+  <path d="M40 104 L112 58 L150 46 L170 54 L196 38 L222 46 L300 104Z" fill="#4b5563"/><path d="M150 46L170 54L196 38L204 58L176 70L156 62Z" fill="#5f6876"/>
+  <rect y="100" width="390" height="16" fill="#3d6a82"/><rect y="114" width="390" height="40" fill="#8f9a6c"/>
+  <g fill="#3f5a3a"><rect x="0" y="122" width="150" height="12" rx="5"/><rect x="176" y="122" width="150" height="12" rx="5"/></g>
+  <g><rect x="24" y="108" width="92" height="18" fill="#e7ddc3"/><path d="M14 110L30 94H110L126 110Z" fill="#7b6a45"/><rect x="200" y="108" width="100" height="18" fill="#e7ddc3"/><path d="M190 110L206 94H294L310 110Z" fill="#7b6a45"/></g>
+  <rect y="134" width="390" height="18" fill="#c9bd9a"/><rect y="150" width="390" height="50" fill="#5f8fa6"/><g fill="none" stroke="#86adc0" stroke-width="1.5"><path d="M10 168q10-4 20 0t20 0M120 180q10-4 20 0t20 0M230 166q10-4 20 0t20 0M300 184q10-4 20 0t20 0"/></g>`),
  kodo:SV(`<rect width="390" height="200" fill="#f4e6e2"/><circle cx="60" cy="40" r="20" fill="#fff" opacity=".55"/>
   <rect y="150" width="390" height="50" fill="#cfc5a9"/>
   <rect y="112" width="310" height="38" fill="#f7f3ea"/><rect y="103" width="310" height="10" fill="#37383b"/><rect y="142" width="310" height="8" fill="#8d8674"/>
@@ -906,7 +944,7 @@ const SCN={
 function frame(sc,body,total,canNext){
   const st=STATIONS.find(s=>s.id===S.school);
   clearTimeout(T);const nm=st.nm.replace(/\{[^}]+\}/g,'');
-  const fs=Math.min(28,Math.floor(150/nm.length)),pic=SCN[S.school];if(pic)sc=pic+sc.replace(/<div class="(roof|ume|ship)"><\/div>/g,'');
+  const fs=Math.min(28,Math.floor(150/nm.length)),pic=SCN[S.school];if(pic)sc=pic+sc.replace(/<div class="(roof|ume|ship|win|kou|lamp|shoji|yama|kemuri)"><\/div>/g,'');
   app.innerHTML=`<div class="scene sc-${S.school}${pic?' pic':''}">${sc}<div class="name" style="font-size:${fs}px;height:${Math.ceil(nm.length*fs*1.08+19)}px">${nm}</div></div>
   <section class="panel">${S.step===0?nyumon()+meet()+event():''}${body}</section>
   <div class="nav"><button class="btn sub" id="quit">← ${R('道中図{どうちゅうず}')}</button><span class="dots">${Array.from({length:total},(_,i)=>`<i class="${i<=S.step?'on':''}"></i>`).join('')}</span><button class="btn" id="next" ${canNext?'':'disabled'}>${R('つぎへ')} →</button></div>`;
