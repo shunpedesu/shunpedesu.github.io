@@ -257,6 +257,9 @@ h1,h2,.fuda .nm,.fuda .no,.big,.kyu,.seal,.shi,.okite .last{letter-spacing:.02em
 .gbs{display:flex;flex-wrap:wrap;gap:6px}.gbs button{min-width:46px;min-height:46px;padding:4px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--f-brush);font-size:19px;line-height:1.1;background:var(--bg);color:var(--fg);border:1.5px solid var(--fg);border-radius:3px}.gbs button.sel{background:var(--fg);color:var(--bg)}.gbs small{font-family:var(--f-body);font-size:10px;font-weight:600}
 .gbh{font-size:13px;font-weight:600;line-height:1.7}.gbt{font-family:var(--f-book);font-weight:400;font-size:19px;line-height:2.1}.gbt.eng{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1.3}.gbt span{font-family:var(--f-body);font-weight:600;font-size:13px}.gbo,.shoko i,.gbt i{font-style:normal;font-size:13px;letter-spacing:.18em;opacity:.7}
 .choice button.ng{animation:shake .3s}
+.gnc{font-family:var(--f-brush);font-size:20px;letter-spacing:.2em}.gnc span{display:inline-block;width:1.3em;text-align:center;opacity:.35}.gnc span.on{opacity:1;color:var(--shu)}
+.gn h3{font-family:var(--f-brush);font-weight:400;font-size:22px}.gn.ok{opacity:.92}.gn .seal.sm{display:inline-grid;width:30px;height:30px;font-size:16px;vertical-align:middle}
+.gnmi{font-weight:700;border-left:4px solid var(--shu);padding-left:10px}.gnt{font-size:14px;line-height:1.8;background:var(--bg);padding:8px 10px;border:1.5px dashed var(--line)}.gnx{font-size:14px;line-height:1.8}
 .dok{font-size:14px;line-height:1.8;opacity:.85}
 .shoko p{font-family:var(--f-book);font-weight:400;font-size:16px;line-height:2;border-bottom:1px dashed var(--line);padding:6px 0}
 .shoko span{font-family:var(--f-body);font-weight:600;font-size:13px}
@@ -314,7 +317,7 @@ const F=t=>`<span class="chip f">${R('史実{しじつ}')}</span>${R(t)}`;
 const A=t=>`<span class="chip a">${R('アプリの工夫{くふう}')}</span>${R(t)}`;
 const app=document.getElementById('app');
 /* バージョン情報: 更新のたびに先頭へ足す */
-const HIST=[['1.7.0','2026-10-12','のこり四つの学び舎(日新館、適塾、松下村塾、郷中教育)の絵も、資料にあわせて描きなおした。'],['1.6.1','2026-10-12','広い画面で学び舎の絵の上が切れるのを直した。'],['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
+const HIST=[['1.8.0','2026-10-15','「現地の巻」を追加。日田の咸宜園跡で見る六つの場所を、問いと親子の話題つきで案内する。'],['1.7.0','2026-10-12','のこり四つの学び舎(日新館、適塾、松下村塾、郷中教育)の絵も、資料にあわせて描きなおした。'],['1.6.1','2026-10-12','広い画面で学び舎の絵の上が切れるのを直した。'],['1.6.0','2026-10-12','六つの学び舎の絵を、資料で確かめた建物のかたちに描きなおした。学び舎の名前を看板に。'],['1.5.1','2026-10-12','閑谷学校の床みがきを、公式サイトの記述にあわせて「史実」に。'],['1.5.0','2026-10-12','学び舎ごとの読本を追加(十の学び舎で全158)。修めた学び舎をえらんで、一日にひとつ読み進める。'],['1.4.0','2026-10-12','毎日ひとつ新しい文に進む「読本」を追加(全64の文)。おさらいと算術一問、読んだ文を見かえす書庫も。学び舎で読む文も増えた。'],
  ['1.3.0','2026-10-12','むずかしさを三段階でえらべるように。説明文を「くわしく知る」にたたんで文章を減らした。バージョン情報を追加。'],
  ['1.2.0','2026-10-10','レベル、門の解放、時代の仕事、品あつめを追加。シェア用の画像を設定。'],
  ['1.1.0','2026-10-10','史実を原典と照らし合わせ、裏づけのない説明を削除。出典ページ、オープニング、旅の目あて、旅のむすびを追加。音楽を自作曲に。'],
@@ -322,8 +325,8 @@ const HIST=[['1.7.0','2026-10-12','のこり四つの学び舎(日新館、適�
 const VER=HIST[0][0],VERDATE=HIST[0][1];
 let S={view:'title',school:null,step:0,done:{},shi:'',notes:{},marks:[]};
 S.gb={};S.gbDone='';S.me=null;S.at='edo';S.met={};S.vis={};S.days={};S.ev={};S.items={};S.jobs={};S.inbox=[];
-try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.diff=d.df||'n';S.read=d.rd||0;S.revDone=d.rv||'';S.calcDone=d.cq||'';S.gb=d.gb||{};S.gbDone=d.gd||'';S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
-const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox,df:S.diff,rd:S.read,rv:S.revDone,cq:S.calcDone,gb:S.gb,gd:S.gbDone}))}catch(e){}};
+try{const d=JSON.parse(localStorage.getItem('manabitabi')||'{}');S.done=d.done||{};S.shi=d.shi||'';S.me=d.me||null;S.at=d.at||'edo';S.met=d.met||{};S.vis=d.vis||{};S.days=d.days||{};S.ev=d.ev||{};S.dailyDone=d.dd||'';S.opSeen=d.op||0;S.endSeen=d.ed||0;S.diff=d.df||'n';S.read=d.rd||0;S.revDone=d.rv||'';S.calcDone=d.cq||'';S.gn=d.gn||{};S.gb=d.gb||{};S.gbDone=d.gd||'';S.items=d.it||{};S.jobs=d.jb||{};S.inbox=d.ib||[];Object.keys(S.done).forEach(k=>{if(!S.vis[k])S.vis[k]=1})}catch(e){}
+const save=()=>{try{localStorage.setItem('manabitabi',JSON.stringify({done:S.done,shi:S.shi,me:S.me,at:S.at,met:S.met,vis:S.vis,days:S.days,ev:S.ev,dd:S.dailyDone,op:S.opSeen,ed:S.endSeen,it:S.items,jb:S.jobs,ib:S.inbox,df:S.diff,rd:S.read,rv:S.revDone,cq:S.calcDone,gb:S.gb,gd:S.gbDone,gn:S.gn}))}catch(e){}};
 const UM={b:'武士{ぶし}の子{こ}',c:'商人{しょうにん}の子{こ}',n:'農家{のうか}の子{こ}',i:'医者{いしゃ}の子{こ}'};
 const UMD={b:'藩{はん}の学校{がっこう}に通{かよ}える家{いえ}。父{ちち}は刀{かたな}を二本{にほん}さしている。',c:'町{まち}の寺子屋{てらこや}で、読{よ}み書{か}きとそろばんを習{なら}った。',n:'村{むら}の寺子屋{てらこや}で学{まな}び、家{いえ}の田畑{たはた}も手{て}つだっている。',i:'家{いえ}には薬{くすり}と本{ほん}がある。蘭学{らんがく}にあこがれている。'};
 const AGE={10:'十歳{じっさい}',11:'十一歳{じゅういっさい}',12:'十二歳{じゅうにさい}',13:'十三歳{じゅうさんさい}',14:'十四歳{じゅうよんさい}',15:'十五歳{じゅうごさい}'};
@@ -462,6 +465,7 @@ const ITEMS={
  s_kangi:{g:'評',n:'月旦評{げったんひょう}',f:'毎月{まいつき}の成績{せいせき}をしめす表{ひょう}。無級{むきゅう}から九級{きゅうきゅう}までありました。'},
  s_kaigun:{g:'航',n:'航海術{こうかいじゅつ}の帳面{ちょうめん}',f:'伝習所{でんしゅうじょ}では、航海術{こうかいじゅつ}・測量{そくりょう}・算術{さんじゅつ}などを学{まな}びました。'},
  s_goju:{g:'歌',n:'いろは歌{うた}の書{か}きつけ',f:'島津忠良{しまづただよし}の四十七首{よんじゅうななしゅ}。郷中{ごじゅう}の学{まな}びの手本{てほん}でした。'},
+ g_kangi:{g:'咸',n:'咸宜園跡{かんぎえんあと} 見学{けんがく}の印{しるし}',f:'日田{ひた}の咸宜園跡{かんぎえんあと}を、じっさいに歩{ある}いて見{み}た印{しるし}。'},
  t_tegata:{g:'手',n:'通行手形{つうこうてがた}',f:'関所{せきしょ}を通{とお}るための書{か}きつけ。'},
  t_kasa:{g:'笠',n:'菅笠{すげがさ}',f:'日{ひ}ざしや雨{あめ}をよける笠{かさ}。浮世絵{うきよえ}の旅人{たびびと}もかぶっています。'},
  t_yatate:{g:'筆',n:'矢立{やたて}',f:'筆{ふで}と墨{すみ}つぼをひとつにした、持{も}ちはこべる筆記用具{ひっきようぐ}。'},
@@ -662,6 +666,7 @@ function viewMap(){
   ${S.inbox.length?`<section class="panel inbox">${H('知{し}らせ')}${S.inbox.map(x=>`<p>${x}</p>`).join('')}<button class="btn" id="ibok">${R('わかった')}</button></section>`:''}
   <section class="panel goal">${H('旅{たび}の目{め}あて')}${goalList(true)}<p style="font-size:14px">${R(n>=10?'十{とお}の印{しるし}がそろいました。レベルを上{あ}げて、時代{じだい}の仕事{しごと}を四{よっ}つやりとげると、旅{たび}のむすびをむかえます。':'十{とお}の印{しるし}がそろうと「遊学免状{ゆうがくめんじょう}」がもらえます。はじめは一校{いっこう}だけ。学{まな}んでレベルが上{あ}がると、紹介状{しょうかいじょう}をもらって次{つぎ}の門{もん}をたたけます。')}</p></section>
   <section class="panel">${H('時代{じだい}の仕事{しごと}')}<p style="font-size:14px">${R('学{まな}んだことを使{つか}って、当時{とうじ}ほんとうにあった仕事{しごと}を手{て}つだいます。')}</p><div class="jobs">${JOBS.map(j=>{const ok=lv()>=j.lv&&S.done[j.need],dn=S.jobs[j.id];return `<button class="fuda" ${ok&&!dn?`data-job="${j.id}"`:'disabled'}><span class="no">${j.g}</span><span><span class="nm" style="font-size:17px">${R(j.t)}</span><br><span class="sub">${dn?R('やりとげた'):ok?R('手{て}つだえる'):R('レベル'+j.lv+'と、'+STATIONS.find(s=>s.id===j.need).nm+'の修了{しゅうりょう}が要{い}る')}</span></span>${dn?'<span class="seal">礎</span>':''}</button>`}).join('')}</div></section>
+  <button class="fuda" id="gnb"><span class="no">咸</span><span><span class="nm" style="font-size:19px">${R('現地{げんち}の巻{まき}:咸宜園跡{かんぎえんあと}を歩{ある}く')}</span><br><span class="sub">${R('日田{ひた}で、ひらいて使{つか}う見学{けんがく}ページ')}</span></span><span class="go">${R('ひらく')}</span></button>
   <ol class="road">${STATIONS.map((s,i)=>`<li class="${s.id&&S.done[s.id]?'done':''}"><button class="fuda" ${unlocked(s.id)?`data-id="${s.id}"`:'disabled'}>
     <span class="no">${NUM[i]}</span>
     <span><span class="nm">${R(s.nm)}</span><br><span class="sub">${R(s.pl)} ・ ${R(s.way)}${s.id===S.at?' <b class="ima">いまここ</b>':''}</span></span>
@@ -670,7 +675,7 @@ function viewMap(){
   <details><summary>${R('おうちの方{かた}・先生{せんせい}へ')}</summary><p>各校の学び方(素読・会読・討論・詮議など)と読んでいる文章は、当時の記録や広く知られた資料をもとにしています。画面の「史実」は記録にもとづく内容、「アプリの工夫」は遊びやすくするために加えた演出です。当時の学校の多くは武士の男子に限られていました。このアプリでは主人公の生まれを選び、各校の「入門札」で「だれが学べたか」を示しています。専門家の監修は受けていません。確認できた内容と出典は下のボタンから見られます。素読は、意味の説明より先に声に出すのが当時のやり方です。ぜひ一緒に声に出してお読みください。</p><button class="btn sub" id="srcb">出典と確認のようす</button></details>
   <details><summary>バージョン ${VER}(${VERDATE})・更新のきろく</summary>${HIST.map(h=>`<p><b>ver ${h[0]}</b> ${h[1]}<br>${h[2]}</p>`).join('')}</details>`;
   app.querySelector('#srcb').onclick=()=>{S.view='src';render();scrollTo(0,0)};
-  app.querySelector('#me').onclick=()=>{S.view='make';render()};
+  app.querySelector('#me').onclick=()=>{S.view='make';render()};app.querySelector('#gnb').onclick=()=>{S.view='genchi';render();scrollTo(0,0)};
   const ib=app.querySelector('#ibok');if(ib)ib.onclick=()=>{S.inbox=[];save();render()};
   app.querySelectorAll('[data-job]').forEach(b=>b.onclick=()=>{S.view='job';S.job=b.dataset.job;render();scrollTo(0,0)});
   app.querySelector('#pass').onclick=()=>{S.view='pass';render()};
@@ -704,6 +709,7 @@ const SRC=[
  ['古典の文','原文で確認:『論語』五十句の本文と篇(学而・為政・里仁・公冶長・雍也・述而・子罕・先進・顔淵・子路・憲問・衛霊公・季氏・陽貨・子張)/『孟子』七句(離婁上下・公孫丑上下・告子下・尽心上)/『大学』二句(礼記)','(ふりがなと読み下しは、一般的な読み方によっています。オランダ語の文と算術の問題は、はじめから「アプリの工夫」です)',[['論語(Wikisource 原文)','https://zh.wikisource.org/wiki/論語'],['孟子(Wikisource 原文)','https://zh.wikisource.org/wiki/孟子']]],
  ['学び舎の読本','日新館:什の掟(公式サイトの表記)/弘道館:『弘道館記』の本文(拓本)と読み方(茨城県教育会『愛誦集衍義』一九三九年)/昌平坂:佐藤一斎『言志四録』は後半生の四十余年にわたる語録。十四のことばは西郷隆盛が書きぬいた『南洲手抄言志録』の本文と読み下し、「少くして学べば」は『言志四録』の項による/福沢塾:『学問のすすめ』の本文(一八七二〜七六年)/閑谷学校:毎月ついたちに「朱文公学規」の講釈があり農民も聴講できた(公式サイト)。朱子の学規の原文は「白鹿洞書院学規(掲示)」として確認/松下村塾:「士規七則」の原文と読み下し、一八五五年に玉木彦助の元服の祝いに書いたこと/咸宜園:「桂林荘雑詠」四首の原文と読み下し、淡窓のはじめの塾が桂林荘であること/郷中教育:いろは歌三十六首の本文(加世田歴史館のページ。『加世田市史』による)/適塾・海軍伝習所:オランダ語から日本語に入ったことば四十語とつづり','『学問のすすめ』は明治の本で、幕末の塾で読まれたものではありません(画面にもそう書いています)/閑谷学校で読まれた「朱文公学規」の本文そのものは未確認。朱子の学規として伝わる文を使いました。読み下しは一般的な読み方です/オランダ語の四十語を、適塾や伝習所で実際に教えたかどうかは未確認。「アプリの工夫」として表示しています/いろは歌は四十七首のうち三十六首。残りは小学生むけに説明しきれないため入れていません/すべての「やさしい意味」はこのアプリで書いたもので、専門家の校閲は受けていません',[['弘道館記(Wikisource)','https://ja.wikisource.org/wiki/弘道館記'],['弘道館記 愛誦集衍義(Wikisource)','https://ja.wikisource.org/wiki/弘道館記_(愛誦集衍義)'],['南洲手抄言志録(Wikisource)','https://ja.wikisource.org/wiki/南洲手抄言志録'],['言志四録',W+'言志四録'],['学問のすゝめ(Wikisource)','https://ja.wikisource.org/wiki/学問のすゝめ'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['白鹿洞書院學規(Wikisource 原文)','https://zh.wikisource.org/wiki/白鹿洞書院學規'],['士規七則',W+'士規七則'],['広瀬淡窓',W+'広瀬淡窓'],['日新公いろは歌(加世田歴史館)','https://hantoubunka.site.kagoshima.jp/kasedainfo/irohauta2.html'],['オランダ語由来の日本語(英語版Wikipedia)','https://en.wikipedia.org/wiki/List_of_Japanese_words_of_Dutch_origin']]],
  ['学び舎の絵','弘道館:正門は本瓦葺きの四脚門。梅は設立当初から植えられた/昌平坂学問所:一七九九年の改築で、黒塗りの大きな建物に改められた/福沢塾:中津藩中屋敷の二階建ての長屋(一階は六畳一室と台所、二階は十五畳ほど)/閑谷学校:講堂は入母屋造り、しころ葺きの大屋根、火灯窓。石塀がめぐる/咸宜園:秋風庵は大きな寄棟造で茅葺き。遠思楼は二階建ての寄棟造(一八四九年)/長崎海軍伝習所:観光丸は木造の外輪船で、三本マストのスクーナー型/日新館:会津若松城の西隣にあり、水練場と天文台をそなえた/適塾:北浜の町家(もとは商家)。辞書のある部屋はあかりが消えることがなかった/松下村塾:木造かわらぶきの平屋。八畳に十畳半を増築/郷中教育:加治屋町は甲突川の下流にあり、下級武士が住んだ','こまかい色、寸法、窓や柱の数、塀のつくりは想像で描いています/昌平坂と遠思楼の屋根の材料、観光丸の煙突の位置、福沢塾から海が見えたかどうかは未確認/日新館の校舎と門のかたち、城の見え方、適塾の格子や二階の窓、松下村塾の松の木と間取りの見え方、加治屋町の家と生垣は想像です(加治屋町の当時の建物は残っていません)',[['弘道館',W+'弘道館'],['湯島聖堂',W+'湯島聖堂'],['慶應義塾',W+'慶應義塾'],['旧閑谷学校 史跡各所案内','https://shizutani.jp/appreciate/ja-map/'],['咸宜園跡(教育遺産の資料・水戸市)','https://www.city.mito.lg.jp/uploaded/attachment/1199.pdf'],['観光丸',W+'観光丸'],['日新館',W+'日新館'],['適塾(OSAKA-INFO)','https://osaka-info.jp/spot/tekijuku/'],['松下村塾',W+'松下村塾'],['加治屋町',W+'加治屋町_(鹿児島市)']]],
+ ['現地の巻(咸宜園跡)','秋風庵:一七八一年に淡窓の伯父・廣瀬月化(平八)が隠宅として建てた。開塾以前から現存する唯一の建物で、歴代塾主の居宅/遠思楼:一八四九年に淡窓の書斎として建てた二階建て寄棟造。二階は床の間も棚もなく円窓がひとつ。夜話や詩会の場。一八七四年に売却・移築、一九五三年に旧位置へ/井戸:一八一九年に掘り、翌年の梅雨に崩れ、一八二〇年十一月に使えるように。となりに釜屋と風呂。井戸屋形は二〇一〇年に復元/書蔵庫:一八九〇年十二月、蔵書の散逸を防ぐため有志が建てた。曳家で現在地へ/敷地:東西に長い約九百坪、嘉永年間に大小十五棟をこえる建物。東塾は一八二四年の茅葺二階建ての寄宿舎/閉塾までの門人は五千人をこえる(日田市)/教育研究センターの開館時間・休館日・入館料','建物の中のどこまで入れるか、見学の順路/センターの開館情報は、日田市の公式ページではなく博物館の案内サイトで確認したもの/問いと「親子で話そう」は、このアプリで作ったもの',[['咸宜園とは(日田市)','https://www.city.hita.oita.jp/site/kangien/1736.html'],['咸宜園跡(教育遺産の資料・水戸市)','https://www.city.mito.lg.jp/uploaded/attachment/1199.pdf'],['咸宜園教育研究センター(インターネットミュージアム)','https://www.museum.or.jp/museum/17936']]],
  ['旅と時代','一里塚は日本橋を起点に一里ごと/関所の通過に通行手形','旅人は一日に十里歩いた、という説明',[['一里塚',W+'一里塚'],['通行手形',W+'通行手形']]]];
 function viewSrc(){document.body.dataset.s='';
   app.innerHTML=`<button class="btn sub" id="back">← ${R('道中図{どうちゅうず}へ')}</button><section class="panel">${H('出典{しゅってん}と確認{かくにん}のようす')}
@@ -1323,13 +1329,60 @@ function bindGaku(d4,k,dn,ok){
   d4.querySelectorAll('.choice button').forEach(b=>b.onclick=()=>{if(b.dataset.k==='1'){if(!rev)S.gb[id]=n+1;S.gbDone=k;S.gbPick=0;if(!S.days[k])logDay();else save();sfx('stamp');bindGaku(d4,k,dn,ok);d4.querySelector('#gbr').innerHTML=`<p class="gbt" style="font-size:16px">${line(it)}</p>`}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}})}
 const SCHOOLS={nisshin:NISSHIN,teki:TEKI,shoka:SHOKA,kodo:KODO,shohei:SHOHEI,fuku:FUKU,shizu:SHIZU,kangi:KANGI,kaigun:KAIGUN,goju:GOJU};
 
+/* ---------- 現地の巻:咸宜園跡を歩く ---------- */
+const GN=[
+ {id:'c',n:'咸宜園教育研究{かんぎえんきょういくけんきゅう}センター',mi:'はじめにここへ。案内{あんない}の映像{えいぞう}を見{み}よう。「咸宜園入門{かんぎえんにゅうもん}ぼっくす」という体験用{たいけんよう}の教材{きょうざい}もあります。',
+  f:'咸宜園跡{かんぎえんあと}をおとずれる人{ひと}のための案内{あんない}の施設{しせつ}。淡窓{たんそう}や門下生{もんかせい}についての資料{しりょう}を展示{てんじ}しています。',
+  q:{q:'咸宜園{かんぎえん}で、毎月{まいつき}、塾生{じゅくせい}の成績{せいせき}を発表{はっぴょう}したしくみは?',o:['月旦評{げったんひょう}','素読吟味{そどくぎんみ}','会読{かいどく}'],a:0,x:'月旦評{げったんひょう}。毎月{まいつき}の成績{せいせき}で、無級{むきゅう}から九級{きゅうきゅう}まで上{あ}がっていきました。'},
+  t:'自分{じぶん}の成績{せいせき}が毎月{まいつき}みんなに知{し}らされたら、どんな気{き}もちになる?'},
+ {id:'s',n:'秋風庵{しゅうふうあん}',mi:'大{おお}きな屋根{やね}を見{み}上{あ}げよう。四方{しほう}にかたむく「寄棟造{よせむねづく}り」。',
+  f:'一七八一年{ねん}、淡窓{たんそう}の伯父{おじ}・廣瀬月化{ひろせげっか}が、隠居{いんきょ}のために建{た}てた家{いえ}。咸宜園{かんぎえん}ができる前{まえ}からのこる、ただひとつの建物{たてもの}で、のちに塾主{じゅくしゅ}の住{す}まいになりました。',
+  q:{q:'秋風庵{しゅうふうあん}が建{た}ったのは、咸宜園{かんぎえん}がこの場所{ばしょ}に開{ひら}かれた一八一七年{ねん}より、前{まえ}? あと?',o:['前{まえ}','あと'],a:0,x:'一七八一年{ねん}。咸宜園{かんぎえん}より三十六年{さんじゅうろくねん}も古{ふる}い建物{たてもの}です。'},
+  t:'家族{かぞく}の家{いえ}が、学校{がっこう}のはじまりの場所{ばしょ}になった。自分{じぶん}の家{いえ}が塾{じゅく}になったら、どの部屋{へや}を教室{きょうしつ}にする?'},
+ {id:'i',n:'井戸{いど}',mi:'井戸{いど}のまわりを見{み}てみよう。のぞきこむときは、身{み}をのり出{だ}さないで。',
+  f:'一八一九年{ねん}に掘{ほ}ったものの、次{つぎ}の年{とし}の梅雨{つゆ}に石積{いしづ}みがくずれ、掘{ほ}りなおして一八二〇年{ねん}の十一月{じゅういちがつ}に使{つか}えるようになりました。となりには炊事場{すいじば}(釜屋{かまや})とお風呂{ふろ}がありました。いまの井戸{いど}の屋根{やね}は二〇一〇年{ねん}に復元{ふくげん}したものです。',
+  q:{q:'淡窓{たんそう}の詩{し}「君{きみ}は川流{せんりゅう}を汲{く}め 我{われ}は薪{たきぎ}を拾{ひろ}わん」。「きみ」がするのは?',o:['川{かわ}で水{みず}をくむ','たきぎをひろう','本{ほん}を読{よ}む'],a:0,x:'きみは水{みず}をくみ、ぼくはたきぎをひろう。仲間{なかま}と分{わ}けあってくらすようすをうたった詩{し}です。'},
+  t:'一度{いちど}くずれた井戸{いど}を、もう一度{いちど}掘{ほ}りなおした。うまくいかなかったとき、どうする?'},
+ {id:'e',n:'遠思楼{えんしろう}',mi:'二階{にかい}の窓{まど}をさがそう。どんな形{かたち}かな。',
+  f:'一八四九年{ねん}、淡窓{たんそう}の書斎{しょさい}として建{た}てた二階建{にかいだ}て。二階{にかい}は床{とこ}の間{ま}も棚{たな}もなく、丸{まる}い窓{まど}がひとつあるだけの簡素{かんそ}な部屋{へや}。夜{よる}に塾生{じゅくせい}と語{かた}りあう「夜話{やわ}」や、詩{し}の会{かい}の場{ば}にもなりました。一度{いちど}売{う}られてよそへ移{うつ}されましたが、一九五三年{ねん}にもとの場所{ばしょ}にもどされました。',
+  q:{q:'遠思楼{えんしろう}の二階{にかい}の窓{まど}は?',o:['丸{まる}い窓{まど}がひとつ','四角{しかく}い窓{まど}がたくさん','窓{まど}はない'],a:0,x:'丸{まる}い窓{まど}がひとつだけ。かざりのない部屋{へや}で、淡窓{たんそう}は本{ほん}を読{よ}み、考{かんが}えました。'},
+  t:'かざりのない静{しず}かな部屋{へや}と、にぎやかな部屋{へや}。考{かんが}えごとをするなら、どっちがいい?'},
+ {id:'k',n:'書蔵庫{しょぞうこ}',mi:'ほかの建物{たてもの}とくらべてみよう。これは明治{めいじ}になってからの蔵{くら}です。',
+  f:'一八九〇年{ねん}の十二月{じゅうにがつ}、咸宜園{かんぎえん}がおとろえて本{ほん}がちらばってしまわないよう、志{こころざし}のある人{ひと}たちがお金{かね}を集{あつ}めて建{た}てました。はじめは別{べつ}の場所{ばしょ}にあり、建物{たてもの}ごと動{うご}かして今{いま}の場所{ばしょ}に来{き}ました。',
+  q:{q:'書蔵庫{しょぞうこ}を建{た}てたのは、なんのため?',o:['塾{じゅく}の本{ほん}を守{まも}るため','お米{こめ}をしまうため','お金{かね}をしまうため'],a:0,x:'本{ほん}を守{まも}るため。塾{じゅく}が閉{と}じたあとも、学{まな}びをのこそうとした人{ひと}たちがいました。'},
+  t:'百年後{ひゃくねんご}の人{ひと}にのこしたいものを、ひとつえらぶなら何{なに}?'},
+ {id:'h',n:'敷地{しきち}を見{み}わたす',mi:'いまは建物{たてもの}がない広{ひろ}い場所{ばしょ}も、ぐるりと見{み}わたそう。ここに塾生{じゅくせい}の寮{りょう}がならんでいたと思{おも}って。',
+  f:'東西{とうざい}に長{なが}い、およそ九百坪{きゅうひゃくつぼ}の敷地{しきち}。いちばん多{おお}いころは大小{だいしょう}十五棟{じゅうごむね}をこえる建物{たてもの}がありました。塾生{じゅくせい}の寄宿舎{きしゅくしゃ}「東塾{とうじゅく}」は一八二四年{ねん}にできた茅葺{かやぶ}きの二階建{にかいだ}て。東塾{とうじゅく}も、のちの南塾{なんじゅく}も、今{いま}はのこっていません。',
+  q:{q:'いちばん多{おお}いころ、咸宜園{かんぎえん}の建物{たてもの}はいくつあった?',o:['十五棟{じゅうごむね}をこえた','二棟{ふたむね}だけ','百棟{ひゃくむね}'],a:0,x:'十五棟{じゅうごむね}をこえる建物{たてもの}。閉塾{へいじゅく}までに五千人{ごせんにん}をこえる人{ひと}が学{まな}びました。'},
+  t:'ここで寝{ね}おきして学{まな}ぶとしたら、何{なに}がいちばん楽{たの}しみ? 何{なに}がいちばんたいへん?'}];
+function viewGenchi(){document.body.dataset.s='kangi';S.gn=S.gn||{};const g=S.gn,done=GN.filter(x=>g[x.id]).length;
+  app.innerHTML=`<div class="scene sc-kangi pic" style="margin-bottom:0">${SCN.kangi}<div class="name" style="font-size:22px;height:140px">咸宜園跡</div><div class="where">${R('現地{げんち}の巻{まき}')}</div></div>
+  <section class="panel"><h2>${R('咸宜園跡{かんぎえんあと}を歩{ある}く')}</h2>
+  <p>${R('日田{ひた}の咸宜園跡{かんぎえんあと}で、ひらいて使{つか}うページです。見{み}たところから印{しるし}をつけよう。どこから回{まわ}ってもかまいません。')}</p>
+  <p class="gnc">${GN.map(x=>`<span class="${g[x.id]?'on':''}">${g[x.id]?'咸':'・'}</span>`).join('')} ${done}/${GN.length}</p>
+  <details class="more"><summary>${R('出{で}かける前{まえ}に')}</summary><p style="font-size:14px;line-height:1.8">咸宜園教育研究センター:午前9時〜午後5時(入館は4時30分まで)、水曜休館(祝日なら翌日)、入館無料。2026年10月に博物館の案内サイトで見た情報です。出かける前に、日田市の案内で確かめてください。</p></details></section>
+  ${GN.map((x,i)=>`<section class="panel gn${g[x.id]?' ok':''}" id="gn_${x.id}"><h3>${NUM[i]} ${R(x.n)}${g[x.id]?' <b class="seal sm">咸</b>':''}</h3>
+   <p class="gnmi">${R(x.mi)}</p><p class="note">${F(x.f)}</p>
+   <p style="font-size:15px">${R(x.q.q)}</p><div class="choice">${x.q.o.map((o,j)=>`<button data-s="${x.id}" data-k="${j}">${R(o)}</button>`).join('')}</div><p class="gnx" hidden>${R('正解{せいかい}。'+x.q.x)}</p>
+   <p class="gnt"><b>${R('親子{おやこ}で話{はな}そう')}</b><br>${R(x.t)}</p>
+   <button class="btn${g[x.id]?' sub':''}" data-mark="${x.id}">${g[x.id]?R('見{み}た(もう一度{いちど}おすと消{け}せます)'):R('ここを見{み}た!')}</button></section>`).join('')}
+  <section class="panel">${H('今日{きょう}の発見{はっけん}')}<p style="font-size:14px">${R('現地{げんち}で気{き}づいたことを、ひとことのこそう。この端末{たんまつ}の中{なか}だけに保存{ほぞん}されます。')}</p>
+   <textarea id="gnm" rows="3" maxlength="200" style="width:100%;font:inherit;padding:8px;border:1.5px solid var(--fg);background:var(--bg);color:var(--fg)">${esc(g.memo||'')}</textarea>${g.day?`<p style="font-size:13px">${R('すべて見{み}た日{ひ}')}:${g.day}</p>`:''}</section>
+  <button class="btn sub" id="back">← ${R(S.me?'道中図{どうちゅうず}へ':'はじめの画面{がめん}へ')}</button>
+  <p class="note">${F('建物{たてもの}と井戸{いど}、書蔵庫{しょぞうこ}の説明{せつめい}は、日田市{ひたし}と教育遺産{きょういくいさん}の資料{しりょう}によります。')}<br>${A('問{と}いと「親子{おやこ}で話{はな}そう」は、このアプリで作{つく}ったものです。')}</p>`;
+  app.querySelectorAll('.gn .choice button').forEach(b=>b.onclick=()=>{const x=GN.find(y=>y.id===b.dataset.s),sec=b.closest('section');if(+b.dataset.k===x.q.a){sec.querySelector('.gnx').hidden=false;b.classList.add('sel');sfx('ok')}else{tok(160,.15);b.classList.remove('ng');void b.offsetWidth;b.classList.add('ng')}});
+  app.querySelectorAll('[data-mark]').forEach(b=>b.onclick=()=>{const id=b.dataset.mark;if(g[id])delete g[id];else{g[id]=1;sfx('stamp')}
+    if(GN.every(x=>g[x.id])&&!g.day){g.day=new Date().toLocaleDateString('ja-JP');if(S.me){give('g_kangi');logDay()}}save();const y=scrollY;viewGenchi();scrollTo(0,y)});
+  app.querySelector('#gnm').oninput=e=>{g.memo=e.target.value;save()};
+  app.querySelector('#back').onclick=()=>{S.view=S.me?'map':'title';if(location.hash==='#kangien')history.replaceState(null,'',location.pathname+location.search);render();scrollTo(0,0)}}
 function render(){
-  const tabs=document.getElementById('tabs'),tabbed=!!S.me&&!['title','make','op','end'].includes(S.view);tabs.hidden=!tabbed;document.body.classList.toggle('tabbed',tabbed);
+  const tabs=document.getElementById('tabs'),tabbed=!!S.me&&!['title','make','op','end','genchi'].includes(S.view);tabs.hidden=!tabbed;document.body.classList.toggle('tabbed',tabbed);
   tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(b.dataset.v==='pass')===(S.view==='pass')));
   setMood(['title','op','end','make'].includes(S.view)?'op':'main');
   if(S.view==='title')return viewTitle();
   if(S.view==='op')return slides(OP(),()=>{S.opSeen=1;save();S.view=S.me?'map':'make';render();scrollTo(0,0)});
   if(S.view==='end'&&S.me)return slides(ED(),()=>{S.endSeen=1;save();S.view='pass';render();scrollTo(0,0)});
+  if(S.view==='genchi')return viewGenchi();
   if(!S.me||S.view==='make')return viewMake();
   if(S.view==='school'){document.body.dataset.s=S.school;SCHOOLS[S.school][S.step]()}
   else if(S.view==='walk')viewWalk();
@@ -1341,6 +1394,7 @@ document.getElementById('tabs').onclick=e=>{const b=e.target.closest('button');i
   S.resume=S.view==='school'&&b.dataset.v==='pass'?{school:S.school,step:S.step}:b.dataset.v==='map'?null:S.resume;S.view=b.dataset.v;render();scrollTo(0,0)};
 /* 文章を減らす: 史実と工夫の説明は「くわしく知る」にたたむ */
 new MutationObserver(()=>{app.querySelectorAll('p.note').forEach(n=>{if(n.closest('details')||n.hidden)return;const d=document.createElement('details'),m=document.createElement('summary');d.className='more';m.innerHTML=R('くわしく知{し}る');n.replaceWith(d);d.append(m,n)})}).observe(app,{childList:true});
+if(location.hash==='#kangien')S.view='genchi';
 const start=d=>{if(d&&d.done){S.done=d.done;S.shi=d.shi||'';S.me=d.me||S.me;S.at=d.at||S.at}render()};
 window.claude?.hot?.snapshot?.(()=>({done:S.done,shi:S.shi,me:S.me,at:S.at}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
