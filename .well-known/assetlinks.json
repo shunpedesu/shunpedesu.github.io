@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "jp.shunpe.rekishirpg",
+      "sha256_cert_fingerprints": [
+        "A8:D5:B9:A3:AC:EB:7E:20:F6:37:48:35:83:B3:D1:CC:EC:7C:D5:38:BE:47:CF:D6:42:48:3E:0A:64:81:28:96",
+        "35:D6:E7:D7:9E:29:63:D0:3A:D2:42:46:AC:99:0E:A8:89:7A:A2:03:92:DF:BC:36:E0:60:C9:A4:CA:DF:A1:4C"
+      ]
+    }
+  }
+]

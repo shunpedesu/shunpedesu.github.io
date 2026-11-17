@@ -446,3 +446,93 @@ main {
   .media-list__item { grid-template-columns: 1fr; }
   .media-list__work { grid-column: 1; }
 }
+
+/* ===== Hero: publisher line ===== */
+.hero__publisher {
+  font-size: 0.82rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fafafa;
+}
+.hero__publisher strong {
+  color: var(--ink);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* ===== Publisher card (section 05) ===== */
+.publisher-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fafafa;
+}
+.publisher-card__body {
+  padding: 32px 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.publisher-card__name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.5;
+}
+.publisher-card__name-en {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin-left: 2px;
+}
+.publisher-card__desc {
+  font-size: 0.95rem;
+  color: var(--ink);
+  line-height: 1.95;
+  text-wrap: pretty;
+}
+.publisher-card__desc strong { font-weight: 700; }
+.publisher-card__info {
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 8px 18px;
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  padding: 18px 20px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+.publisher-card__info dt {
+  color: var(--muted);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.publisher-card__info dd {
+  margin: 0;
+  color: var(--ink);
+}
+.publisher-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+@media (max-width: 640px) {
+  .publisher-card__body { padding: 24px 22px 22px; }
+  .publisher-card__info { grid-template-columns: 1fr; gap: 2px 0; padding: 16px; }
+  .publisher-card__info dt { margin-top: 10px; }
+  .publisher-card__info dt:first-child { margin-top: 0; }
+}
+
+/* ===== Footer: publisher line ===== */
+.footer__publisher {
+  font-size: 0.82rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  margin: 0;
+}
